@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>Factura</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; color: #000; padding: 40px; }
+        .header { display: block; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 2px solid #000; }
+        .brand { font-size: 32px; font-weight: 900; letter-spacing: 6px; float: left; }
+        .factura-num { text-align: right; }
+        .factura-num h2 { font-size: 20px; font-weight: 700; letter-spacing: 2px; }
+        .badge { background: #000; color: #fff; padding: 12px 20px; margin-bottom: 28px; clear: both; }
+        .grid { width: 100%; margin-bottom: 28px; }
+        .grid td { width: 33%; vertical-align: top; }
+        .label { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: #999; margin-bottom: 6px; }
+        .value { font-size: 13px; font-weight: 600; }
+        table.items { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        table.items thead th { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; padding: 10px 0; border-bottom: 2px solid #000; text-align: left; }
+        table.items tbody td { padding: 14px 0; font-size: 12px; border-bottom: 1px solid #eee; }
+        .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; text-align: center; font-size: 11px; color: #999; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="brand">STATELESS</div>
+        <div class="factura-num">
+            <h2 th:text="'FACTURA #' + ${#strings.substring('000000' + venta.id, #strings.length('' + venta.id))}"></h2>
+            <p th:text="${#temporals.format(venta.created_at, 'dd/MM/yyyy HH:mm')}"></p>
+        </div>
+    </div>
+
+    <div class="badge">
+        <h3>✓ PAGO CONFIRMADO</h3>
+        <p>Tu pedido ha sido procesado correctamente.</p>
+    </div>
+
+    <table class="grid">
+        <tr>
+            <td>
+                <div class="label">Cliente</div>
+                <div class="value" th:text="${venta.usuario.name}"></div>
+                <div class="value" th:text="${venta.usuario.email}" style="font-weight: 400; color: #666;"></div>
+            </td>
+            <td>
+                <div class="label">Envío</div>
+                <div class="value" th:text="${venta.envio.direccion}"></div>
+                <div class="value" th:text="${venta.envio.ciudad}" style="font-weight: 400; color: #666;"></div>
+            </td>
+            <td>
+                <div class="label">Método de pago</div>
+                <div class="value" th:text="${#strings.capitalize(venta.metodoPago)}"></div>
+            </td>
+        </tr>
+    </table>
+
+    <table class="items">
+        <thead>
+            <tr>
+                <th>Descripción</th>
+                <th style="text-align: right;">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="padding: 14px 0;">
+                    Pedido #<span th:text="${venta.id}"></span><br/>
+                    <small style="color:#666;" th:text="${#strings.capitalize(venta.tipoVenta)}"></small>
+                </td>
+                <td style="text-align: right; font-weight: 600;" th:text="${'$' + #numbers.formatDecimal(venta.total, 1, 'COMMA', 2, 'POINT')}"></td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td style="padding-top: 20px; font-weight: 900; font-size: 18px;">TOTAL</td>
+                <td style="padding-top: 20px; text-align: right; font-weight: 900; font-size: 18px;" th:text="${'$' + #numbers.formatDecimal(venta.total, 1, 'COMMA', 2, 'POINT')}"></td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <div class="footer">
+        <p>STATELESS © 2026 — Todos los derechos reservados</p>
+    </div>
+</body>
+</html>

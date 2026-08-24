@@ -1,0 +1,63 @@
+<div th:replace="~{layouts/admin-layout :: layout(content=~{::section})}">
+<section>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+        <h2 style="font-family:'Bebas Neue'; font-size:32px; letter-spacing:3px;">Reporte de Ventas</h2>
+        <div style="display:flex; gap:10px;">
+            <!-- Botón de Excel -->
+            <a th:href="@{/admin/reportes/ventas/excel(desde=${desde}, hasta=${hasta})}" class="btn-sl-outline">📥 Exportar Excel</a>
+            <a th:href="@{/admin/reportes}" class="btn-sl-outline">← Volver</a>
+        </div>
+    </div>
+
+    <!-- FILTRO FECHAS (Exacto a tu Blade) -->
+    <form method="GET" th:action="@{/admin/reportes/ventas}" style="background:#fff; border:1px solid #eee; padding:20px; margin-bottom:24px; display:flex; gap:16px; align-items:flex-end;">
+        <div>
+            <label class="sl-label">Desde</label>
+            <input type="date" name="desde" class="sl-input" th:value="${desde}">
+        </div>
+        <div>
+            <label class="sl-label">Hasta</label>
+            <input type="date" name="hasta" class="sl-input" th:value="${hasta}">
+        </div>
+        <button type="submit" class="btn-sl">Filtrar</button>
+    </form>
+
+    <!-- STATS CARDS -->
+    <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:20px; margin-bottom:32px;">
+        <div class="stat-card">
+            <div class="stat-label">Total Ventas</div>
+            <div class="stat-value" th:text="${'$' + #numbers.formatDecimal(totalVentas, 0, 'POINT', 0, 'COMMA')}"></div>
+        </div>
+        <div class="stat-card"><div class="stat-label">Total Pedidos</div><div class="stat-value" th:text="${totalPedidos}"></div></div>
+        <div class="stat-card"><div class="stat-label">Ventas Físicas</div><div class="stat-value" th:text="${'$' + ventasFisicas}"></div></div>
+        <div class="stat-card"><div class="stat-label">Ventas Online</div><div class="stat-value" th:text="${'$' + ventasOnline}"></div></div>
+    </div>
+
+    <!-- DETALLE DE VENTAS -->
+    <div style="background:#fff; border:1px solid #eee; padding:24px;">
+        <p style="font-size:11px; letter-spacing:2px; text-transform:uppercase; opacity:0.4; margin-bottom:16px;">Detalle del Periodo</p>
+        <table class="stateless-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Cliente</th>
+                    <th>Tipo</th>
+                    <th>Método</th>
+                    <th>Total</th>
+                    <th>Fecha</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="v : ${ventas}">
+                    <td th:text="'#' + ${v.id}"></td>
+                    <td th:text="${v.usuario.name}"></td>
+                    <td th:text="${#strings.capitalize(v.tipoVenta)}"></td>
+                    <td th:text="${#strings.capitalize(v.metodoPago)}"></td>
+                    <td th:text="${'$' + v.total}"></td>
+                    <td th:text="${#temporals.format(v.created_at, 'dd/MM/yyyy')}"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+</div>

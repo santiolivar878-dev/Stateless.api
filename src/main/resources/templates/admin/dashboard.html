@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/admin-layout :: layout(content=~{::section})}">
+<body>
+<section>
+    <!-- STATS CARDS -->
+    <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:20px; margin-bottom:32px;">
+        <div class="stat-card">
+            <div class="stat-label">Ventas Totales</div>
+            <div class="stat-value" th:text="${'$' + #numbers.formatDecimal(totalVentas, 0, 'POINT', 0, 'COMMA')}"></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Total Pedidos</div>
+            <div class="stat-value" th:text="${totalPedidos}"></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Clientes</div>
+            <div class="stat-value" th:text="${totalClientes}"></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Productos</div>
+            <div class="stat-value" th:text="${totalProductos}"></div>
+        </div>
+    </div>
+
+    <!-- ALERTAS -->
+    <div style="display:flex; gap:16px; margin-bottom:32px;">
+        <div th:if="${stockBajo > 0}" style="background:#fff3cd; border:1px solid #ffc107; padding:16px 20px; flex:1;">
+            <p style="font-size:11px; letter-spacing:2px; text-transform:uppercase; font-weight:600;">⚠️ Stock Bajo</p>
+            <p style="font-size:13px; margin-top:4px;" th:text="${stockBajo + ' producto(s) con stock bajo o agotado'}"></p>
+        </div>
+        <div th:if="${enviosPendientes > 0}" style="background:#e8f4fd; border:1px solid #0066cc; padding:16px 20px; flex:1;">
+            <p style="font-size:11px; letter-spacing:2px; text-transform:uppercase; font-weight:600;">📦 Envíos Pendientes</p>
+            <p style="font-size:13px; margin-top:4px;" th:text="${enviosPendientes + ' envío(s) pendientes de despachar'}"></p>
+        </div>
+    </div>
+
+    <!-- GRÁFICAS -->
+    <div style="display:grid; grid-template-columns:2fr 1fr; gap:24px; margin-bottom:32px;">
+        <div style="background:#fff; border:1px solid #eee; padding:24px;">
+            <p style="font-size:11px; letter-spacing:2px; text-transform:uppercase; opacity:0.4; margin-bottom:16px;">Ventas último mes</p>
+            <canvas id="graficaVentas" height="120"></canvas>
+        </div>
+        <div style="background:#fff; border:1px solid #eee; padding:24px;">
+            <p style="font-size:11px; letter-spacing:2px; text-transform:uppercase; opacity:0.4; margin-bottom:16px;">Métodos de pago</p>
+            <canvas id="graficaMetodos" height="200"></canvas>
+        </div>
+    </div>
+
+    <!-- TABLAS RECIENTES -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+        <!-- Ventas Recientes -->
+        <div style="background:#fff; border:1px solid #eee; padding:24px;">
+            <p style="font-size:11px; letter-spacing:2px; text-transform:uppercase; opacity:0.4; margin-bottom:16px;">Ventas Recientes</p>
+            <table style="width:100%; border-collapse:collapse;">
+                <thead>
+                    <tr style="border-bottom:2px solid #000;">
+                        <th style="text-align:left; font-size:10px;">Cliente</th>
+                        <th style="text-align:right; font-size:10px;">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="venta : ${ventasRecientes}" style="border-bottom:1px solid #f0f0f0;">
+                        <td style="padding:10px 0; font-size:12px;" th:text="${venta.usuario.name}"></td>
+                        <td style="padding:10px 0; font-size:12px; text-align:right;" th:text="${'$' + venta.total}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- SCRIPTS PARA CHART.JS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script th:inline="javascript">
+        // Ventas por día
+        new Chart(document.getElementById('graficaVentas'), {
+            type: 'bar',
+            data: {
+                labels: [[${labelsDias}]],
+                datasets: [{
+                    label: 'Ventas COP',
+                    data: [[${ventasPorDia}]],
+                    backgroundColor: '#000'
+                }]
+            },
+            options: { responsive: true, plugins: { legend: { display: false } } }
+        });
+
+        // Métodos de pago
+        const metodosData = [[${ventasPorMetodo}]];
+        new Chart(document.getElementById('graficaMetodos'), {
+            type: 'doughnut',
+            data: {
+                labels: metodosData.map(m => m[0]),
+                datasets: [{
+                    data: metodosData.map(m => m[1]),
+                    backgroundColor: ['#9b9b9b', '#656565', '#333333', '#000000']
+                }]
+            },
+            options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+        });
+    </script>
+</section>
+</body>
+</html>

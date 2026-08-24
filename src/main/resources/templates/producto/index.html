@@ -1,0 +1,49 @@
+<div th:replace="~{layouts/admin-layout :: layout(content=~{::section})}">
+<section>
+    <div th:if="${success}" class="alert-success-sl" th:text="${success}"></div>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+        <h2 style="font-family:'Bebas Neue'; font-size:32px; letter-spacing:3px;">Lista de Productos</h2>
+        <a th:href="@{/admin/productos/create}" class="btn-sl">+ Registrar</a>
+    </div>
+
+    <!-- FILTROS -->
+    <div style="display:flex; gap:12px; margin-bottom:24px;">
+        <a th:href="@{/admin/productos}" class="btn-sl-outline">Todos</a>
+        <a th:href="@{/admin/productos(filtro='stock_bajo')}" class="btn-sl-outline">Stock Bajo</a>
+        <a th:href="@{/admin/productos(filtro='activo')}" class="btn-sl-outline">Activos</a>
+    </div>
+
+    <table class="stateless-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Imagen</th>
+                <th>Nombre</th>
+                <th>Precio</th>
+                <th>Estado</th>
+                <th>Stock</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="p : ${productos}">
+                <td th:text="${p.id}"></td>
+                <td>
+                    <img th:if="${p.imagen}" th:src="@{'/images/' + ${p.imagen}}" style="width:50px; height:60px; object-fit:cover;">
+                </td>
+                <td th:text="${p.nombre}"></td>
+                <td th:text="${'$' + p.precio}"></td>
+                <td th:text="${#strings.capitalize(p.estado)}"></td>
+                <td th:text="${p.stockActual}" th:style="${p.stockActual <= p.stockMinimo ? 'color:#c00; font-weight:600' : ''}"></td>
+                <td style="display:flex; gap:8px;">
+                    <a th:href="@{'/admin/productos/edit/' + ${p.id}}" class="btn-sl-outline">Editar</a>
+                    <form th:action="@{'/admin/productos/delete/' + ${p.id}}" method="POST" onsubmit="return confirm('¿Eliminar?')">
+                        <button type="submit" class="btn-sl-danger">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+</div>

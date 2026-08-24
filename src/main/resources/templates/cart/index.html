@@ -1,0 +1,55 @@
+<div th:replace="~{layouts/app-layout :: layout(content=~{::section})}">
+<section style="padding: 60px; max-width: 1000px; margin: 0 auto;">
+    <h1 style="font-family:'Bebas Neue', sans-serif; font-size:48px; letter-spacing:4px; margin-bottom:8px;">MI CARRITO</h1>
+    <p style="font-size:13px; opacity:0.5; letter-spacing:1px; margin-bottom:40px;" 
+       th:text="${carrito.items.size() + ' producto(s)'}"></p>
+
+    <!-- Alertas -->
+    <div th:if="${success}" th:text="${success}" style="background:#000; color:#fff; padding:12px 20px; font-size:12px; margin-bottom:24px;"></div>
+    <div th:if="${error}" th:text="${error}" style="background:#c00; color:#fff; padding:12px 20px; font-size:12px; margin-bottom:24px;"></div>
+
+    <div th:if="${not #lists.isEmpty(carrito.items)}">
+        <div style="border-top: 2px solid #000;">
+            <div th:each="item : ${carrito.items}" style="display:flex; align-items:center; gap:24px; padding:24px 0; border-bottom:1px solid #eee;">
+                
+                <img th:src="@{'/images/' + ${item.producto.imagen}}" style="width:100px; height:120px; object-fit:cover;">
+
+                <div style="flex:1;">
+                    <p style="font-family:'Bebas Neue', sans-serif; font-size:20px;" th:text="${item.producto.nombre}"></p>
+                    <p th:text="${'$' + item.precioUnitario}" style="font-size:14px; font-weight:600;"></p>
+                </div>
+
+                <!-- Formulario Cantidad -->
+                <form th:action="@{'/carrito/actualizar/' + ${item.id}}" method="POST" style="display:flex; align-items:center; gap:8px;">
+                    <input type="number" name="cantidad" th:value="${item.cantidad}" min="1" 
+                           style="width:70px; text-align:center; border:1px solid #ddd; padding:6px;"
+                           onchange="this.form.submit()">
+                </form>
+
+                <div style="text-align:right; min-width:100px;">
+                    <p style="font-family:'Bebas Neue', sans-serif; font-size:20px;" 
+                       th:text="${'$' + #numbers.formatDecimal(item.subtotal, 0, 'COMMA', 2, 'POINT')}"></p>
+                </div>
+
+                <form th:action="@{'/carrito/eliminar/' + ${item.id}}" method="POST">
+                    <button type="submit" style="background:none; border:none; cursor:pointer; opacity:0.3;">✕</button>
+                </form>
+            </div>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; padding:32px 0;">
+            <div style="text-align:right;">
+                <p style="font-size:12px; opacity:0.5;">Total</p>
+                <p style="font-family:'Bebas Neue', sans-serif; font-size:40px;" 
+                   th:text="${'$' + #numbers.formatDecimal(carrito.total, 0, 'COMMA', 2, 'POINT')}"></p>
+                <a th:href="@{/checkout}" class="btn-stateless" style="margin-top:16px; display:inline-block; text-decoration:none; padding:15px 30px; background:#000; color:#fff;">Proceder al pago</a>
+            </div>
+        </div>
+    </div>
+
+    <div th:unless="${not #lists.isEmpty(carrito.items)}" style="text-align:center; padding:80px 0;">
+        <p style="opacity:0.2; font-size:32px; font-family:'Bebas Neue';">TU CARRITO ESTÁ VACÍO</p>
+        <a th:href="@{/}" class="btn-stateless" style="margin-top:24px; display:inline-block; text-decoration:none; padding:15px 30px; border:1px solid #000; color:#000;">Ver productos</a>
+    </div>
+</section>
+</div>

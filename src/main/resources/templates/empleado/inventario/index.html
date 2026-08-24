@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/admin-layout :: layout(content=~{::section})}">
+<body>
+<section>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+        <h2 style="font-family:'Bebas Neue', sans-serif; font-size:32px; letter-spacing:3px;">Control de Inventario</h2>
+        
+        <!-- Filtro por Categoría -->
+        <form method="GET" th:action="@{/empleado/inventario}" style="display:flex; gap:10px;">
+            <select name="categoriaId" class="sl-input" onchange="this.form.submit()" style="width:200px;">
+                <option value="">Todas las categorías</option>
+                <option th:each="c : ${categorias}" 
+                        th:value="${c.id}" 
+                        th:text="${c.nombre}"
+                        th:selected="${c.id == categoriaSeleccionada}"></option>
+            </select>
+        </form>
+    </div>
+
+    <div th:if="${success}" class="alert-success-sl" th:text="${success}"></div>
+
+    <table class="stateless-table">
+        <thead>
+            <tr>
+                <th>Ref</th>
+                <th>Producto</th>
+                <th>Estado Stock</th>
+                <th>Mínimo</th>
+                <th>Stock Actual</th>
+                <th>Acción Rápida</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="p : ${productos}">
+                <td th:text="${p.id}" style="opacity:0.5;"></td>
+                <td>
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <img th:if="${p.imagen}" th:src="@{'/images/' + ${p.imagen}}" style="width:40px; height:50px; object-fit:cover;">
+                        <div>
+                            <p th:text="${p.nombre}" style="font-weight:600; margin:0;"></p>
+                            <p th:text="${p.categoria.nombre}" style="font-size:10px; opacity:0.5; margin:0; text-transform:uppercase;"></p>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <!-- Badge de alerta de stock (Lógica Laravel replicada) -->
+                    <span th:if="${p.stockActual == 0}" style="background:#c00; color:#fff; padding:2px 8px; font-size:10px;">AGOTADO</span>
+                    <span th:if="${p.stockActual > 0 && p.stockActual <= p.stockMinimo}" style="background:#f90; color:#000; padding:2px 8px; font-size:10px;">STOCK BAJO</span>
+                    <span th:if="${p.stockActual > p.stockMinimo}" style="background:green; color:#fff; padding:2px 8px; font-size:10px;">DISPONIBLE</span>
+                </td>
+                <td th:text="${p.stockMinimo}"></td>
+                <td th:text="${p.stockActual}" th:style="${p.stockActual <= p.stockMinimo ? 'color:#c00; font-weight:700;' : ''}"></td>
+                <td>
+                    <!-- Formulario de actualización rápida -->
+                    <form th:action="@{'/empleado/inventario/update-stock/' + ${p.id}}" method="POST" style="display:flex; gap:5px;">
+                        <input type="number" name="cantidad" th:value="${p.stockActual}" min="0" 
+                               style="width:60px; padding:4px; border:1px solid #ddd; font-size:12px;">
+                        <button type="submit" class="btn-sl" style="padding:4px 10px; font-size:10px;">Actualizar</button>
+                    </form>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+</body>
+</html>

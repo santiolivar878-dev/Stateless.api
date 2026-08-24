@@ -1,0 +1,44 @@
+<div th:replace="~{layouts/admin-layout :: layout(content=~{::section})}">
+<section>
+    <h2 style="font-family:'Bebas Neue'; font-size:32px; margin-bottom:24px;">Registrar Producto</h2>
+    
+    <div style="background:#fff; border:1px solid #eee; padding:32px; max-width:600px;">
+        <form th:action="@{/admin/productos/store}" method="POST" enctype="multipart/form-data">
+            <div class="sl-form-group">
+                <label class="sl-label">Nombre</label>
+                <input type="text" name="nombre" class="sl-input" required>
+            </div>
+            
+            <div class="sl-form-group">
+                <label class="sl-label">Imagen</label>
+                <select name="imagen" class="sl-input">
+                    <option value="">— Seleccionar existente —</option>
+                    <option th:each="img : ${imagenes}" th:value="${img}" th:text="${img}"></option>
+                </select>
+                <label class="sl-label" style="margin-top:10px;">O subir nueva</label>
+                <input type="file" name="imagen_nueva" class="sl-input">
+            </div>
+
+            <div class="sl-form-group">
+                <label class="sl-label">Precio</label>
+                <input type="number" step="0.01" name="precio" class="sl-input" required>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+                <div class="sl-form-group">
+                    <label class="sl-label">Stock Actual</label>
+                    <input type="number" name="stockActual" class="sl-input" required>
+                </div>
+                <div class="sl-form-group">
+                    <label class="sl-label">Categoría</label>
+                    <select name="categoria.id" class="sl-input" required>
+                        <option th:each="c : ${categorias}" th:value="${c.id}" th:text="${c.nombre}"></option>
+                    </select>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-sl">Registrar Producto</button>
+        </form>
+    </div>
+</section>
+</div>

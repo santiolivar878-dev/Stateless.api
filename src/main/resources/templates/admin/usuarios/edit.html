@@ -1,0 +1,39 @@
+<div th:replace="~{layouts/admin-layout :: layout(content=~{::section})}">
+<section>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+        <h2 style="font-family:'Bebas Neue'; font-size:32px; letter-spacing:3px;">Editar Usuario</h2>
+        <a th:href="@{/admin/usuarios}" class="btn-sl-outline">← Volver</a>
+    </div>
+
+    <div style="background:#fff; border:1px solid #eee; padding:32px; max-width:600px;">
+        <form th:action="@{'/admin/usuarios/update/' + ${user.id}}" method="POST">
+            <div class="sl-form-group">
+                <label class="sl-label">Nombre</label>
+                <input type="text" name="name" class="sl-input" th:value="${user.name}" required>
+            </div>
+            <div class="sl-form-group">
+                <label class="sl-label">Email</label>
+                <input type="email" name="email" class="sl-input" th:value="${user.email}" required>
+            </div>
+            <div class="sl-form-group">
+                <label class="sl-label">Nueva Contraseña <small style="opacity:0.5; font-size:10px;">(dejar en blanco para no cambiar)</small></label>
+                <input type="password" name="newPassword" class="sl-input">
+            </div>
+            <div class="sl-form-group">
+                <label class="sl-label">Rol</label>
+                <select name="role.id" class="sl-input" required>
+                    <option th:each="r : ${roles}" th:value="${r.id}" th:text="${#strings.capitalize(r.name)}" th:selected="${r.id == user.role.id}"></option>
+                </select>
+            </div>
+            <div class="sl-form-group">
+                <label class="sl-label">Estado</label>
+                <select name="estado" class="sl-input">
+                    <option value="activo" th:selected="${user.estado == 'activo'}">Activo</option>
+                    <option value="inactivo" th:selected="${user.estado == 'inactivo'}">Inactivo</option>
+                </select>
+            </div>
+            <button type="submit" class="btn-sl">Actualizar Usuario</button>
+        </form>
+    </div>
+</section>
+</div>

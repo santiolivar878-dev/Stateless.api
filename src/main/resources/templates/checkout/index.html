@@ -1,0 +1,88 @@
+<div th:replace="~{layouts/app-layout :: layout(content=~{::section})}">
+<section style="padding: 60px; max-width: 1000px; margin: 0 auto;">
+    <h1 style="font-family:'Bebas Neue', sans-serif; font-size:48px; letter-spacing:4px; margin-bottom:8px;">CHECKOUT</h1>
+    <p style="font-size:13px; opacity:0.5; margin-bottom:40px;">Completa tu pedido</p>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:60px;">
+        <!-- FORMULARIO -->
+        <div>
+            <h2 style="font-family:'Bebas Neue', sans-serif; font-size:24px; margin-bottom:24px;">DATOS DE ENVÍO</h2>
+            <form id="checkout-form">
+                <div style="margin-bottom:20px;">
+                    <label class="sl-label">Dirección</label>
+                    <input type="text" id="direccion" name="direccion" class="sl-input" required>
+                </div>
+                <div style="margin-bottom:20px;">
+                    <label class="sl-label">Ciudad</label>
+                    <input type="text" id="ciudad" name="ciudad" class="sl-input" required>
+                </div>
+
+                <h2 style="font-family:'Bebas Neue', sans-serif; font-size:24px; margin-top:32px; margin-bottom:24px;">MÉTODO DE PAGO</h2>
+                
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:24px;">
+                    <label id="opt-tarjeta" onclick="seleccionarMetodo('tarjeta')" style="border:2px solid #000; padding:16px; cursor:pointer; text-align:center;">
+                        <p>💳 Tarjeta</p>
+                    </label>
+                    <label id="opt-efecty" onclick="seleccionarMetodo('efecty')" style="border:1px solid #ddd; padding:16px; cursor:pointer; text-align:center;">
+                        <p>💵 Efecty</p>
+                    </label>
+                </div>
+
+                <button type="submit" id="submit-btn" class="btn-stateless" style="width:100%; padding:16px;">
+                    Pagar <span th:text="${'$' + #numbers.formatDecimal(carrito.total, 0, 'COMMA', 2, 'POINT')}"></span>
+                </button>
+            </form>
+        </div>
+
+        <!-- RESUMEN (Derecha) -->
+        <div>
+            <h2 style="font-family:'Bebas Neue', sans-serif; font-size:24px; margin-bottom:24px;">RESUMEN</h2>
+            <div th:each="item : ${carrito.items}" style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid #eee;">
+                <div>
+                    <p th:text="${item.producto.nombre}" style="font-size:13px; font-weight:600;"></p>
+                    <p th:text="${'Cantidad: ' + item.cantidad}" style="font-size:12px; opacity:0.5;"></p>
+                </div>
+                <p th:text="${'$' + item.subtotal}" style="font-size:13px; font-weight:600;"></p>
+            </div>
+            <div style="display:flex; justify-content:space-between; padding:20px 0; border-top:2px solid #000; margin-top:8px;">
+                <p style="font-family:'Bebas Neue', sans-serif; font-size:20px;">TOTAL</p>
+                <p th:text="${'$' + #numbers.formatDecimal(carrito.total, 0, 'COMMA', 2, 'POINT')}" style="font-family:'Bebas Neue', sans-serif; font-size:20px;"></p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script th:inline="javascript">
+    let metodoSeleccionado = 'tarjeta';
+
+    function seleccionarMetodo(metodo) {
+        metodoSeleccionado = metodo;
+        document.getElementById('opt-tarjeta').style.border = metodo === 'tarjeta' ? '2px solid #000' : '1px solid #ddd';
+        document.getElementById('opt-efecty').style.border = metodo === 'efecty' ? '2px solid #000' : '1px solid #ddd';
+    }
+
+    document.getElementById('checkout-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const btn = document.getElementById('submit-btn');
+        btn.disabled = true;
+        btn.textContent = 'Procesando...';
+
+        const response = await fetch('/checkout/procesar', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content
+            },
+            body: JSON.stringify({
+                direccion: document.getElementById('direccion').value,
+                ciudad: document.getElementById('ciudad').value,
+                metodo_pago: metodoSeleccionado
+            })
+        });
+
+        const data = await response.json();
+        if (data.redirect) window.location.href = data.redirect;
+    });
+</script>
+</div>

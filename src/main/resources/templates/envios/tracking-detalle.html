@@ -1,0 +1,49 @@
+<div th:replace="~{layouts/app-layout :: layout(content=~{::section})}">
+<section style="padding: 80px 60px; max-width: 800px; margin: 0 auto;">
+    
+    <a th:href="@{/account/pedidos}" style="font-size:12px; opacity:0.5; text-decoration:none;">← Volver</a>
+
+    <h1 style="font-family:'Bebas Neue'; font-size:40px; letter-spacing:3px; margin:16px 0 8px;"
+        th:text="'PEDIDO #' + ${#strings.substring('000000' + venta.id, #strings.length('' + venta.id))}"></h1>
+    
+    <p style="font-size:13px; opacity:0.5; margin-bottom:48px;" 
+       th:text="${envio.direccion + ', ' + envio.ciudad}"></p>
+
+    <!-- LISTA DE PASOS (Timeline) -->
+    <div style="display:flex; flex-direction:column;">
+        
+        <!-- Paso 1: Confirmado -->
+        <div th:with="completado=${envio.pasoActual >= 2}" style="display:flex; gap:16px; align-items:flex-start;">
+            <div style="display:flex; flex-direction:column; align-items:center;">
+                <div th:style="'width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:1px solid #000; font-size:14px; ' + 
+                     (${completado} ? 'background:#000; color:#fff;' : 'background:#fff; color:#000;')">
+                    <span th:text="${completado ? '✓' : '1'}"></span>
+                </div>
+                <div th:style="'width:2px; height:40px; ' + (${envio.pasoActual >= 3} ? 'background:#000;' : 'background:#eee;')"></div>
+            </div>
+            <div>
+                <p th:style="'font-family:Bebas Neue; font-size:18px; letter-spacing:1px; ' + (${completado} ? 'opacity:1;' : 'opacity:0.3;')">Pedido Confirmado</p>
+                <p th:if="${envio.fecha_confirmado}" th:text="${#temporals.format(envio.fecha_confirmado, 'dd MMM yyyy, hh:mm a')}" style="font-size:11px; opacity:0.4;"></p>
+            </div>
+        </div>
+
+        <!-- Paso 2: Preparando (Repetir lógica para en_curso y entregado) -->
+        <div th:with="completado=${envio.pasoActual >= 3}" style="display:flex; gap:16px; align-items:flex-start;">
+            <div style="display:flex; flex-direction:column; align-items:center;">
+                <div th:style="'width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:1px solid #000; font-size:14px; ' + 
+                     (${completado} ? 'background:#000; color:#fff;' : 'background:#fff; color:#000;')">
+                    <span th:text="${completado ? '✓' : '2'}"></span>
+                </div>
+                <div th:style="'width:2px; height:40px; ' + (${envio.pasoActual >= 4} ? 'background:#000;' : 'background:#eee;')"></div>
+            </div>
+            <div>
+                <p th:style="'font-family:Bebas Neue; font-size:18px; letter-spacing:1px; ' + (${completado} ? 'opacity:1;' : 'opacity:0.3;')">Preparando pedido</p>
+                <p th:if="${envio.fecha_preparando}" th:text="${#temporals.format(envio.fecha_preparando, 'dd MMM yyyy, hh:mm a')}" style="font-size:11px; opacity:0.4;"></p>
+            </div>
+        </div>
+
+        <!-- ... (Repetir para En camino y Entregado) ... -->
+
+    </div>
+</section>
+</div>

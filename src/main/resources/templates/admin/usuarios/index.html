@@ -1,0 +1,46 @@
+<div th:replace="~{layouts/admin-layout :: layout(content=~{::section})}">
+<section>
+    <div th:if="${success}" class="alert-success-sl" th:text="${success}"></div>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+        <h2 style="font-family:'Bebas Neue'; font-size:32px; letter-spacing:3px;">Lista de Usuarios</h2>
+        <a th:href="@{/admin/usuarios/create}" class="btn-sl">+ Registrar</a>
+    </div>
+
+    <!-- TABLA -->
+    <table class="stateless-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Email</th>
+                <th>Rol</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="u : ${users}">
+                <td th:text="${u.id}"></td>
+                <td th:text="${u.name}"></td>
+                <td th:text="${u.email}"></td>
+                <td th:text="${#strings.capitalize(u.role.name)}"></td>
+                <td>
+                    <span th:if="${u.estado == 'activo'}" style="background:green; color:#fff; padding:2px 8px; font-size:10px;">ACTIVO</span>
+                    <span th:unless="${u.estado == 'activo'}" style="background:#c00; color:#fff; padding:2px 8px; font-size:10px;">INACTIVO</span>
+                </td>
+                <td style="display:flex; gap:8px;">
+                    <a th:href="@{'/admin/usuarios/edit/' + ${u.id}}" class="btn-sl-outline">Editar</a>
+                    <form th:action="@{'/admin/usuarios/toggle-status/' + ${u.id}}" method="POST">
+                        <button type="submit" 
+                                th:class="${u.estado == 'activo' ? 'btn-sl-danger' : 'btn-sl'}"
+                                th:text="${u.estado == 'activo' ? 'Inhabilitar' : 'Habilitar'}"
+                                th:onclick="return confirm('¿Cambiar estado del usuario?')">
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+</div>
