@@ -8,48 +8,46 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
-import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
-    @Autowired private UserRepository userRepository;
-    @Autowired private RoleRepository roleRepository;
-    @Autowired private PasswordEncoder passwordEncoder;
+    @Autowired 
+    private UserRepository userRepository;
+
+    @Autowired 
+    private RoleRepository roleRepository;
+
+    @Autowired 
+    private PasswordEncoder passwordEncoder;
 
     @Override
-    public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+    public OAuth2User loadUser(OAuth2UserRequest userRequest) {
+        // Cargar el usuario desde Google
         OAuth2User oauth2User = super.loadUser(userRequest);
         
         String email = oauth2User.getAttribute("email");
         String name = oauth2User.getAttribute("name");
 
-        User user = userRepository.findByEmail(email).orElseGet(() -> {
-            // Lógica de creación (equivalente a User::create en GoogleController)
+        // Buscar en la BD o crear uno nuevo (Equivalencia a GoogleController.php)
+        return userRepository.findByEmail(email).orElseGet(() -> {
             User newUser = new User();
             newUser.setName(name);
             newUser.setEmail(email);
-            newUser.setPassword(passwordEncoder.encode(UUID.randomUUID().toString())); // Password aleatorio
+            newUser.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
             newUser.setEstado("activo");
-            newUser.setEmail_verified(true);
-            newUser.setEmail_verified_at(LocalDateTime.now());
+            newUser.setEmailVerified(true);
+            newUser.setEmailTokenExpiresAt(LocalDateTime.now());
             
-            Role clienteRole = roleRepository.findByName("cliente").orElseThrow();
+            // Asignar rol cliente
+            Role clienteRole = roleRepository.findByName("cliente").orElse(null);
             newUser.setRole(clienteRole);
             
             return userRepository.save(newUser);
         });
-
-        // Verificación de estado inactivo (equivalente a tu validación en Laravel)
-        if ("inactivo".equals(user.getEstado())) {
-            throw new OAuth2AuthenticationException("Tu cuenta está deshabilitada.");
-        }
-
-        return user; // La entidad User ya implementa UserDetails/OAuth2User
     }
 }

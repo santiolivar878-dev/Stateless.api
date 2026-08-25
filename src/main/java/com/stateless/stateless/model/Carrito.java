@@ -1,14 +1,11 @@
 package com.stateless.stateless.model;
 
 import jakarta.persistence.*;
-import lombok.*;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "carritos")
-@Getter @Setter @NoArgsConstructor
 public class Carrito {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,10 +18,17 @@ public class Carrito {
     @OneToMany(mappedBy = "carrito", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CarritoItem> items = new ArrayList<>();
 
-    // Equivalente al método total() en el modelo Carrito.php de Laravel
-    public BigDecimal getTotal() {
+    public Carrito() {}
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
+    public List<CarritoItem> getItems() { return items; }
+    public void setItems(List<CarritoItem> items) { this.items = items; }
+    
+    public java.math.BigDecimal getTotal() {
         return items.stream()
-                .map(CarritoItem::getSubtotal)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+            .map(CarritoItem::getSubtotal)
+            .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
     }
 }

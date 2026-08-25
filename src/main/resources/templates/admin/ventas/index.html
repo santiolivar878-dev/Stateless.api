@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/admin-layout :: layout(content=~{::section})}">
+<body>
+<section>
+    <h2 style="font-family:'Bebas Neue'; font-size:32px; margin-bottom:24px;">Pedidos</h2>
+    
+    <div style="background:#fff; border:1px solid #eee; padding:24px; margin-bottom:24px;">
+        <p>Total en Ventas: <strong th:text="${'$' + totalGeneral}"></strong></p>
+    </div>
+
+    <table class="stateless-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Cliente</th>
+                <th>Total</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="v : ${ventas}">
+                <td th:text="${'#' + v.id}"></td>
+                <td th:text="${v.usuario.name}"></td>
+                <td th:text="${'$' + v.total}"></td>
+                <td th:text="${#strings.toUpperCase(v.estado)}"></td>
+                <td>
+                    <a th:href="@{'/admin/ventas/' + ${v.id}}" class="btn-sl-outline">Detalle</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+</body>
+</html>

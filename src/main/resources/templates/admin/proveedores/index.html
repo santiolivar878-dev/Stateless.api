@@ -1,0 +1,40 @@
+<div th:replace="~{layouts/admin-layout :: layout(content=~{::section})}">
+<section>
+    <div th:if="${success}" class="alert-success-sl" th:text="${success}"></div>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+        <h2 style="font-family:'Bebas Neue'; font-size:32px; letter-spacing:3px;">Lista de Proveedores</h2>
+        <a th:href="@{/admin/proveedores/create}" class="btn-sl">+ Registrar</a>
+    </div>
+
+    <table class="stateless-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Teléfono</th>
+                <th>Correo</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="prov : ${proveedores}">
+                <td th:text="${prov.id}"></td>
+                <td th:text="${prov.nombre}"></td>
+                <td th:text="${prov.telefono}"></td>
+                <td th:text="${prov.correo}"></td>
+                <td>
+                    <span th:text="${prov.estado ? 'ACTIVO' : 'INACTIVO'}" 
+                          th:style="'padding:2px 8px; font-size:10px; color:#fff; background:' + (${prov.estado} ? 'green' : '#c00')"></span>
+                </td>
+                <td style="display:flex; gap:8px;">
+                    <a th:href="@{'/admin/proveedores/edit/' + ${prov.id}}" class="btn-sl-outline">Editar</a>
+                    <form th:action="@{'/admin/proveedores/delete/' + ${prov.id}}" method="POST" onsubmit="return confirm('¿Eliminar?')">
+                        <button type="submit" class="btn-sl-danger">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+</div>

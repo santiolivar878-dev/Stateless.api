@@ -9,19 +9,19 @@
             <div id="producto-carousel" style="display:flex; transition:transform 0.4s ease;">
                 <!-- Imagen principal -->
                 <div style="min-width:100%; flex-shrink:0;">
-                    <img th:src="@{'/images/' + ${producto.imagen}}"
+                    <img th:src="${producto.imagen}"
                          style="width:100%; height:600px; object-fit:cover; display:block;">
                 </div>
                 <!-- Imágenes adicionales -->
                 <div th:each="img : ${producto.imagenes}" style="min-width:100%; flex-shrink:0;">
-                    <img th:src="@{'/images/' + ${img.imagen}}"
+                    <img th:src="${img.imagen}"
                          style="width:100%; height:600px; object-fit:cover; display:block;">
                 </div>
             </div>
             <!-- Controles (Solo si hay más imágenes) -->
             <div th:if="${not #lists.isEmpty(producto.imagenes)}">
-                <button onclick="moverProducto(-1)" style="position:absolute; left:12px; top:50%; background:rgba(0,0,0,0.5); color:#fff; border:none; width:40px; height:40px; cursor:pointer;">‹</button>
-                <button onclick="moverProducto(1)" style="position:absolute; right:12px; top:50%; background:rgba(0,0,0,0.5); color:#fff; border:none; width:40px; height:40px; cursor:pointer;">›</button>
+                <button onclick="moverProducto(-1)" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); background:rgba(0,0,0,0.5); color:#fff; border:none; width:40px; height:40px; cursor:pointer; z-index:10;">‹</button>
+                <button onclick="moverProducto(1)" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); background:rgba(0,0,0,0.5); color:#fff; border:none; width:40px; height:40px; cursor:pointer; z-index:10;">›</button>
             </div>
         </div>
 
@@ -32,6 +32,24 @@
             <p th:text="${'$' + #numbers.formatDecimal(producto.precio, 0, 'COMMA', 2, 'POINT')}" style="font-family:'Bebas Neue', sans-serif; font-size:36px; letter-spacing:2px; margin-bottom:24px;"></p>
             <p th:text="${producto.descripcion}" style="font-size:14px; line-height:1.8; opacity:0.7; margin-bottom:32px;"></p>
 
+            <!-- SELECTOR DE VARIANTES (Integrado en la columna de info) -->
+            <div th:if="${not #lists.isEmpty(producto.variantes)}" style="margin-bottom:32px; padding-top:20px; border-top:1px solid #eee;">
+                <p style="font-size:11px; letter-spacing:3px; text-transform:uppercase; opacity:0.4; margin-bottom:12px;">
+                    COLOR: <span id="color-nombre" style="color:#000; font-weight:600;">Original</span>
+                </p>
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <!-- Círculo Original -->
+                    <button th:onclick=" 'seleccionarVariante(\'Original\', \'' + ${producto.imagen} + '\', ' + ${producto.stockActual} + ')' "
+                            style="width:36px; height:36px; border-radius:50%; border:3px solid #000; cursor:pointer; background: #eee;"></button>
+                    
+                    <!-- Círculos de Colores de Variantes -->
+                    <button th:each="v : ${producto.variantes}"
+                            th:onclick=" 'seleccionarVariante(\'' + ${v.color} + '\', \'' + ${v.imagen} + '\', ' + ${v.stockActual} + ')' "
+                            th:style="'width:36px; height:36px; border-radius:50%; border:2px solid #ddd; cursor:pointer; background:' + ${v.hex}"></button>
+                </div>
+                <p id="variante-stock" style="font-size:12px; opacity:0.5; margin-top:10px;" th:text="'Stock: ' + ${producto.stockActual} + ' unidades'"></p>
+            </div>
+
             <!-- BOTÓN CARRITO -->
             <form th:action="@{'/carrito/agregar/' + ${producto.id}}" method="POST">
                 <button type="submit" class="btn-stateless" style="width:100%; padding:16px; font-size:13px;">
@@ -40,11 +58,41 @@
             </form>
             
             <div style="margin-top:32px; padding-top:24px; border-top:1px solid #eee;">
-                <p style="font-size:11px; opacity:0.4;">Stock disponible</p>
+                <p style="font-size:11px; opacity:0.4;">Stock disponible general</p>
                 <p th:text="${producto.stockActual + ' unidades'}" style="font-size:14px; font-weight:600;"></p>
             </div>
         </div>
     </div>
+
+    <script th:inline="javascript">
+        let productoIndex = 0;
+        /*[# th:if="${not #lists.isEmpty(producto.imagenes)}"]*/
+        const totalImagenes = [[${producto.imagenes.size() + 1}]];
+        /*[/#]*/
+        /*[# th:unless="${not #lists.isEmpty(producto.imagenes)}"]*/
+        const totalImagenes = 1;
+        /*[/#]*/
+
+        function moverProducto(dir) {
+            productoIndex = (productoIndex + dir + totalImagenes) % totalImagenes;
+            document.getElementById('producto-carousel').style.transform = `translateX(-${productoIndex * 100}%)`;
+        }
+
+        function seleccionarVariante(nombre, imagenUrl, stock) {
+            document.getElementById('color-nombre').innerText = nombre;
+            if(stock !== null) {
+                document.getElementById('variante-stock').innerText = 'Stock: ' + stock + ' unidades';
+            }
+            // Si la variante tiene imagen de Cloudinary, cambiamos el primer slide del carrusel
+            if(imagenUrl && imagenUrl !== 'null') {
+                const firstImg = document.querySelector('#producto-carousel img');
+                if(firstImg) firstImg.src = imagenUrl;
+                // Volver el carrusel al inicio para mostrar la imagen de la variante
+                productoIndex = 0;
+                document.getElementById('producto-carousel').style.transform = `translateX(0%)`;
+            }
+        }
+    </script>
 </section>
 </body>
 </html>

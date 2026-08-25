@@ -1,12 +1,26 @@
 package com.stateless.stateless.controller.web;
 
+import com.stateless.stateless.model.User;
+import com.stateless.stateless.service.EmailService;
+import com.stateless.stateless.service.PasswordResetService;
+import com.stateless.stateless.repository.UserRepository;
+import jakarta.mail.MessagingException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 @Controller
 public class ForgotPasswordController {
 
     @Autowired private PasswordResetService resetService;
     @Autowired private EmailService emailService;
     @Autowired private UserRepository userRepository;
-    @Value("${app.base-url}") private String baseUrl;
+    
+    @Value("${app.base-url}") 
+    private String baseUrl;
 
     @GetMapping("/forgot-password")
     public String showForgotForm() {
@@ -16,14 +30,11 @@ public class ForgotPasswordController {
     @PostMapping("/forgot-password")
     public String processForgot(@RequestParam String email, RedirectAttributes ra) throws MessagingException {
         String token = resetService.createToken(email);
-        
-        // Respuesta genérica por seguridad (Igual que en tu AuthController.php)
         if (token != null) {
             String url = baseUrl + "/reset-password/" + token;
             User user = userRepository.findByEmail(email).get();
             emailService.sendResetPasswordEmail(email, url, user.getName());
         }
-
         ra.addFlashAttribute("status", "Si ese correo existe, recibirás un enlace en breve.");
         return "redirect:/forgot-password";
     }
@@ -39,18 +50,14 @@ public class ForgotPasswordController {
                                @RequestParam String password, 
                                @RequestParam String password_confirmation, 
                                RedirectAttributes ra) {
-        
         if (!password.equals(password_confirmation)) {
             ra.addFlashAttribute("error", "Las contraseñas no coinciden.");
             return "redirect:/reset-password/" + token;
         }
-
         if (resetService.validateAndReset(token, password)) {
-            ra.addFlashAttribute("success", "¡Contraseña actualizada! Ya puedes iniciar sesión.");
+            ra.addFlashAttribute("success", "Contraseña actualizada.");
             return "redirect:/login";
         }
-
-        ra.addFlashAttribute("error", "El enlace expiró o es inválido.");
         return "redirect:/forgot-password";
     }
 }

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/app-layout :: layout(content=~{::section})}">
+<body>
+<section style="padding: 80px 60px; max-width: 800px; margin: 0 auto;">
+    
+    <h1 style="font-family:'Bebas Neue', sans-serif; font-size:48px; letter-spacing:4px; margin-bottom:8px;">MI PERFIL</h1>
+    <p style="font-size:13px; opacity:0.5; letter-spacing:1px; margin-bottom:40px;">Gestiona tu información personal</p>
+
+    <!-- BLOQUE 1: INFORMACIÓN BÁSICA -->
+    <div style="background:#fff; border:1px solid #eee; padding:32px; margin-bottom:32px;">
+        <h3 style="font-family:'Bebas Neue'; font-size:24px; letter-spacing:2px; margin-bottom:24px;">Información de la cuenta</h3>
+        
+        <div th:if="${successInfo}" class="alert alert-success" th:text="${successInfo}" style="font-size:12px; border-radius:0;"></div>
+
+        <form th:action="@{/account/profile/update-info}" method="POST">
+            <div class="mb-4">
+                <label style="font-size:11px; text-transform:uppercase; letter-spacing:1px; display:block; margin-bottom:8px;">Nombre Completo</label>
+                <input type="text" name="name" th:value="${user.name}" class="form-control" style="border-radius:0;" required>
+            </div>
+            <div class="mb-4">
+                <label style="font-size:11px; text-transform:uppercase; letter-spacing:1px; display:block; margin-bottom:8px;">Correo Electrónico</label>
+                <input type="email" name="email" th:value="${user.email}" class="form-control" style="border-radius:0;" required>
+            </div>
+            <button type="submit" class="btn-sl" style="padding:12px 30px;">Guardar Cambios</button>
+        </form>
+    </div>
+
+    <!-- BLOQUE 2: CAMBIO DE CONTRASEÑA -->
+    <div style="background:#fff; border:1px solid #eee; padding:32px;">
+        <h3 style="font-family:'Bebas Neue'; font-size:24px; letter-spacing:2px; margin-bottom:24px;">Seguridad</h3>
+        
+        <div th:if="${successPass}" class="alert alert-success" th:text="${successPass}" style="font-size:12px; border-radius:0;"></div>
+        <div th:if="${errorPass}" class="alert alert-danger" th:text="${errorPass}" style="font-size:12px; border-radius:0;"></div>
+
+        <form th:action="@{/account/profile/update-password}" method="POST">
+            <div class="mb-3">
+                <label style="font-size:11px; text-transform:uppercase; letter-spacing:1px;">Contraseña Actual</label>
+                <input type="password" name="current_password" class="form-control" style="border-radius:0;" required>
+            </div>
+            <div class="mb-3">
+                <label style="font-size:11px; text-transform:uppercase; letter-spacing:1px;">Nueva Contraseña</label>
+                <input type="password" name="password" class="form-control" style="border-radius:0;" required>
+            </div>
+            <div class="mb-4">
+                <label style="font-size:11px; text-transform:uppercase; letter-spacing:1px;">Confirmar Nueva Contraseña</label>
+                <input type="password" name="password_confirmation" class="form-control" style="border-radius:0;" required>
+            </div>
+            <button type="submit" class="btn-sl" style="background:#000; color:#fff; border:none; padding:12px 30px;">Actualizar Contraseña</button>
+        </form>
+    </div>
+
+    <div style="margin-top:40px; text-align:center;">
+        <a th:href="@{/account}" style="font-size:12px; color:#999; text-decoration:none; letter-spacing:1px;">← VOLVER A MI CUENTA</a>
+    </div>
+
+</section>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<div th:replace="~{layouts/admin-layout :: layout(content=~{::section})}">
+<section>
+    <div style="margin-bottom:24px;">
+        <a th:href="@{/admin/ventas}" style="font-size:12px; text-decoration:none; opacity:0.5;">← Volver</a>
+        <h2 style="font-family:'Bebas Neue'; font-size:32px; letter-spacing:3px; margin-top:8px;" th:text="'Pedido #' + ${venta.id}"></h2>
+    </div>
+
+    <div style="display:grid; grid-template-columns:2fr 1fr; gap:32px;">
+        <!-- Lado Izquierdo: Items -->
+        <div style="background:#fff; border:1px solid #eee; padding:24px;">
+            <p style="font-size:11px; letter-spacing:2px; text-transform:uppercase; opacity:0.4; margin-bottom:16px;">Productos solicitados</p>
+            <table class="stateless-table">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cant</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="item : ${venta.items}">
+                        <td th:text="${item.producto.nombre}"></td>
+                        <td th:text="${item.cantidad}"></td>
+                        <td th:text="${'$' + item.precioUnitario * item.cantidad}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Lado Derecho: Info Cliente/Envio -->
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            <div style="background:#fff; border:1px solid #eee; padding:24px;">
+                <p class="sl-label">Información Cliente</p>
+                <p th:text="${venta.usuario.name}" style="font-weight:600; margin:0;"></p>
+                <p th:text="${venta.usuario.email}" style="font-size:12px; opacity:0.5;"></p>
+            </div>
+
+            <div style="background:#fff; border:1px solid #eee; padding:24px;" th:if="${venta.envio != null}">
+                <p class="sl-label">Dirección Envío</p>
+                <p th:text="${venta.envio.direccion}" style="margin:0;"></p>
+                <p th:text="${venta.envio.ciudad}" style="margin:0;"></p>
+                <p th:text="'Estado: ' + ${#strings.toUpperCase(venta.envio.estado)}" style="font-size:11px; color:blue; margin-top:8px;"></p>
+            </div>
+        </div>
+    </div>
+</section>
+</div>

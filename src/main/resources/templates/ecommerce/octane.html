@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/app-layout :: layout(content=~{::section})}">
+<body>
+<section style="background:#000; color:#fff; min-height:100vh;">
+    <div style="padding:100px 40px; text-align:center;">
+        <h1 style="font-family:'Bebas Neue'; font-size:80px; letter-spacing:10px; color:#af0eaf;">OCTANE</h1>
+        <p style="letter-spacing:4px; opacity:0.8;">MIDNIGHT DRIFT DIVISION</p>
+    </div>
+    <div style="padding:60px 40px; display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:30px;">
+        <div th:each="p : ${octane}" style="border:1px solid #222; background:#111; padding:20px;">
+            <a th:href="@{'/producto/' + ${p.id}}" style="text-decoration:none; color:inherit;">
+                <img th:src="${p.imagen}" style="width:100%; aspect-ratio:3/4; object-fit:cover;">
+                <p th:text="${p.nombre}" style="font-family:'Bebas Neue'; font-size:22px; margin-top:15px;"></p>
+                <p th:text="${'$' + p.precio}" style="color:#af0eaf; font-weight:bold;"></p>
+            </a>
+        </div>
+    </div>
+</section>
+</body>
+</html>

@@ -1,7 +1,7 @@
 package com.stateless.stateless.service;
 
-import com.stateless.stateless.model.*;
-import com.stateless.stateless.repository.*;
+import com.stateless.stateless.model.Venta;
+import com.stateless.stateless.repository.VentaRepository;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,25 +18,29 @@ import java.util.stream.Collectors;
 public class ReporteService {
 
     @Autowired private VentaRepository ventaRepository;
-    @Autowired private ProductoRepository productoRepository;
 
-    // Lógica para reporte de Ventas (Equivalente a ReporteController@ventas)
     public Map<String, Object> generarDataVentas(LocalDateTime desde, LocalDateTime hasta) {
-        List<Venta> ventas = ventaRepository.findAllByCreated_atBetween(desde, hasta);
+        List<Venta> ventas = ventaRepository.findAllByCreatedAtBetween(desde, hasta);
         
         Map<String, Object> data = new HashMap<>();
         data.put("ventas", ventas);
-        data.put("totalVentas", ventas.stream().map(Venta::getTotal).reduce(BigDecimal.ZERO, BigDecimal::add));
+        
+        BigDecimal total = ventas.stream().map(Venta::getTotal).filter(Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add);
+        data.put("totalVentas", total);
         data.put("totalPedidos", ventas.size());
-        data.put("ventasFisicas", ventas.stream().filter(v -> "fisica".equals(v.getTipoVenta())).map(Venta::getTotal).reduce(BigDecimal.ZERO, BigDecimal::add));
-        data.put("ventasOnline", ventas.stream().filter(v -> "online".equals(v.getTipoVenta())).map(Venta::getTotal).reduce(BigDecimal.ZERO, BigDecimal::add));
+        
+        BigDecimal fisicas = ventas.stream().filter(v -> "fisica".equals(v.getTipoVenta())).map(Venta::getTotal).filter(Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add);
+        data.put("ventasFisicas", fisicas);
+        
+        BigDecimal online = ventas.stream().filter(v -> "online".equals(v.getTipoVenta())).map(Venta::getTotal).filter(Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add);
+        data.put("ventasOnline", online);
 
         // Agrupación por método de pago
         Map<String, Map<String, Object>> porMetodo = ventas.stream()
             .collect(Collectors.groupingBy(Venta::getMetodoPago, Collectors.collectingAndThen(Collectors.toList(), list -> {
                 Map<String, Object> map = new HashMap<>();
                 map.put("cantidad", list.size());
-                map.put("total", list.stream().map(Venta::getTotal).reduce(BigDecimal.ZERO, BigDecimal::add));
+                map.put("total", list.stream().map(Venta::getTotal).filter(Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add));
                 return map;
             })));
         data.put("porMetodo", porMetodo);
@@ -44,35 +48,24 @@ public class ReporteService {
         return data;
     }
 
-    // Exportación a Excel usando Apache POI
     public byte[] exportarVentasExcel(LocalDateTime desde, LocalDateTime hasta) throws IOException {
-        List<Venta> ventas = ventaRepository.findAllByCreated_atBetween(desde, hasta);
-        
+        List<Venta> ventas = ventaRepository.findAllByCreatedAtBetween(desde, hasta);
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            Sheet sheet = workbook.createSheet("Reporte de Ventas");
+            Sheet sheet = workbook.createSheet("Reporte");
+            Row header = sheet.createRow(0);
+            header.createCell(0).setCellValue("ID");
+            header.createCell(1).setCellValue("Cliente");
+            header.createCell(2).setCellValue("Total");
 
-            // Encabezados
-            Row headerRow = sheet.createRow(0);
-            String[] columns = {"ID Venta", "Cliente", "Tipo", "Método", "Total", "Fecha"};
-            for (int i = 0; i < columns.length; i++) {
-                Cell cell = headerRow.createCell(i);
-                cell.setCellValue(columns[i]);
-            }
-
-            // Datos
             int rowIdx = 1;
             for (Venta v : ventas) {
                 Row row = sheet.createRow(rowIdx++);
                 row.createCell(0).setCellValue(v.getId());
                 row.createCell(1).setCellValue(v.getUsuario().getName());
-                row.createCell(2).setCellValue(v.getTipoVenta());
-                row.createCell(3).setCellValue(v.getMetodoPago());
-                row.createCell(4).setCellValue(v.getTotal().doubleValue());
-                row.createCell(5).setCellValue(v.getCreated_at().toString());
+                row.createCell(2).setCellValue(v.getTotal().doubleValue());
             }
-
             workbook.write(out);
             return out.toByteArray();
         }
     }
-}.stateless
+}

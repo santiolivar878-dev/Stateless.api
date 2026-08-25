@@ -9,49 +9,29 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import java.util.List;
 
 @Controller
 @RequestMapping("/empleado/inventario")
-@PreAuthorize("hasAnyRole('EMPLEADO', 'ADMIN')") // Restricción de acceso
+@PreAuthorize("hasAnyRole('EMPLEADO', 'ADMIN')")
 public class EmpleadoInventarioController {
 
-    @Autowired
-    private ProductoRepository productoRepository;
-
-    @Autowired
-    private CategoriaRepository categoriaRepository;
+    @Autowired private ProductoRepository productoRepository;
+    @Autowired private CategoriaRepository categoriaRepository;
 
     @GetMapping
-    public String index(@RequestParam(required = false) Long categoriaId, Model model) {
-        List<Producto> productos;
-        if (categoriaId != null) {
-            productos = productoRepository.findAll().stream()
-                    .filter(p -> p.getCategoria().getId().equals(categoriaId))
-                    .toList();
-        } else {
-            productos = productoRepository.findAll();
-        }
-
-        model.addAttribute("productos", productos);
+    public String index(Model model) {
+        model.addAttribute("productos", productoRepository.findAll());
         model.addAttribute("categorias", categoriaRepository.findAll());
-        model.addAttribute("categoriaSeleccionada", categoriaId);
         return "empleado/inventario/index";
     }
 
-    // Método para actualización rápida de stock (Ajuste de inventario)
     @PostMapping("/update-stock/{id}")
-    public String updateStock(@PathVariable Long id, 
-                              @RequestParam Integer cantidad, 
-                              RedirectAttributes ra) {
-        Producto producto = productoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
-
-        producto.setStockActual(cantidad);
-        productoRepository.save(producto);
-
-        ra.addFlashAttribute("success", "Stock de " + producto.getNombre() + " actualizado a " + cantidad);
+    public String updateStock(@PathVariable Long id, @RequestParam Integer cantidad, RedirectAttributes ra) {
+        Producto p = productoRepository.findById(id).get();
+        p.setStockActual(cantidad);
+        productoRepository.save(p);
+        ra.addFlashAttribute("success", "Stock actualizado.");
         return "redirect:/empleado/inventario";
     }
 }

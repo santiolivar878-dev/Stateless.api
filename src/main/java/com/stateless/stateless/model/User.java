@@ -1,102 +1,67 @@
 package com.stateless.stateless.model;
 
 import jakarta.persistence.*;
-import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 @Table(name = "users")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class User implements UserDetails {
-
+public class User implements UserDetails, OAuth2User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable = false)
     private String name;
-
-    @Column(unique = true, nullable = false)
     private String email;
-
-    @Column(name = "email_verified_at")
-    private LocalDateTime email_verified_at;
-
-    @Column(name = "email_verified")
-    private boolean email_verified = false;
-
-    @Column(name = "email_token")
-    private String email_token;
-
-    @Column(name = "email_token_expires_at")
-    private LocalDateTime email_token_expires_at;
-
-    @Column(name = "reset_token")
-    private String reset_token;
-
-    @Column(name = "reset_token_expires_at")
-    private LocalDateTime reset_token_expires_at;
-
-    @Column(nullable = false)
     private String password;
+    private String estado = "activo";
+    @Column(name = "email_verified")
+    private boolean emailVerified = false;
+    @Column(name = "email_token")
+    private String emailToken;
+    @Column(name = "email_token_expires_at")
+    private LocalDateTime emailTokenExpiresAt;
 
-    @Column(name = "remember_token")
-    private String remember_token;
-
-    @Column(nullable = false)
-    private String estado = "activo"; // 'activo', 'inactivo'
-
-    @ManyToOne(fetch = Connection.Lookup.PRIMARY) // Laravel role_id
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id")
     private Role role;
 
-    @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime created_at;
+    public User() {}
 
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    private LocalDateTime updated_at;
+    // GETTERS Y SETTERS OBLIGATORIOS
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+    public String getEstado() { return estado; }
+    public void setEstado(String estado) { this.estado = estado; }
+    public Role getRole() { return role; }
+    public void setRole(Role role) { this.role = role; }
+    public boolean isEmailVerified() { return emailVerified; }
+    public void setEmailVerified(boolean v) { this.emailVerified = v; }
+    public String getEmailToken() { return emailToken; }
+    public void setEmailToken(String v) { this.emailToken = v; }
+    public LocalDateTime getEmailTokenExpiresAt() { return emailTokenExpiresAt; }
+    public void setEmailTokenExpiresAt(LocalDateTime v) { this.emailTokenExpiresAt = v; }
 
-    // Métodos de UserDetails para Spring Security
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
+    // SEGURIDAD
+    @Override public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
+    @Override public String getUsername() { return email; }
+    @Override public Map<String, Object> getAttributes() { return Map.of("email", email); }
+    @Override public Collection<? extends GrantedAuthority> getAuthorities() {
+        if (role == null) return List.of();
         return List.of(new SimpleGrantedAuthority("ROLE_" + role.getName().toUpperCase()));
     }
-
-    @Override
-    public String getUsername() {
-        return email;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return "activo".equals(estado);
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true; // La verificación por email se maneja en la lógica de negocio
-    }
+    @Override public boolean isAccountNonExpired() { return true; }
+    @Override public boolean isAccountNonLocked() { return "activo".equals(estado); }
+    @Override public boolean isCredentialsNonExpired() { return true; }
+    @Override public boolean isEnabled() { return true; }
 }

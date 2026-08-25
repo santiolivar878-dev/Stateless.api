@@ -1,0 +1,45 @@
+package com.stateless.stateless.controller.web;
+
+import com.stateless.stateless.model.User;
+import com.stateless.stateless.model.Venta;
+import com.stateless.stateless.repository.VentaRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
+
+import java.util.List;
+
+@Controller
+@RequestMapping("/account/pedidos")
+public class ClientePedidoController {
+
+    @Autowired
+    private VentaRepository ventaRepository;
+
+    @GetMapping
+    public String index(@AuthenticationPrincipal User user, Model model) {
+        List<Venta> ventas = ventaRepository.findByUsuarioIdOrderByCreated_atDesc(user.getId());
+        model.addAttribute("ventas", ventas);
+        return "cliente/pedidos/index";
+    }
+
+    @GetMapping("/{id}")
+    public String show(@PathVariable Long id, @AuthenticationPrincipal User user, Model model) {
+        Venta venta = ventaRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        // Verificación de seguridad: Solo el dueño puede ver el detalle
+        if (!venta.getUsuario().getId().equals(user.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        model.addAttribute("venta", venta);
+        return "cliente/pedidos/show";
+    }
+}

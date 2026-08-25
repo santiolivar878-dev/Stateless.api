@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/app-layout :: layout(content=~{::section})}">
+<body>
+<section style="padding:60px 40px; max-width:900px; margin:0 auto;">
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:32px;">
+        <div>
+            <a th:href="@{/account/pedidos}" style="font-size:12px; opacity:0.5; text-decoration:none;">← Volver al historial</a>
+            <h1 style="font-family:'Bebas Neue'; font-size:36px; letter-spacing:3px; margin-top:10px;" 
+                th:text="'DETALLE PEDIDO #' + ${venta.id}"></h1>
+        </div>
+        <!-- Botón para volver a descargar la factura -->
+        <a th:href="@{'/checkout/factura/' + ${venta.id} + '/descargar'}" class="btn-stateless">Descargar PDF</a>
+    </div>
+
+    <div style="background:#f9f9f9; padding:24px; border:1px solid #eee; margin-bottom:32px;">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+            <div>
+                <p style="font-size:10px; letter-spacing:2px; text-transform:uppercase; opacity:0.4;">Envío a:</p>
+                <p th:text="${venta.envio.direccion + ', ' + venta.envio.ciudad}" style="font-size:14px; font-weight:600;"></p>
+                <p th:text="'Estado Envío: ' + ${#strings.capitalize(venta.envio.estado)}" style="font-size:12px; opacity:0.6;"></p>
+            </div>
+            <div>
+                <p style="font-size:10px; letter-spacing:2px; text-transform:uppercase; opacity:0.4;">Método de Pago:</p>
+                <p th:text="${#strings.toUpperCase(venta.metodoPago)}" style="font-size:14px; font-weight:600;"></p>
+            </div>
+        </div>
+    </div>
+
+    <table style="width:100%; border-collapse:collapse;">
+        <thead>
+            <tr style="border-bottom:2px solid #000;">
+                <th style="text-align:left; padding:10px 0; font-size:11px; letter-spacing:2px; text-transform:uppercase;">Producto</th>
+                <th style="text-align:center; padding:10px 0; font-size:11px; letter-spacing:2px; text-transform:uppercase;">Cant</th>
+                <th style="text-align:right; padding:10px 0; font-size:11px; letter-spacing:2px; text-transform:uppercase;">Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="item : ${venta.items}" style="border-bottom:1px solid #eee;">
+                <td style="padding:16px 0;">
+                    <p th:text="${item.producto.nombre}" style="font-weight:600; margin:0;"></p>
+                    <p th:text="${'$' + item.precioUnitario}" style="font-size:12px; opacity:0.5; margin:0;"></p>
+                </td>
+                <td th:text="${item.cantidad}" style="text-align:center;"></td>
+                <td th:text="${'$' + #numbers.formatDecimal(item.precioUnitario * item.cantidad, 0, 'COMMA', 2, 'POINT')}" 
+                    style="text-align:right; font-weight:600;"></td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="2" style="padding:20px 0; font-family:'Bebas Neue'; font-size:24px;">TOTAL</td>
+                <td th:text="${'$' + #numbers.formatDecimal(venta.total, 0, 'COMMA', 2, 'POINT')}" 
+                    style="text-align:right; font-family:'Bebas Neue'; font-size:24px; padding:20px 0;"></td>
+            </tr>
+        </tfoot>
+    </table>
+
+</section>
+</body>
+</html>

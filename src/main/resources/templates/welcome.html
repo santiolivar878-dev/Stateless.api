@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/app-layout :: layout(content=~{::section})}">
+<body>
+<section>
+    <style>
+        .hero { height: 85vh; display: flex; align-items: center; justify-content: center; text-align: center; position: relative; background: #000; }
+        .hero-title { font-family: 'Bebas Neue'; font-size: 120px; letter-spacing: 12px; line-height: 0.9; margin: 0; }
+        .hero-sub { font-size: 13px; letter-spacing: 4px; opacity: 0.6; margin-top: 30px; margin-bottom: 40px; }
+        .btn-outline-white { border: 1px solid #fff; color: #fff; padding: 15px 40px; text-decoration: none; font-size: 12px; letter-spacing: 3px; font-weight: 600; transition: 0.3s; }
+        .btn-outline-white:hover { background: #fff; color: #000; }
+        .ctrl-btn { position: absolute; top: 50%; background: none; border: 1px solid rgba(255,255,255,0.2); color: #fff; width: 40px; height: 40px; cursor: pointer; }
+    </style>
+
+    <div class="hero">
+        <button class="ctrl-btn" style="left: 20px;">&lt;</button>
+        <button class="ctrl-btn" style="right: 20px;">&gt;</button>
+
+        <div class="hero-content">
+            <p style="font-size: 11px; letter-spacing: 5px; color: rgba(255,255,255,0.5); margin-bottom: 20px;">NUEVA COLECCIÓN 2026</p>
+            <h1 class="hero-title">STATELESS</h1>
+            <p class="hero-sub">DEFINE TU MUNDO. SIN ETIQUETAS.</p>
+            <a th:href="@{/essentials}" class="btn-outline-white">VER ESSENTIALS</a>
+        </div>
+
+        <div style="position: absolute; bottom: 30px; right: 50px; font-size: 12px; opacity: 0.3; letter-spacing: 2px;">
+            01 / 03
+        </div>
+    </div>
+</section>
+</body>
+</html>

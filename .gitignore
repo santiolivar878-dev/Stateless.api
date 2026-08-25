@@ -42,3 +42,12 @@ build/
 salida.txt
 error.log
 *.log
+
+# Archivos de salida de Repomix
+repomix-output.*
+repomix-output.xml
+repomix-output.txt
+
+# Configuración local con credenciales secretas
+src/main/resources/application-local.properties
+.env

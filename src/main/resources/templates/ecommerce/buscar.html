@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/app-layout :: layout(content=~{::section})}">
+<body>
+<section style="padding: 60px 40px; max-width: 1200px; margin: 0 auto;">
+
+    <h1 style="font-family:'Bebas Neue'; font-size:42px; letter-spacing:4px; margin-bottom:40px;">CATÁLOGO COMPLETO</h1>
+
+    <!-- FORMULARIO DE FILTROS (Equivalente a tu buscador lateral) -->
+    <form th:action="@{/catalogo}" method="GET" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:20px; background:#f9f9f9; padding:24px; border:1px solid #eee; margin-bottom:48px;">
+        
+        <div>
+            <label class="sl-label">Palabra clave</label>
+            <input type="text" name="q" th:value="${query}" class="sl-input" placeholder="Camiseta, gorra...">
+        </div>
+
+        <div>
+            <label class="sl-label">Categoría</label>
+            <select name="cat" class="sl-input">
+                <option value="">Todas</option>
+                <option th:each="c : ${categorias}" th:value="${c.id}" th:text="${c.nombre}" th:selected="${c.id == catSeleccionada}"></option>
+            </select>
+        </div>
+
+        <div>
+            <label class="sl-label">Precio Máximo</label>
+            <input type="number" name="max" th:value="${maxPrecio}" class="sl-input" placeholder="Ej: 100000">
+        </div>
+
+        <div style="display:flex; align-items:center; gap:10px; padding-top:25px;">
+            <input type="checkbox" name="disponible" value="true" th:checked="${soloDisponible}" id="chk-disp">
+            <label for="chk-disp" style="font-size:12px; letter-spacing:1px; cursor:pointer;">SOLO DISPONIBLES</label>
+        </div>
+
+        <div style="padding-top:20px;">
+            <button type="submit" class="btn-stateless" style="width:100%;">FILTRAR</button>
+        </div>
+    </form>
+
+    <!-- GRID DE PRODUCTOS -->
+    <p th:text="${productos.size() + ' PRODUCTOS ENCONTRADOS'}" style="font-size:11px; letter-spacing:2px; opacity:0.4; margin-bottom:24px;"></p>
+    
+    <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:32px;">
+        <div th:each="p : ${productos}" style="border:1px solid #eee; padding:16px; transition: border-color 0.3s;" onmouseover="this.style.borderColor='#000'" onmouseout="this.style.borderColor='#eee'">
+            <a th:href="@{'/producto/' + ${p.id}}" style="text-decoration:none; color:inherit;">
+                <img th:src="${p.imagen}" style="width:100%; aspect-ratio:3/4; object-fit:cover; margin-bottom:16px;">
+                <p th:text="${p.categoria.nombre}" style="font-size:10px; opacity:0.5; letter-spacing:2px; text-transform:uppercase; margin-bottom:4px;"></p>
+                <p th:text="${p.nombre}" style="font-family:'Bebas Neue'; font-size:20px; letter-spacing:1px; margin-bottom:8px;"></p>
+                <p th:text="${'$' + #numbers.formatDecimal(p.precio, 0, 'COMMA', 0, 'POINT')}" style="font-weight:600;"></p>
+            </a>
+            
+            <form th:action="@{'/carrito/agregar/' + ${p.id}}" method="POST" style="margin-top:16px;">
+                <button type="submit" class="btn-sl-outline" style="width:100%;" th:disabled="${p.stockActual == 0}" th:text="${p.stockActual > 0 ? 'AÑADIR AL CARRITO' : 'AGOTADO'}"></button>
+            </form>
+        </div>
+    </div>
+
+    <div th:if="${#lists.isEmpty(productos)}" style="text-align:center; padding:80px 0;">
+        <p style="opacity:0.3; font-family:'Bebas Neue'; font-size:24px;">No se encontraron productos con esos filtros.</p>
+        <a th:href="@{/catalogo}" style="color:#000; font-size:12px; letter-spacing:2px;">LIMPIAR FILTROS</a>
+    </div>
+
+</section>
+</body>
+</html>

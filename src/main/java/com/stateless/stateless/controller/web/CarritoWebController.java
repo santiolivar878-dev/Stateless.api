@@ -1,5 +1,16 @@
 package com.stateless.stateless.controller.web;
 
+import com.stateless.stateless.model.User;
+import com.stateless.stateless.model.CarritoItem;
+import com.stateless.stateless.service.CarritoService;
+import com.stateless.stateless.repository.CarritoItemRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 @Controller
 @RequestMapping("/carrito")
 public class CarritoWebController {
@@ -10,7 +21,7 @@ public class CarritoWebController {
     @GetMapping
     public String index(Model model, @AuthenticationPrincipal User user) {
         model.addAttribute("carrito", carritoService.obtenerOcrearCarrito(user));
-        return "carrito/index";
+        return "cart/index";
     }
 
     @PostMapping("/agregar/{id}")
@@ -27,16 +38,11 @@ public class CarritoWebController {
     @PostMapping("/actualizar/{itemId}")
     public String actualizar(@PathVariable Long itemId, @RequestParam Integer cantidad, RedirectAttributes ra) {
         CarritoItem item = itemRepository.findById(itemId).orElseThrow();
-        
         if (cantidad <= 0) {
             itemRepository.delete(item);
-            ra.addFlashAttribute("success", "Producto eliminado.");
-        } else if (cantidad > item.getProducto().getStockActual()) {
-            ra.addFlashAttribute("error", "Stock insuficiente. Máximo: " + item.getProducto().getStockActual());
         } else {
             item.setCantidad(cantidad);
             itemRepository.save(item);
-            ra.addFlashAttribute("success", "Carrito actualizado.");
         }
         return "redirect:/carrito";
     }

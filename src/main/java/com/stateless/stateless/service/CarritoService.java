@@ -2,47 +2,43 @@ package com.stateless.stateless.service;
 
 import com.stateless.stateless.model.*;
 import com.stateless.stateless.repository.*;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CarritoService {
-
     @Autowired private CarritoRepository carritoRepository;
-    @Autowired private CarritoItemRepository itemRepository;
     @Autowired private ProductoRepository productoRepository;
+    @Autowired private HttpSession session; // Para el contador del navbar
 
     public Carrito obtenerOcrearCarrito(User user) {
-        return carritoRepository.findByUserId(user.getId())
+        Carrito carrito = carritoRepository.findByUserId(user.getId())
                 .orElseGet(() -> {
                     Carrito nuevo = new Carrito();
                     nuevo.setUser(user);
                     return carritoRepository.save(nuevo);
                 });
+        
+        // Actualizamos el contador de la sesión
+        int totalItems = carrito.getItems().stream().mapToInt(CarritoItem::getCantidad).sum();
+        session.setAttribute("cartCount", totalItems);
+        
+        return carrito;
     }
 
     @Transactional
     public String agregarProducto(Long productoId, User user) {
-        Producto producto = productoRepository.findById(productoId)
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
-
+        Producto producto = productoRepository.findById(productoId).orElseThrow();
         Carrito carrito = obtenerOcrearCarrito(user);
         
-        // Buscar si el producto ya está en el carrito
         CarritoItem item = carrito.getItems().stream()
                 .filter(i -> i.getProducto().getId().equals(productoId))
                 .findFirst().orElse(null);
 
-        int cantidadDeseada = (item != null) ? item.getCantidad() + 1 : 1;
-
-        // Validación de Stock (Misma lógica que Laravel)
-        if (cantidadDeseada > producto.getStockActual()) {
-            return "No hay suficiente stock disponible.";
-        }
-
         if (item != null) {
-            item.setCantidad(cantidadDeseada);
+            item.setCantidad(item.getCantidad() + 1);
         } else {
             item = new CarritoItem();
             item.setCarrito(carrito);
@@ -51,8 +47,8 @@ public class CarritoService {
             item.setPrecioUnitario(producto.getPrecio());
             carrito.getItems().add(item);
         }
-        
         carritoRepository.save(carrito);
+        obtenerOcrearCarrito(user); // Actualiza sesión
         return "OK";
     }
 }

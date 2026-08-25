@@ -1,15 +1,12 @@
 package com.stateless.stateless.model;
 
 import jakarta.persistence.*;
-import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
 @Table(name = "ventas")
-@Getter @Setter @NoArgsConstructor
 public class Venta {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,7 +21,7 @@ public class Venta {
     private BigDecimal total;
 
     @Column(name = "codigo_pago")
-    private String codigoPago; // Para Efecty
+    private String codigoPago;
 
     private String estado = "pendiente";
 
@@ -32,13 +29,34 @@ public class Venta {
     @JoinColumn(name = "user_id")
     private User usuario;
 
-    @OneToOne(mappedBy = "venta", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "venta")
     private Envio envio;
 
-    @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "venta")
     private List<VentaItem> items;
 
-    @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime created_at;
+    @Column(name = "created_at")
+    private LocalDateTime createdAt; // Renombrado a camelCase
+
+    public Venta() {}
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public String getTipoVenta() { return tipoVenta; }
+    public void setTipoVenta(String val) { this.tipoVenta = val; }
+    public String getMetodoPago() { return metodoPago; }
+    public void setMetodoPago(String val) { this.metodoPago = val; }
+    public BigDecimal getTotal() { return total; }
+    public void setTotal(BigDecimal total) { this.total = total; }
+    public String getCodigoPago() { return codigoPago; }
+    public void setCodigoPago(String val) { this.codigoPago = val; }
+    public String getEstado() { return estado; }
+    public void setEstado(String estado) { this.estado = estado; }
+    public User getUsuario() { return usuario; }
+    public void setUsuario(User usuario) { this.usuario = usuario; }
+    public Envio getEnvio() { return envio; }
+    public void setEnvio(Envio envio) { this.envio = envio; }
+    public List<VentaItem> getItems() { return items; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

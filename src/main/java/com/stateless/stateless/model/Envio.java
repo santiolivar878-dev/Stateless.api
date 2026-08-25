@@ -1,13 +1,10 @@
 package com.stateless.stateless.model;
 
 import jakarta.persistence.*;
-import lombok.*;
 import java.time.LocalDateTime;
-import java.util.Map;
 
 @Entity
 @Table(name = "envios")
-@Getter @Setter @NoArgsConstructor
 public class Envio {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,27 +16,37 @@ public class Envio {
 
     private String direccion;
     private String ciudad;
-    private String estado = "pendiente"; // pendiente, confirmado, preparando, en_curso, entregado
-
-    @Column(name = "fecha_envio")
-    private LocalDateTime fechaEnvio;
-
-    // Hitos de tracking (Agregados en la migración de Laravel 2026_07_02)
+    private String estado = "pendiente";
+    private LocalDateTime fecha_envio;
     private LocalDateTime fecha_confirmado;
     private LocalDateTime fecha_preparando;
     private LocalDateTime fecha_en_curso;
     private LocalDateTime fecha_entregado;
 
-    // Equivalente a const ESTADOS en Laravel
-    public static final Map<String, Integer> ESTADOS_MAP = Map.of(
-        "pendiente", 1,
-        "confirmado", 2,
-        "preparando", 3,
-        "en_curso", 4,
-        "entregado", 5
-    );
+    public Envio() {}
 
-    public Integer getPasoActual() {
-        return ESTADOS_MAP.getOrDefault(this.estado, 1);
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public Venta getVenta() { return venta; }
+    public void setVenta(Venta venta) { this.venta = venta; }
+    public String getDireccion() { return direccion; }
+    public void setDireccion(String direccion) { this.direccion = direccion; }
+    public String getCiudad() { return ciudad; }
+    public void setCiudad(String ciudad) { this.ciudad = ciudad; }
+    public String getEstado() { return estado; }
+    public void setEstado(String estado) { this.estado = estado; }
+    public void setFecha_confirmado(LocalDateTime f) { this.fecha_confirmado = f; }
+    public void setFecha_preparando(LocalDateTime f) { this.fecha_preparando = f; }
+    public void setFecha_en_curso(LocalDateTime f) { this.fecha_en_curso = f; }
+    public void setFecha_entregado(LocalDateTime f) { this.fecha_entregado = f; }
+
+    public int getPasoActual() {
+        return switch (this.estado) {
+            case "confirmado" -> 2;
+            case "preparando" -> 3;
+            case "en_curso" -> 4;
+            case "entregado" -> 5;
+            default -> 1;
+        };
     }
 }
