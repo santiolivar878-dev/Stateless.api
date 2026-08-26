@@ -1,47 +1,75 @@
-<div th:replace="~{layouts/admin-layout :: layout(content=~{::section})}">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/admin-layout :: layout(content=~{::section})}">
+<body>
 <section>
-    <div style="margin-bottom:24px;">
-        <a th:href="@{/admin/ventas}" style="font-size:12px; text-decoration:none; opacity:0.5;">← Volver</a>
-        <h2 style="font-family:'Bebas Neue'; font-size:32px; letter-spacing:3px; margin-top:8px;" th:text="'Pedido #' + ${venta.id}"></h2>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+        <h2 style="font-family:'Bebas Neue'; font-size:28px; letter-spacing:2px;" th:text="'DETALLE PEDIDO #' + ${venta.id}"></h2>
+        <a th:href="@{/admin/ventas}" class="text-dark text-decoration-none" style="font-size:12px;">← VOLVER AL LISTADO</a>
     </div>
 
-    <div style="display:grid; grid-template-columns:2fr 1fr; gap:32px;">
-        <!-- Lado Izquierdo: Items -->
-        <div style="background:#fff; border:1px solid #eee; padding:24px;">
-            <p style="font-size:11px; letter-spacing:2px; text-transform:uppercase; opacity:0.4; margin-bottom:16px;">Productos solicitados</p>
-            <table class="stateless-table">
-                <thead>
-                    <tr>
-                        <th>Producto</th>
-                        <th>Cant</th>
-                        <th>Subtotal</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="item : ${venta.items}">
-                        <td th:text="${item.producto.nombre}"></td>
-                        <td th:text="${item.cantidad}"></td>
-                        <td th:text="${'$' + item.precioUnitario * item.cantidad}"></td>
-                    </tr>
-                </tbody>
-            </table>
+    <div class="row">
+        <!-- Columna Izquierda: Items del Pedido -->
+        <div class="col-md-8">
+            <div class="bg-white p-4 border mb-4">
+                <p style="font-size:11px; opacity:0.5; text-transform:uppercase; letter-spacing:1px; margin-bottom:20px;">Productos en este pedido</p>
+                <table class="table align-middle">
+                    <thead>
+                        <tr style="font-size:11px; text-transform:uppercase; opacity:0.6;">
+                            <th>Producto</th>
+                            <th>Variante</th>
+                            <th>Precio</th>
+                            <th>Cant.</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="item : ${venta.items}">
+                            <td th:text="${item.producto.nombre}"></td>
+                            <td>
+                                <span th:if="${item.variante != null}" th:text="${item.variante.color}" class="badge bg-light text-dark border"></span>
+                                <span th:unless="${item.variante != null}" class="text-muted" style="font-size:11px;">—</span>
+                            </td>
+                            <td th:text="${'$' + item.precioUnitario}"></td>
+                            <td th:text="${item.cantidad}"></td>
+                            <td th:text="${'$' + (item.precioUnitario * item.cantidad)}" style="font-weight:bold;"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div style="text-align:right; margin-top:20px;">
+                    <h3 style="font-family:'Bebas Neue'; font-size:32px;" th:text="'TOTAL: $' + ${venta.total}"></h3>
+                </div>
+            </div>
         </div>
 
-        <!-- Lado Derecho: Info Cliente/Envio -->
-        <div style="display:flex; flex-direction:column; gap:20px;">
-            <div style="background:#fff; border:1px solid #eee; padding:24px;">
-                <p class="sl-label">Información Cliente</p>
-                <p th:text="${venta.usuario.name}" style="font-weight:600; margin:0;"></p>
-                <p th:text="${venta.usuario.email}" style="font-size:12px; opacity:0.5;"></p>
+        <!-- Columna Derecha: Gestión de Estado y Cliente -->
+        <div class="col-md-4">
+            <!-- Formulario de Estado -->
+            <div class="bg-white p-4 border mb-4">
+                <p class="form-label" style="font-size:11px; text-transform:uppercase; font-weight:bold;">Estado del Pedido</p>
+                <form th:action="@{'/admin/ventas/update-status/' + ${venta.id}}" method="POST">
+                    <select name="nuevoEstado" class="form-select mb-3" style="border-radius:0;">
+                        <option value="pendiente" th:selected="${venta.estado == 'pendiente'}">PENDIENTE</option>
+                        <option value="pagado" th:selected="${venta.estado == 'pagado'}">PAGADO</option>
+                        <option value="en_preparacion" th:selected="${venta.estado == 'en_preparacion'}">EN PREPARACIÓN</option>
+                        <option value="enviado" th:selected="${venta.estado == 'enviado'}">ENVIADO</option>
+                        <option value="entregado" th:selected="${venta.estado == 'entregado'}">ENTREGADO</option>
+                        <option value="cancelado" th:selected="${venta.estado == 'cancelado'}">CANCELADO</option>
+                    </select>
+                    <button type="submit" class="btn-sl w-100" style="background:#000; color:#fff; border:none; padding:10px;">ACTUALIZAR ESTADO</button>
+                </form>
             </div>
 
-            <div style="background:#fff; border:1px solid #eee; padding:24px;" th:if="${venta.envio != null}">
-                <p class="sl-label">Dirección Envío</p>
-                <p th:text="${venta.envio.direccion}" style="margin:0;"></p>
-                <p th:text="${venta.envio.ciudad}" style="margin:0;"></p>
-                <p th:text="'Estado: ' + ${#strings.toUpperCase(venta.envio.estado)}" style="font-size:11px; color:blue; margin-top:8px;"></p>
+            <!-- Información del Cliente -->
+            <div class="bg-white p-4 border">
+                <p style="font-size:11px; opacity:0.5; text-transform:uppercase;">Datos de Envío</p>
+                <p th:text="${venta.usuario.name}" style="font-weight:bold; margin-bottom:5px;"></p>
+                <p th:text="${venta.usuario.email}" style="font-size:13px; color:#666;"></p>
+                <hr>
+                <p th:text="${venta.envio.direccion}" style="margin:0; font-size:13px;"></p>
+                <p th:text="${venta.envio.ciudad}" style="margin:0; font-size:13px; font-weight:bold;"></p>
             </div>
         </div>
     </div>
 </section>
-</div>
+</body>
+</html>

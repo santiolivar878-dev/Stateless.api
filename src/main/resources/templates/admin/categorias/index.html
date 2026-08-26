@@ -1,0 +1,30 @@
+<div th:replace="~{layouts/admin-layout :: layout(content=~{::section})}">
+<section>
+    <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+        <h2 style="font-family:'Bebas Neue';">Categorías</h2>
+        <a th:href="@{/admin/categorias/create}" class="btn btn-dark btn-sm">+ NUEVA</a>
+    </div>
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+    <table class="table border bg-white">
+        <thead class="table-light">
+            <tr>
+                <th>Nombre</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="c : ${categorias}">
+                <td th:text="${c.nombre}"></td>
+                <td>
+                    <a th:href="@{'/admin/categorias/edit/' + ${c.id}}" class="btn btn-sm btn-outline-primary">Editar</a>
+                    <form th:action="@{'/admin/categorias/delete/' + ${c.id}}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-sm btn-link text-danger">Borrar</button>
+                    </form>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+</div>

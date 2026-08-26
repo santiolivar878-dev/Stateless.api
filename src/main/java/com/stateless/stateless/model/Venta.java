@@ -13,7 +13,7 @@ public class Venta {
     private Long id;
 
     @Column(name = "tipo_venta")
-    private String tipoVenta = "online";
+    private String tipoVenta = "online"; // Esta es la variable que usa el Repositorio
 
     @Column(name = "metodo_pago")
     private String metodoPago;
@@ -36,10 +36,11 @@ public class Venta {
     private List<VentaItem> items;
 
     @Column(name = "created_at")
-    private LocalDateTime createdAt; // Renombrado a camelCase
+    private LocalDateTime createdAt;
 
     public Venta() {}
 
+    // GETTERS Y SETTERS MANUALES
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getTipoVenta() { return tipoVenta; }
@@ -57,6 +58,7 @@ public class Venta {
     public Envio getEnvio() { return envio; }
     public void setEnvio(Envio envio) { this.envio = envio; }
     public List<VentaItem> getItems() { return items; }
+    public void setItems(List<VentaItem> items) { this.items = items; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

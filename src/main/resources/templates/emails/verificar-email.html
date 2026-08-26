@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Verifica tu cuenta</title>
+</head>
+<body style="font-family: sans-serif; color: #000; line-height: 1.6; padding: 20px;">
+    <div style="max-width: 600px; margin: 0 auto; border: 1px solid #eee; padding: 40px; text-align: center;">
+        <h1 style="font-family: 'Arial Black', sans-serif; letter-spacing: 5px; text-transform: uppercase;">STATELESS</h1>
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+        
+        <h2 style="font-size: 24px;">¡Hola, <span th:text="${nombre}">Usuario</span>!</h2>
+        <p style="font-size: 16px; color: #555;">Gracias por unirte a nuestra comunidad. Para comenzar a comprar, necesitamos confirmar que este correo te pertenece.</p>
+        
+        <div style="margin: 40px 0;">
+            <a th:href="${url}" 
+               style="background: #000; color: #fff; padding: 15px 30px; text-decoration: none; font-size: 14px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px;">
+               VERIFICAR MI CUENTA
+            </a>
+        </div>
+        
+        <p style="font-size: 12px; color: #999; margin-top: 40px;">
+            Este enlace expirará en 24 horas.<br>
+            Si no creaste una cuenta en STATELESS, puedes ignorar este mensaje.
+        </p>
+    </div>
+</body>
+</html>

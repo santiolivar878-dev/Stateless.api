@@ -19,14 +19,14 @@ public class Producto {
     private Integer stock_actual;
     private Integer stock_minimo = 5;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "categoria_id")
     private Categoria categoria;
 
-    @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<ProductoImagen> imagenes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<ProductoVariante> variantes = new ArrayList<>();
 
     public Producto() {}
@@ -44,13 +44,10 @@ public class Producto {
     public String getImagen() { return imagen; }
     public void setImagen(String imagen) { this.imagen = imagen; }
     public Integer getStockActual() { return stock_actual; }
-    public void setStockActual(Integer stock_actual) { this.stock_actual = stock_actual; }
+    public void setStockActual(Integer s) { this.stock_actual = s; }
     public Integer getStockMinimo() { return stock_minimo; }
-    public void setStockMinimo(Integer stock_minimo) { this.stock_minimo = stock_minimo; }
     public Categoria getCategoria() { return categoria; }
-    public void setCategoria(Categoria categoria) { this.categoria = categoria; }
+    public void setCategoria(Categoria c) { this.categoria = c; }
     public List<ProductoImagen> getImagenes() { return imagenes; }
-    public void setImagenes(List<ProductoImagen> imagenes) { this.imagenes = imagenes; }
     public List<ProductoVariante> getVariantes() { return variantes; }
-    public void setVariantes(List<ProductoVariante> variantes) { this.variantes = variantes; }
 }

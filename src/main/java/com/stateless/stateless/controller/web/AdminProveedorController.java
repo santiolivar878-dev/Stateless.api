@@ -11,7 +11,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/admin/proveedores")
-@PreAuthorize("hasAnyRole('ADMIN', 'EMPLEADO')")
+@PreAuthorize("hasRole('ADMIN')")
 public class AdminProveedorController {
 
     @Autowired private ProveedorRepository proveedorRepository;
@@ -25,39 +25,30 @@ public class AdminProveedorController {
     @GetMapping("/create")
     public String create(Model model) {
         model.addAttribute("proveedor", new Proveedor());
-        return "admin/proveedores/create";
+        return "admin/proveedores/form";
     }
 
-    @PostMapping("/store")
-    public String store(@ModelAttribute Proveedor proveedor, RedirectAttributes ra) {
+    @PostMapping("/save")
+    public String save(@ModelAttribute Proveedor proveedor, RedirectAttributes ra) {
         proveedorRepository.save(proveedor);
-        ra.addFlashAttribute("success", "Proveedor creado correctamente.");
+        ra.addFlashAttribute("success", "Proveedor guardado correctamente.");
         return "redirect:/admin/proveedores";
     }
 
     @GetMapping("/edit/{id}")
     public String edit(@PathVariable Long id, Model model) {
         model.addAttribute("proveedor", proveedorRepository.findById(id).orElseThrow());
-        return "admin/proveedores/edit";
-    }
-
-    @PostMapping("/update/{id}")
-    public String update(@PathVariable Long id, @ModelAttribute Proveedor proveedorData, RedirectAttributes ra) {
-        Proveedor proveedor = proveedorRepository.findById(id).orElseThrow();
-        proveedor.setNombre(proveedorData.getNombre());
-        proveedor.setTelefono(proveedorData.getTelefono());
-        proveedor.setCorreo(proveedorData.getCorreo());
-        proveedor.setEstado(proveedorData.isEstado());
-        
-        proveedorRepository.save(proveedor);
-        ra.addFlashAttribute("success", "Proveedor actualizado correctamente.");
-        return "redirect:/admin/proveedores";
+        return "admin/proveedores/form";
     }
 
     @PostMapping("/delete/{id}")
-    public String destroy(@PathVariable Long id, RedirectAttributes ra) {
-        proveedorRepository.deleteById(id);
-        ra.addFlashAttribute("success", "Proveedor eliminado correctamente.");
+    public String delete(@PathVariable Long id, RedirectAttributes ra) {
+        try {
+            proveedorRepository.deleteById(id);
+            ra.addFlashAttribute("success", "Proveedor eliminado.");
+        } catch (Exception e) {
+            ra.addFlashAttribute("error", "No se puede eliminar: tiene productos asociados.");
+        }
         return "redirect:/admin/proveedores";
     }
 }

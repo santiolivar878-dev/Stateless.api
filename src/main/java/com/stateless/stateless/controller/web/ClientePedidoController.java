@@ -23,6 +23,7 @@ public class ClientePedidoController {
 
     @GetMapping
     public String index(@AuthenticationPrincipal User user, Model model) {
+        // Llamada corregida para coincidir con el Repositorio
         List<Venta> ventas = ventaRepository.findByUsuarioIdOrderByCreatedAtDesc(user.getId());
         model.addAttribute("ventas", ventas);
         return "cliente/pedidos/index";

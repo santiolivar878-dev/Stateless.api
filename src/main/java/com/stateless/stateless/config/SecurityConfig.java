@@ -28,10 +28,20 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/login", "/register", "/css/**", "/js/**", "/images/**").permitAll()
-                .requestMatchers("/essentials", "/octane", "/waves", "/producto/**", "/buscar/**", "/catalogo/**").permitAll()
-                .requestMatchers("/admin/**").hasRole("ADMIN")
-                .requestMatchers("/empleado/**").hasRole("EMPLEADO")
+                // 1. Recursos estáticos y rutas básicas de error
+                .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico", "/error").permitAll()
+                
+                // 2. Vistas públicas de la tienda (ABIERTAS AL PÚBLICO)
+                .requestMatchers("/", "/login", "/register", "/essentials", "/octane", "/waves", "/buscar/**", "/catalogo/**").permitAll()
+                
+                // 3. Detalle de producto y Carrito (ABIERTOS AL PÚBLICO)
+                .requestMatchers("/producto/**", "/carrito", "/carrito/**").permitAll()
+                
+                // 4. Rutas protegidas (REQUIEREN LOGIN)
+                .requestMatchers("/admin/**", "/reportes/**").hasRole("ADMIN")
+                .requestMatchers("/empleado/**").hasAnyRole("ADMIN", "EMPLEADO")
+                .requestMatchers("/account/**", "/checkout/**").authenticated() 
+                
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form

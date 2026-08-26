@@ -2,16 +2,15 @@
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/admin-layout :: layout(content=~{::section})}">
 <body>
 <section>
-    <h2 style="font-family:'Bebas Neue'; font-size:32px; margin-bottom:24px;">Pedidos</h2>
-    
-    <div style="background:#fff; border:1px solid #eee; padding:24px; margin-bottom:24px;">
-        <p>Total en Ventas: <strong th:text="${'$' + totalGeneral}"></strong></p>
-    </div>
+    <h2 style="font-family:'Bebas Neue'; font-size:28px; margin-bottom:30px; letter-spacing:2px;">PEDIDOS RECIBIDOS</h2>
 
-    <table class="stateless-table">
-        <thead>
+    <div th:if="${success}" class="alert alert-success" th:text="${success}" style="border-radius:0; font-size:12px;"></div>
+
+    <table class="table align-middle bg-white border">
+        <thead class="table-dark">
             <tr>
                 <th>ID</th>
+                <th>Fecha</th>
                 <th>Cliente</th>
                 <th>Total</th>
                 <th>Estado</th>
@@ -21,11 +20,16 @@
         <tbody>
             <tr th:each="v : ${ventas}">
                 <td th:text="${'#' + v.id}"></td>
+                <td th:text="${#temporals.format(v.createdAt, 'dd/MM/yyyy HH:mm')}"></td>
                 <td th:text="${v.usuario.name}"></td>
-                <td th:text="${'$' + v.total}"></td>
-                <td th:text="${#strings.toUpperCase(v.estado)}"></td>
+                <td th:text="${'$' + #numbers.formatDecimal(v.total, 0, 'COMMA', 0, 'POINT')}" style="font-weight:bold;"></td>
                 <td>
-                    <a th:href="@{'/admin/ventas/' + ${v.id}}" class="btn-sl-outline">Detalle</a>
+                    <span th:text="${#strings.toUpperCase(v.estado)}" 
+                          th:classappend="${v.estado == 'pendiente' ? 'text-warning' : (v.estado == 'entregado' ? 'text-success' : 'text-primary')}"
+                          style="font-size:11px; font-weight:bold;"></span>
+                </td>
+                <td>
+                    <a th:href="@{'/admin/ventas/' + ${v.id}}" class="btn btn-sm btn-dark" style="font-size:10px; border-radius:0;">GESTIONAR</a>
                 </td>
             </tr>
         </tbody>

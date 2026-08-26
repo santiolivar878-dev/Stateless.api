@@ -1,0 +1,14 @@
+<div th:replace="~{layouts/admin-layout :: layout(content=~{::section})}">
+<section>
+    <h2 style="font-family:'Bebas Neue'; margin-bottom:20px;" th:text="${categoria.id == null ? 'Crear Categoría' : 'Editar Categoría'}"></h2>
+    <form th:action="@{/admin/categorias/save}" th:object="${categoria}" method="POST" class="bg-white p-4 border">
+        <input type="hidden" th:field="*{id}">
+        <div class="mb-3">
+            <label class="form-label">Nombre</label>
+            <input type="text" th:field="*{nombre}" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-dark">GUARDAR</button>
+        <a th:href="@{/admin/categorias}" class="ms-2 text-decoration-none">Cancelar</a>
+    </form>
+</section>
+</div>

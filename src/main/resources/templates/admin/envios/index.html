@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/admin-layout :: layout(content=~{::section})}">
+<body>
+<section>
+    <h2 style="font-family:'Bebas Neue'; font-size:28px; margin-bottom:30px; letter-spacing:2px;">LOGÍSTICA Y ENVÍOS</h2>
+
+    <div th:if="${success}" class="alert alert-success" th:text="${success}" style="font-size:12px; border-radius:0;"></div>
+
+    <table class="table align-middle bg-white border">
+        <thead class="table-dark">
+            <tr>
+                <th>Pedido</th>
+                <th>Ciudad</th>
+                <th>Transportadora</th>
+                <th>N° Guía</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="e : ${envios}">
+                <td th:text="${'#' + e.venta.id}"></td>
+                <td th:text="${e.ciudad}"></td>
+                <td th:text="${e.transportadora != null ? e.transportadora : 'PENDIENTE'}"></td>
+                <td th:text="${e.numeroGuia != null ? e.numeroGuia : '---'}" style="font-family:monospace;"></td>
+                <td>
+                    <span th:text="${#strings.toUpperCase(e.estado)}" 
+                          th:classappend="${e.estado == 'entregado' ? 'text-success' : 'text-primary'}"
+                          style="font-size:11px; font-weight:bold;"></span>
+                </td>
+                <td>
+                    <a th:href="@{'/admin/envios/edit/' + ${e.id}}" class="btn btn-sm btn-dark" style="font-size:10px; border-radius:0;">ASIGNAR GUÍA</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+</body>
+</html>

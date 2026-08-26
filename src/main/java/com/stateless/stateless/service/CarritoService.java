@@ -11,30 +11,29 @@ import org.springframework.transaction.annotation.Transactional;
 public class CarritoService {
     @Autowired private CarritoRepository carritoRepository;
     @Autowired private ProductoRepository productoRepository;
-    @Autowired private HttpSession session; // Para el contador del navbar
+    @Autowired private ProductoVarianteRepository varianteRepository;
+    @Autowired private HttpSession session;
 
     public Carrito obtenerOcrearCarrito(User user) {
-        Carrito carrito = carritoRepository.findByUserId(user.getId())
-                .orElseGet(() -> {
-                    Carrito nuevo = new Carrito();
-                    nuevo.setUser(user);
-                    return carritoRepository.save(nuevo);
-                });
-        
-        // Actualizamos el contador de la sesión
-        int totalItems = carrito.getItems().stream().mapToInt(CarritoItem::getCantidad).sum();
-        session.setAttribute("cartCount", totalItems);
-        
+        Carrito carrito = carritoRepository.findByUserId(user.getId()).orElseGet(() -> {
+            Carrito nuevo = new Carrito();
+            nuevo.setUser(user);
+            return carritoRepository.save(nuevo);
+        });
+        session.setAttribute("cartCount", carrito.getItems().stream().mapToInt(CarritoItem::getCantidad).sum());
         return carrito;
     }
 
     @Transactional
-    public String agregarProducto(Long productoId, User user) {
+    public String agregarProducto(Long productoId, Long varianteId, User user) {
         Producto producto = productoRepository.findById(productoId).orElseThrow();
+        ProductoVariante variante = (varianteId != null) ? varianteRepository.findById(varianteId).orElse(null) : null;
         Carrito carrito = obtenerOcrearCarrito(user);
         
+        // Buscar si ya existe el mismo producto con la misma variante
         CarritoItem item = carrito.getItems().stream()
-                .filter(i -> i.getProducto().getId().equals(productoId))
+                .filter(i -> i.getProducto().getId().equals(productoId) && 
+                            (variante == null || (i.getVariante() != null && i.getVariante().getId().equals(varianteId))))
                 .findFirst().orElse(null);
 
         if (item != null) {
@@ -43,12 +42,12 @@ public class CarritoService {
             item = new CarritoItem();
             item.setCarrito(carrito);
             item.setProducto(producto);
+            item.setVariante(variante);
             item.setCantidad(1);
             item.setPrecioUnitario(producto.getPrecio());
             carrito.getItems().add(item);
         }
         carritoRepository.save(carrito);
-        obtenerOcrearCarrito(user); // Actualiza sesión
         return "OK";
     }
 }

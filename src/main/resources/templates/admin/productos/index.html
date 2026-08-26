@@ -1,49 +1,41 @@
-<div th:replace="~{layouts/admin-layout :: layout(content=~{::section})}">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/admin-layout :: layout(content=~{::section})}">
+<body>
 <section>
-    <div th:if="${success}" class="alert-success-sl" th:text="${success}"></div>
-
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
-        <h2 style="font-family:'Bebas Neue'; font-size:32px; letter-spacing:3px;">Lista de Productos</h2>
-        <a th:href="@{/admin/productos/create}" class="btn-sl">+ Registrar</a>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+        <h2 style="font-family:'Bebas Neue'; font-size:28px;">Gestión de Catálogo</h2>
+        <a th:href="@{/admin/productos/create}" class="btn-sl" style="background:#000; color:#fff; text-decoration:none; padding:10px 20px; font-size:11px;">+ NUEVO PRODUCTO</a>
     </div>
 
-    <!-- FILTROS -->
-    <div style="display:flex; gap:12px; margin-bottom:24px;">
-        <a th:href="@{/admin/productos}" class="btn-sl-outline">Todos</a>
-        <a th:href="@{/admin/productos(filtro='stock_bajo')}" class="btn-sl-outline">Stock Bajo</a>
-        <a th:href="@{/admin/productos(filtro='activo')}" class="btn-sl-outline">Activos</a>
-    </div>
+    <div th:if="${success}" class="alert alert-success" th:text="${success}" style="border-radius:0; font-size:12px;"></div>
 
-    <table class="stateless-table">
-        <thead>
+    <table class="table align-middle bg-white border">
+        <thead class="table-dark">
             <tr>
-                <th>ID</th>
                 <th>Imagen</th>
                 <th>Nombre</th>
                 <th>Precio</th>
-                <th>Estado</th>
                 <th>Stock</th>
+                <th>Categoría</th>
                 <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
             <tr th:each="p : ${productos}">
-                <td th:text="${p.id}"></td>
-                <td>
-                    <img th:if="${p.imagen}" th:src="@{'/images/' + ${p.imagen}}" style="width:50px; height:60px; object-fit:cover;">
-                </td>
+                <td><img th:src="${p.imagen}" style="width:50px; height:60px; object-fit:cover; background:#eee;"></td>
                 <td th:text="${p.nombre}"></td>
                 <td th:text="${'$' + p.precio}"></td>
-                <td th:text="${#strings.capitalize(p.estado)}"></td>
-                <td th:text="${p.stockActual}" th:style="${p.stockActual <= p.stockMinimo ? 'color:#c00; font-weight:600' : ''}"></td>
-                <td style="display:flex; gap:8px;">
-                    <a th:href="@{'/admin/productos/edit/' + ${p.id}}" class="btn-sl-outline">Editar</a>
-                    <form th:action="@{'/admin/productos/delete/' + ${p.id}}" method="POST" onsubmit="return confirm('¿Eliminar?')">
-                        <button type="submit" class="btn-sl-danger">Eliminar</button>
+                <td th:text="${p.stockActual}" th:style="${p.stockActual <= 5 ? 'color:red; font-weight:bold' : ''}"></td>
+                <td th:text="${p.categoria != null ? p.categoria.nombre : 'Sin categoría'}"></td>
+                <td>
+                    <a th:href="@{'/admin/productos/edit/' + ${p.id}}" class="btn btn-sm btn-outline-dark" style="font-size:10px;">EDITAR</a>
+                    <form th:action="@{'/admin/productos/delete/' + ${p.id}}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-sm btn-link text-danger" style="font-size:10px;" onclick="return confirm('¿Eliminar?')">BORRAR</button>
                     </form>
                 </td>
             </tr>
         </tbody>
     </table>
 </section>
-</div>
+</body>
+</html>

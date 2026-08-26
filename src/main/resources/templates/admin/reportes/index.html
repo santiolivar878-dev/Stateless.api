@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/admin-layout :: layout(content=~{::section})}">
+<body>
+<section>
+    <p style="font-size:12px; opacity:0.5; letter-spacing:2px;">REPORTES</p>
+    <h1 style="font-family:'Bebas Neue'; font-size:32px; letter-spacing:3px; margin-bottom:40px;">MÓDULO DE REPORTES</h1>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:30px;">
+        <!-- Cuadro Ventas -->
+        <a th:href="@{/admin/reportes/metricas}" style="text-decoration:none; color:inherit;">
+            <div class="bg-white p-5 border" style="transition:0.3s;" onmouseover="this.style.borderColor='#000'">
+                <h3 style="font-family:'Bebas Neue';">📊 VENTAS</h3>
+                <p style="font-size:13px; opacity:0.6;">Reporte de ingresos por período y métodos de pago.</p>
+            </div>
+        </a>
+        <!-- Cuadro Inventario -->
+        <a th:href="@{/admin/reportes/metricas}" style="text-decoration:none; color:inherit;">
+            <div class="bg-white p-5 border" style="transition:0.3s;" onmouseover="this.style.borderColor='#000'">
+                <h3 style="font-family:'Bebas Neue';">📦 INVENTARIO</h3>
+                <p style="font-size:13px; opacity:0.6;">Estado del stock y productos con baja rotación.</p>
+            </div>
+        </a>
+        <!-- Envíos -->
+        <div class="bg-white p-5 border" style="opacity:0.5;">
+            <h3 style="font-family:'Bebas Neue';">🚚 ENVÍOS</h3>
+            <p style="font-size:13px;">Seguimiento de guías procesadas (Próximamente).</p>
+        </div>
+        <!-- Proveedores -->
+        <div class="bg-white p-5 border" style="opacity:0.5;">
+            <h3 style="font-family:'Bebas Neue';">🏭 PROVEEDORES</h3>
+            <p style="font-size:13px;">Análisis de cumplimiento por proveedor (Próximamente).</p>
+        </div>
+    </div>
+</section>
+</body>
+</html>

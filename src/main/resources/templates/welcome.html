@@ -2,28 +2,42 @@
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/app-layout :: layout(content=~{::section})}">
 <body>
 <section>
-    <style>
-        .hero { height: 85vh; display: flex; align-items: center; justify-content: center; text-align: center; position: relative; background: #000; }
-        .hero-title { font-family: 'Bebas Neue'; font-size: 120px; letter-spacing: 12px; line-height: 0.9; margin: 0; }
-        .hero-sub { font-size: 13px; letter-spacing: 4px; opacity: 0.6; margin-top: 30px; margin-bottom: 40px; }
-        .btn-outline-white { border: 1px solid #fff; color: #fff; padding: 15px 40px; text-decoration: none; font-size: 12px; letter-spacing: 3px; font-weight: 600; transition: 0.3s; }
-        .btn-outline-white:hover { background: #fff; color: #000; }
-        .ctrl-btn { position: absolute; top: 50%; background: none; border: 1px solid rgba(255,255,255,0.2); color: #fff; width: 40px; height: 40px; cursor: pointer; }
-    </style>
-
-    <div class="hero">
-        <button class="ctrl-btn" style="left: 20px;">&lt;</button>
-        <button class="ctrl-btn" style="right: 20px;">&gt;</button>
-
+    <div style="background:#000; height:70vh; display:flex; align-items:center; justify-content:center; text-align:center; color:#fff;">
         <div class="hero-content">
             <p style="font-size: 11px; letter-spacing: 5px; color: rgba(255,255,255,0.5); margin-bottom: 20px;">NUEVA COLECCIÓN 2026</p>
-            <h1 class="hero-title">STATELESS</h1>
-            <p class="hero-sub">DEFINE TU MUNDO. SIN ETIQUETAS.</p>
-            <a th:href="@{/essentials}" class="btn-outline-white">VER ESSENTIALS</a>
+            <h1 style="font-family: 'Bebas Neue'; font-size: 100px; letter-spacing: 12px; line-height: 0.9; margin: 0;">STATELESS</h1>
+            <p style="font-size: 13px; letter-spacing: 4px; opacity: 0.6; margin-top: 30px; margin-bottom: 40px;">DEFINE TU MUNDO. SIN ETIQUETAS.</p>
+            <a th:href="@{/essentials}" style="border: 1px solid #fff; color: #fff; padding: 15px 40px; text-decoration: none; font-size: 12px; letter-spacing: 3px; font-weight: 600;">VER ESSENTIALS</a>
+        </div>
+    </div>
+
+    <!-- PRODUCTOS DESTACADOS -->
+    <div style="padding:80px 40px; background:#fff; color:#000;">
+        <h2 style="font-family:'Bebas Neue'; font-size:40px; margin-bottom:40px;">DESTACADOS</h2>
+        
+        <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:30px;">
+            <!-- Iteramos sobre essentials -->
+            <div th:each="p : ${essentials}" style="border:1px solid #eee; padding:15px;">
+                <a th:href="@{'/producto/' + ${p.id}}" style="text-decoration:none; color:inherit;">
+                    <!-- Protección contra imagen nula -->
+                    <!-- Reemplaza solo la etiqueta img por esta lógica -->
+<img th:src="${p.imagen != null ? (p.imagen.startsWith('http') ? p.imagen : '/images/' + p.imagen) : 'https://via.placeholder.com/300x400'}" 
+     style="width:100%; aspect-ratio:3/4; object-fit:cover; margin-bottom:15px;">
+                    
+                    <p th:text="${p.nombre}" style="font-family:'Bebas Neue'; font-size:22px; margin:0;"></p>
+                    
+                    <!-- Protección contra precio nulo -->
+                    <p th:if="${p.precio != null}" 
+                       th:text="${'$' + #numbers.formatDecimal(p.precio, 0, 'COMMA', 0, 'POINT')}" 
+                       style="font-weight:700; margin-top:5px;"></p>
+                    <p th:unless="${p.precio != null}">$ --.--</p>
+                </a>
+            </div>
         </div>
 
-        <div style="position: absolute; bottom: 30px; right: 50px; font-size: 12px; opacity: 0.3; letter-spacing: 2px;">
-            01 / 03
+        <!-- Si no hay productos, mostramos un mensaje en lugar de error -->
+        <div th:if="${#lists.isEmpty(essentials)}" style="text-align:center; padding:40px; opacity:0.3;">
+            <p>No hay productos destacados para mostrar.</p>
         </div>
     </div>
 </section>

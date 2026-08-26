@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/admin-layout :: layout(content=~{::section})}">
+<body>
+<section>
+    <h2 style="font-family:'Bebas Neue'; font-size:28px; margin-bottom:30px;">Actualizar Guía de Envío</h2>
+
+    <div class="bg-white p-4 border" style="max-width: 600px;">
+        <p style="font-size:12px; opacity:0.5;">ORDEN: <strong th:text="${'#' + envio.venta.id}"></strong></p>
+        <p style="font-size:12px; opacity:0.5;">DESTINO: <strong th:text="${envio.direccion + ' (' + envio.ciudad + ')'}"></strong></p>
+        <hr>
+        
+        <form th:action="@{'/admin/envios/update/' + ${envio.id}}" method="POST">
+            <div class="mb-3">
+                <label class="form-label" style="font-size:11px; text-transform:uppercase;">Empresa Transportadora</label>
+                <select name="transportadora" class="form-select" style="border-radius:0;" required>
+                    <option value="Servientrega" th:selected="${envio.transportadora == 'Servientrega'}">Servientrega</option>
+                    <option value="Envía" th:selected="${envio.transportadora == 'Envía'}">Envía</option>
+                    <option value="Interrapidisimo" th:selected="${envio.transportadora == 'Interrapidisimo'}">Interrapidisimo</option>
+                    <option value="DHL" th:selected="${envio.transportadora == 'DHL'}">DHL</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" style="font-size:11px; text-transform:uppercase;">Número de Guía de Rastreo</label>
+                <input type="text" name="numeroGuia" th:value="${envio.numeroGuia}" class="form-control" style="border-radius:0;" placeholder="Ej: 987654321" required>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label" style="font-size:11px; text-transform:uppercase;">Estado Logístico</label>
+                <select name="estado" class="form-select" style="border-radius:0;">
+                    <option value="preparando" th:selected="${envio.estado == 'preparando'}">PREPARANDO</option>
+                    <option value="en_curso" th:selected="${envio.estado == 'en_curso'}">EN CAMINO</option>
+                    <option value="entregado" th:selected="${envio.estado == 'entregado'}">ENTREGADO</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn-sl" style="background:#000; color:#fff; border:none; padding:12px 40px; font-size:12px;">ACTUALIZAR ENVÍO</button>
+            <a th:href="@{/admin/envios}" class="ms-3 text-dark text-decoration-none" style="font-size:12px;">Volver</a>
+        </form>
+    </div>
+</section>
+</body>
+</html>

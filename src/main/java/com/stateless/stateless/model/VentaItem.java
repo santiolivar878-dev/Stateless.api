@@ -6,65 +6,30 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "venta_items")
 public class VentaItem {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "venta_id")
+    @ManyToOne @JoinColumn(name = "venta_id")
     private Venta venta;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "producto_id")
+    @ManyToOne @JoinColumn(name = "producto_id")
     private Producto producto;
 
-    private Integer cantidad;
+    @ManyToOne @JoinColumn(name = "variante_id") // Para saber qué color se compró
+    private ProductoVariante variante;
 
-    @Column(name = "precio_unitario")
+    private Integer cantidad;
     private BigDecimal precioUnitario;
 
-    // Constructor vacío obligatorio para JPA
     public VentaItem() {}
-
-    // Getters y Setters Manuales
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Venta getVenta() {
-        return venta;
-    }
-
-    public void setVenta(Venta venta) {
-        this.venta = venta;
-    }
-
-    public Producto getProducto() {
-        return producto;
-    }
-
-    public void setProducto(Producto producto) {
-        this.producto = producto;
-    }
-
-    public Integer getCantidad() {
-        return cantidad;
-    }
-
-    public void setCantidad(Integer cantidad) {
-        this.cantidad = cantidad;
-    }
-
-    public BigDecimal getPrecioUnitario() {
-        return precioUnitario;
-    }
-
-    public void setPrecioUnitario(BigDecimal precioUnitario) {
-        this.precioUnitario = precioUnitario;
-    }
+    public Long getId() { return id; }
+    public void setVenta(Venta v) { this.venta = v; }
+    public Producto getProducto() { return producto; }
+    public void setProducto(Producto p) { this.producto = p; }
+    public ProductoVariante getVariante() { return variante; }
+    public void setVariante(ProductoVariante v) { this.variante = v; }
+    public Integer getCantidad() { return cantidad; }
+    public void setCantidad(Integer c) { this.cantidad = c; }
+    public void setPrecioUnitario(BigDecimal p) { this.precioUnitario = p; }
 }

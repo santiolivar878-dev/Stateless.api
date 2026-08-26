@@ -17,6 +17,9 @@ public class Envio {
     private String direccion;
     private String ciudad;
     private String estado = "pendiente";
+    private String transportadora;
+    private String numeroGuia;
+
     private LocalDateTime fecha_envio;
     private LocalDateTime fecha_confirmado;
     private LocalDateTime fecha_preparando;
@@ -35,6 +38,12 @@ public class Envio {
     public void setCiudad(String ciudad) { this.ciudad = ciudad; }
     public String getEstado() { return estado; }
     public void setEstado(String estado) { this.estado = estado; }
+    public String getTransportadora() { return transportadora; }
+    public void setTransportadora(String transportadora) { this.transportadora = transportadora; }
+    public String getNumeroGuia() { return numeroGuia; }
+    public void setNumeroGuia(String numeroGuia) { this.numeroGuia = numeroGuia; }
+
+    // Métodos de fecha que pedía el error
     public void setFecha_confirmado(LocalDateTime f) { this.fecha_confirmado = f; }
     public void setFecha_preparando(LocalDateTime f) { this.fecha_preparando = f; }
     public void setFecha_en_curso(LocalDateTime f) { this.fecha_en_curso = f; }
