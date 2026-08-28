@@ -5,43 +5,37 @@ import com.stateless.stateless.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List; // ESTA ES LA LÍNEA QUE FALTABA
+import java.util.List;
+import java.util.UUID;
 
 @Service
 public class CheckoutService {
-
     @Autowired private VentaRepository ventaRepository;
     @Autowired private CarritoRepository carritoRepository;
+    @Autowired private VentaItemRepository ventaItemRepository;
     @Autowired private ProductoRepository productoRepository;
     @Autowired private ProductoVarianteRepository varianteRepository;
-    @Autowired private VentaItemRepository ventaItemRepository;
 
     @Transactional
     public Venta procesarPedido(User user, String direccion, String ciudad, String metodoPago) {
-        Carrito carrito = carritoRepository.findByUserId(user.getId())
-                .orElseThrow(() -> new RuntimeException("Carrito no encontrado"));
-
-        // 1. Crear la Venta principal
+        Carrito carrito = carritoRepository.findByUserId(user.getId()).orElseThrow();
+        
         Venta venta = new Venta();
         venta.setUsuario(user);
         venta.setTotal(carrito.getTotal());
         venta.setMetodoPago(metodoPago);
-        venta.setEstado("pendiente");
+        venta.setEstado("pagado"); // Seteo corregido
+        venta.setCreatedAt(LocalDateTime.now());
+        
+        if ("efecty".equals(metodoPago)) {
+            venta.setCodigoPago("EFY-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
+            venta.setEstado("pendiente_pago");
+        }
+
         Venta ventaGuardada = ventaRepository.save(venta);
 
-        // 2. Crear el Envío
-        Envio envio = new Envio();
-        envio.setVenta(ventaGuardada);
-        envio.setDireccion(direccion);
-        envio.setCiudad(ciudad);
-        // Sincronización manual ya que no usamos Lombok
-        ventaGuardada.setEnvio(envio);
-
-        // 3. Procesar Items y descontar Stock
-        List<VentaItem> listaVentaItems = new ArrayList<>();
-        
         for (CarritoItem cartItem : carrito.getItems()) {
             VentaItem vItem = new VentaItem();
             vItem.setVenta(ventaGuardada);
@@ -49,25 +43,20 @@ public class CheckoutService {
             vItem.setVariante(cartItem.getVariante());
             vItem.setCantidad(cartItem.getCantidad());
             vItem.setPrecioUnitario(cartItem.getPrecioUnitario());
-            listaVentaItems.add(vItem);
+            ventaItemRepository.save(vItem);
 
-            // A. Descontar del total general del Producto (usando el setter manual)
             Producto p = cartItem.getProducto();
             p.setStockActual(p.getStockActual() - cartItem.getCantidad());
             productoRepository.save(p);
-
-            // B. Descontar de la Variante (si existe)
-            if (cartItem.getVariante() != null) {
-                ProductoVariante pv = cartItem.getVariante();
-                pv.setStockActual(pv.getStockActual() - cartItem.getCantidad());
-                varianteRepository.save(pv);
-            }
         }
 
-        // Guardar todos los detalles de la venta
-        ventaItemRepository.saveAll(listaVentaItems);
+        Envio envio = new Envio();
+        envio.setVenta(ventaGuardada);
+        envio.setDireccion(direccion);
+        envio.setCiudad(ciudad);
+        envio.setEstado("pendiente");
+        ventaGuardada.setEnvio(envio);
 
-        // 4. Limpiar carrito (vaciar la lista y persistir)
         carrito.getItems().clear();
         carritoRepository.save(carrito);
 

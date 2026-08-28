@@ -9,19 +9,23 @@ public class CarritoItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Integer cantidad;
-    
-    @Column(name = "precio_unitario")
-    private BigDecimal precioUnitario;
 
-    @ManyToOne @JoinColumn(name = "carrito_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "carrito_id")
     private Carrito carrito;
 
-    @ManyToOne @JoinColumn(name = "producto_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "producto_id")
     private Producto producto;
 
-    @ManyToOne @JoinColumn(name = "variante_id") // Nueva columna
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "variante_id")
     private ProductoVariante variante;
+
+    private Integer cantidad;
+
+    @Column(name = "precio_unitario")
+    private BigDecimal precioUnitario;
 
     public CarritoItem() {}
     public Long getId() { return id; }
@@ -34,5 +38,7 @@ public class CarritoItem {
     public void setProducto(Producto p) { this.producto = p; }
     public ProductoVariante getVariante() { return variante; }
     public void setVariante(ProductoVariante v) { this.variante = v; }
-    public BigDecimal getSubtotal() { return precioUnitario.multiply(new BigDecimal(cantidad)); }
+    public BigDecimal getSubtotal() { 
+        return precioUnitario != null ? precioUnitario.multiply(new BigDecimal(cantidad)) : BigDecimal.ZERO; 
+    }
 }

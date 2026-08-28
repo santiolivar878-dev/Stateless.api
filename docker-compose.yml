@@ -1,0 +1,27 @@
+services:
+  # Servicio de Base de Datos MySQL
+  db:
+    image: mysql:8.0
+    container_name: stateless_db
+    restart: always
+    environment:
+      MYSQL_DATABASE: stateless_db
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./sql:/docker-entrypoint-initdb.d
+
+  # Servicio del Backend Spring Boot
+  app:
+    build: .
+    container_name: stateless_backend
+    restart: always
+    ports:
+      - "8081:8081"
+    depends_on:
+      - db
+
+volumes:
+  mysql_data:

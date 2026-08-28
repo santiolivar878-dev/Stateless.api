@@ -12,18 +12,25 @@
         <div th:if="${success}" class="alert alert-success" th:text="${success}" style="font-size:12px;"></div>
 
         <form th:action="@{/login}" method="POST">
-            <label for="email">Correo electrónico</label>
-            <input id="email" name="email" class="form-control" type="email" placeholder="tucorreo@ejemplo.com" required autofocus>
+    <label for="email">Correo electrónico</label>
+    <input id="email" name="email" class="form-control" type="email" placeholder="tucorreo@ejemplo.com" required autofocus>
 
-            <label for="password">Contraseña</label>
-            <input id="password" name="password" class="form-control" type="password" placeholder="••••••••" required>
+    <label for="password">Contraseña</label>
+    <input id="password" name="password" class="form-control" type="password" placeholder="••••••••" required>
 
-            <button type="submit" class="btn-stateless">INGRESAR</button>
+    <button type="submit" class="btn-stateless">INGRESAR</button>
 
-            <p class="text-center mt-4" style="font-size:11px; color:rgba(255,255,255,0.5);">
-                ¿No tienes cuenta? <a th:href="@{/register}" style="color:#fff;">Regístrate aquí</a>
-            </p>
-        </form>
+    <!-- ENLACE DE RECUPERACIÓN AÑADIDO -->
+    <div style="text-align: center; margin-top: 15px;">
+        <a th:href="@{/forgot-password}" style="color: rgba(255,255,255,0.6); font-size: 11px; text-decoration: none; letter-spacing: 1px;">
+            ¿OLVIDASTE TU CONTRASEÑA?
+        </a>
+    </div>
+
+    <p class="text-center mt-3" style="font-size:11px; color:rgba(255,255,255,0.5);">
+        ¿No tienes cuenta? <a th:href="@{/register}" style="color:#fff; font-weight: bold;">Regístrate aquí</a>
+    </p>
+</form>
 
         <!-- Separador -->
         <div style="display:flex; align-items:center; gap:16px; margin-top:32px; margin-bottom:24px;">

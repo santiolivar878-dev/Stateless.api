@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -20,9 +21,16 @@ public class PasswordResetService {
     @Transactional
     public String createToken(String email) {
         return userRepository.findByEmail(email).map(user -> {
-            tokenRepository.deleteByEmail(email); // Borramos por email plano
+            tokenRepository.deleteById(email); 
+            
             String token = UUID.randomUUID().toString();
-            PasswordResetToken resetToken = new PasswordResetToken(token, user);
+            PasswordResetToken resetToken = new PasswordResetToken();
+            resetToken.setEmail(email);
+            resetToken.setToken(token);
+            resetToken.setUserId(user.getId()); // Seteamos el ID que pide Docker
+            resetToken.setCreatedAt(LocalDateTime.now());
+            resetToken.setExpiryDate(LocalDateTime.now().plusHours(1));
+            
             tokenRepository.save(resetToken);
             return token;
         }).orElse(null);

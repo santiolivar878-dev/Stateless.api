@@ -13,45 +13,29 @@ public class PasswordResetToken {
     private String token;
 
     @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "expiry_date")
     private LocalDateTime expiryDate;
 
-    // Constructor vacío obligatorio para JPA
+    @Column(name = "user_id") // Campo obligatorio en tu DB de Docker
+    private Long userId;
+
     public PasswordResetToken() {}
 
-    // Constructor que usa el PasswordResetService
-    public PasswordResetToken(String token, User user) {
-        this.token = token;
-        this.email = user.getEmail();
-        this.expiryDate = LocalDateTime.now().plusHours(1);
-    }
+    // Getters y Setters
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+    public String getToken() { return token; }
+    public void setToken(String token) { this.token = token; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public LocalDateTime getExpiryDate() { return expiryDate; }
+    public void setExpiryDate(LocalDateTime expiryDate) { this.expiryDate = expiryDate; }
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
 
-    // Getters y Setters Manuales
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    public LocalDateTime getExpiryDate() {
-        return expiryDate;
-    }
-
-    public void setExpiryDate(LocalDateTime expiryDate) {
-        this.expiryDate = expiryDate;
-    }
-
-    // Método de validación que usa el Service
     public boolean isExpired() {
-        return LocalDateTime.now().isAfter(expiryDate);
+        return createdAt != null && createdAt.plusMinutes(60).isBefore(LocalDateTime.now());
     }
 }

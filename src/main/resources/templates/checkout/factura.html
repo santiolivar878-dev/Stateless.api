@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/app-layout :: layout(content=~{::section})}">
+<body>
+<section style="padding: 60px; max-width: 800px; margin: 0 auto; color: #fff; background: #000; border: 1px solid #333;">
+    <div style="text-align: center; margin-bottom: 40px;">
+        <h1 style="font-family:'Bebas Neue'; font-size: 50px; letter-spacing: 5px;">PAGO EXITOSO</h1>
+        <p style="opacity: 0.5;">Gracias por tu compra en STATELESS</p>
+    </div>
+
+    <div style="border-top: 1px solid #333; padding-top: 20px;">
+        <p style="font-size: 12px; opacity: 0.5;">NÚMERO DE PEDIDO</p>
+        <h3 th:text="'#' + ${venta.id}" style="font-family:'Bebas Neue'; letter-spacing: 2px;"></h3>
+    </div>
+
+    <div style="margin: 30px 0;">
+        <table class="table table-dark" style="background: transparent;">
+            <thead>
+                <tr style="font-size: 11px; opacity: 0.5;">
+                    <th>PRODUCTO</th>
+                    <th>CANT</th>
+                    <th style="text-align: right;">TOTAL</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="item : ${venta.items}">
+                    <td>
+                        <span th:text="${item.producto.nombre}"></span>
+                        <small th:if="${item.variante != null}" th:text="' (' + ${item.variante.color} + ')'" style="display: block; opacity: 0.5;"></small>
+                    </td>
+                    <td th:text="${item.cantidad}"></td>
+                    <td th:text="${'$' + item.precioUnitario * item.cantidad}" style="text-align: right;"></td>
+                </tr>
+            </tbody>
+            <!-- Dentro de la tabla de factura.html -->
+<tbody>
+    <tr th:each="item : ${venta.items}">
+        <td th:text="${item.producto?.nombre != null ? item.producto.nombre : 'Producto'}"></td>
+        <td th:text="${item.cantidad}"></td>
+        <td th:text="${'$' + (item.precioUnitario * item.cantidad)}" style="text-align: right;"></td>
+    </tr>
+</tbody>
+        </table>
+    </div>
+
+    <div style="text-align: right; border-top: 2px solid #fff; padding-top: 20px;">
+        <p style="font-size: 14px; opacity: 0.5;">TOTAL PAGADO</p>
+        <h2 th:text="${'$' + #numbers.formatDecimal(venta.total, 0, 'COMMA', 0, 'POINT')}" style="font-family:'Bebas Neue'; font-size: 40px;"></h2>
+    </div>
+
+    <div style="margin-top: 50px; display: flex; gap: 20px; justify-content: center;">
+        <a th:href="@{/}" style="color: #fff; text-decoration: none; font-size: 12px; border: 1px solid #fff; padding: 10px 30px;">VOLVER AL INICIO</a>
+        <a th:href="@{'/checkout/factura/' + ${venta.id} + '/descargar'}" style="background: #fff; color: #000; text-decoration: none; font-size: 12px; padding: 10px 30px; font-weight: bold;">DESCARGAR PDF</a>
+    </div>
+</section>
+</body>
+</html>

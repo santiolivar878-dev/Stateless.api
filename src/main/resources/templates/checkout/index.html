@@ -1,88 +1,120 @@
-<div th:replace="~{layouts/app-layout :: layout(content=~{::section})}">
-<section style="padding: 60px; max-width: 1000px; margin: 0 auto;">
-    <h1 style="font-family:'Bebas Neue', sans-serif; font-size:48px; letter-spacing:4px; margin-bottom:8px;">CHECKOUT</h1>
-    <p style="font-size:13px; opacity:0.5; margin-bottom:40px;">Completa tu pedido</p>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/app-layout :: layout(content=~{::section})}">
+<body>
+<section style="padding: 60px; max-width: 1100px; margin: 0 auto; background: #fff; color: #000;">
+    <style>
+        .method-card { border: 1px solid #ddd; padding: 20px; text-align: center; cursor: pointer; transition: 0.3s; background: #fdffdf; color: #000; }
+        .method-card.active { border: 2px solid #000; background: #f0f0f0; }
+        .method-card p { margin: 0; pointer-events: none; }
+        .form-control { border-radius: 0; border: 1px solid #ccc; padding: 12px; }
+        .resumen-box { border-left: 1px solid #eee; padding-left: 40px; }
+    </style>
 
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:60px;">
+    <h1 style="font-family:'Bebas Neue'; font-size:48px; letter-spacing:4px; margin-bottom:40px;">CHECKOUT</h1>
+
+    <div style="display:grid; grid-template-columns: 1.5fr 1fr; gap:60px;">
         <!-- FORMULARIO -->
         <div>
-            <h2 style="font-family:'Bebas Neue', sans-serif; font-size:24px; margin-bottom:24px;">DATOS DE ENVÍO</h2>
+            <h2 style="font-family:'Bebas Neue'; font-size:24px; margin-bottom:24px;">DATOS DE ENVÍO</h2>
             <form id="checkout-form">
-                <div style="margin-bottom:20px;">
-                    <label class="sl-label">Dirección</label>
-                    <input type="text" id="direccion" name="direccion" class="sl-input" required>
-                </div>
-                <div style="margin-bottom:20px;">
-                    <label class="sl-label">Ciudad</label>
-                    <input type="text" id="ciudad" name="ciudad" class="sl-input" required>
+                <input type="text" id="direccion" placeholder="DIRECCIÓN DE ENTREGA" class="form-control mb-3" required>
+                <input type="text" id="ciudad" placeholder="CIUDAD" class="form-control mb-4" required>
+
+                <h2 style="font-family:'Bebas Neue'; font-size:24px; margin-bottom:24px;">MÉTODO DE PAGO</h2>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:30px;">
+                    <div onclick="seleccionarMetodo('tarjeta')" id="opt-tarjeta" class="method-card active">
+                        <p>💳 TARJETA</p>
+                    </div>
+                    <div onclick="seleccionarMetodo('nequi')" id="opt-nequi" class="method-card">
+                        <p>📱 NEQUI</p>
+                    </div>
+                    <div onclick="seleccionarMetodo('pse')" id="opt-pse" class="method-card">
+                        <p>🏦 PSE</p>
+                    </div>
+                    <div onclick="seleccionarMetodo('efecty')" id="opt-efecty" class="method-card">
+                        <p>💵 EFECTY</p>
+                    </div>
                 </div>
 
-                <h2 style="font-family:'Bebas Neue', sans-serif; font-size:24px; margin-top:32px; margin-bottom:24px;">MÉTODO DE PAGO</h2>
-                
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:24px;">
-                    <label id="opt-tarjeta" onclick="seleccionarMetodo('tarjeta')" style="border:2px solid #000; padding:16px; cursor:pointer; text-align:center;">
-                        <p>💳 Tarjeta</p>
-                    </label>
-                    <label id="opt-efecty" onclick="seleccionarMetodo('efecty')" style="border:1px solid #ddd; padding:16px; cursor:pointer; text-align:center;">
-                        <p>💵 Efecty</p>
-                    </label>
+                <div id="panel-pago" class="p-3 bg-light mb-4 border">
+                    <p id="msg-pago" style="font-size: 12px; margin: 0;">Pago seguro con Tarjeta de Crédito/Débito.</p>
                 </div>
 
-                <button type="submit" id="submit-btn" class="btn-stateless" style="width:100%; padding:16px;">
-                    Pagar <span th:text="${'$' + #numbers.formatDecimal(carrito.total, 0, 'COMMA', 2, 'POINT')}"></span>
+                <button type="submit" id="btn-pagar" class="btn btn-dark w-100 p-3" style="font-weight:bold; border-radius:0; letter-spacing:2px;">
+                    CONFIRMAR PEDIDO
                 </button>
             </form>
         </div>
 
-        <!-- RESUMEN (Derecha) -->
-        <div>
-            <h2 style="font-family:'Bebas Neue', sans-serif; font-size:24px; margin-bottom:24px;">RESUMEN</h2>
-            <div th:each="item : ${carrito.items}" style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid #eee;">
+        <!-- RESUMEN -->
+        <div class="resumen-box">
+            <h2 style="font-family:'Bebas Neue'; font-size:24px; margin-bottom:24px;">RESUMEN</h2>
+            <div th:each="item : ${carrito.items}" style="display:flex; justify-content:space-between; margin-bottom:15px;">
                 <div>
-                    <p th:text="${item.producto.nombre}" style="font-size:13px; font-weight:600;"></p>
-                    <p th:text="${'Cantidad: ' + item.cantidad}" style="font-size:12px; opacity:0.5;"></p>
+                    <p th:text="${item.producto.nombre}" style="font-weight:bold; margin:0;"></p>
+                    <p th:text="'CANT: ' + ${item.cantidad}" style="font-size:11px; opacity:0.5;"></p>
                 </div>
-                <p th:text="${'$' + item.subtotal}" style="font-size:13px; font-weight:600;"></p>
+                <p th:text="${'$' + #numbers.formatDecimal(item.subtotal, 0, 'COMMA', 0, 'POINT')}" style="font-weight:bold;"></p>
             </div>
-            <div style="display:flex; justify-content:space-between; padding:20px 0; border-top:2px solid #000; margin-top:8px;">
-                <p style="font-family:'Bebas Neue', sans-serif; font-size:20px;">TOTAL</p>
-                <p th:text="${'$' + #numbers.formatDecimal(carrito.total, 0, 'COMMA', 2, 'POINT')}" style="font-family:'Bebas Neue', sans-serif; font-size:20px;"></p>
+            <hr>
+            <div style="display:flex; justify-content:space-between;">
+                <p style="font-family:'Bebas Neue'; font-size:24px;">TOTAL</p>
+                <p th:text="${'$' + #numbers.formatDecimal(carrito.total, 0, 'COMMA', 0, 'POINT')}" style="font-family:'Bebas Neue'; font-size:24px;"></p>
             </div>
         </div>
     </div>
-</section>
 
-<script th:inline="javascript">
-    let metodoSeleccionado = 'tarjeta';
+    <script>
+        let metodoSeleccionado = 'tarjeta';
 
-    function seleccionarMetodo(metodo) {
-        metodoSeleccionado = metodo;
-        document.getElementById('opt-tarjeta').style.border = metodo === 'tarjeta' ? '2px solid #000' : '1px solid #ddd';
-        document.getElementById('opt-efecty').style.border = metodo === 'efecty' ? '2px solid #000' : '1px solid #ddd';
-    }
+        function seleccionarMetodo(m) {
+            metodoSeleccionado = m;
+            // Quitar clase activa de todos
+            document.querySelectorAll('.method-card').forEach(el => el.classList.remove('active'));
+            // Poner activa al seleccionado
+            document.getElementById('opt-' + m).classList.add('active');
+            
+            // Cambiar mensaje informativo
+            const msg = document.getElementById('msg-pago');
+            if(m === 'nequi') msg.innerText = "Ingresa tu número de celular Nequi en el siguiente paso.";
+            else if(m === 'pse') msg.innerText = "Serás redirigido a la pasarela de tu banco.";
+            else if(m === 'efecty') msg.innerText = "Se generará un pin para pagar en puntos Efecty.";
+            else msg.innerText = "Pago seguro con Tarjeta de Crédito/Débito.";
+        }
 
-    document.getElementById('checkout-form').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        const btn = document.getElementById('submit-btn');
-        btn.disabled = true;
-        btn.textContent = 'Procesando...';
+        document.getElementById('checkout-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-pagar');
+            btn.disabled = true;
+            btn.innerText = "VALIDANDO...";
 
-        const response = await fetch('/checkout/procesar', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content
-            },
-            body: JSON.stringify({
-                direccion: document.getElementById('direccion').value,
-                ciudad: document.getElementById('ciudad').value,
-                metodo_pago: metodoSeleccionado
-            })
+            try {
+                const response = await fetch('/checkout/procesar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        direccion: document.getElementById('direccion').value,
+                        ciudad: document.getElementById('ciudad').value,
+                        metodo_pago: metodoSeleccionado
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    window.location.href = data.redirect;
+                } else {
+                    const errorData = await response.json();
+                    alert("Error en el pedido: " + (errorData.error || "Falla en el servidor"));
+                    btn.disabled = false;
+                    btn.innerText = "CONFIRMAR PEDIDO";
+                }
+            } catch (err) {
+                alert("Error de red. Verifica que Docker esté corriendo en el puerto 8081.");
+                btn.disabled = false;
+                btn.innerText = "CONFIRMAR PEDIDO";
+            }
         });
-
-        const data = await response.json();
-        if (data.redirect) window.location.href = data.redirect;
-    });
-</script>
-</div>
+    </script>
+</section>
+</body>
+</html>

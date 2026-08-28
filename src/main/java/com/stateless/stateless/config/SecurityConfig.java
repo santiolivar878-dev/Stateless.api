@@ -31,13 +31,14 @@ public class SecurityConfig {
                 // 1. Recursos estáticos y rutas básicas de error
                 .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico", "/error").permitAll()
                 
-                // 2. Vistas públicas de la tienda (ABIERTAS AL PÚBLICO)
+                // 2. Vistas públicas (Asegúrate de que cada una sea un String separado)
                 .requestMatchers("/", "/login", "/register", "/essentials", "/octane", "/waves", "/buscar/**", "/catalogo/**").permitAll()
+                .requestMatchers("/forgot-password", "/reset-password/**").permitAll()
                 
-                // 3. Detalle de producto y Carrito (ABIERTOS AL PÚBLICO)
-                .requestMatchers("/producto/**", "/carrito", "/carrito/**").permitAll()
+                // 3. Detalle de producto y Carrito
+                .requestMatchers("/producto/**", "/carrito/**").permitAll()
                 
-                // 4. Rutas protegidas (REQUIEREN LOGIN)
+                // 4. Rutas protegidas
                 .requestMatchers("/admin/**", "/reportes/**").hasRole("ADMIN")
                 .requestMatchers("/empleado/**").hasAnyRole("ADMIN", "EMPLEADO")
                 .requestMatchers("/account/**", "/checkout/**").authenticated() 

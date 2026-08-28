@@ -3,6 +3,7 @@ package com.stateless.stateless.model;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -13,7 +14,7 @@ public class Venta {
     private Long id;
 
     @Column(name = "tipo_venta")
-    private String tipoVenta = "online"; // Esta es la variable que usa el Repositorio
+    private String tipoVenta = "online";
 
     @Column(name = "metodo_pago")
     private String metodoPago;
@@ -29,11 +30,11 @@ public class Venta {
     @JoinColumn(name = "user_id")
     private User usuario;
 
-    @OneToOne(mappedBy = "venta")
+    @OneToOne(mappedBy = "venta", cascade = CascadeType.ALL)
     private Envio envio;
 
-    @OneToMany(mappedBy = "venta")
-    private List<VentaItem> items;
+    @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL)
+    private List<VentaItem> items = new ArrayList<>();
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -49,10 +50,8 @@ public class Venta {
     public void setMetodoPago(String val) { this.metodoPago = val; }
     public BigDecimal getTotal() { return total; }
     public void setTotal(BigDecimal total) { this.total = total; }
-    public String getCodigoPago() { return codigoPago; }
-    public void setCodigoPago(String val) { this.codigoPago = val; }
     public String getEstado() { return estado; }
-    public void setEstado(String estado) { this.estado = estado; }
+    public void setEstado(String estado) { this.estado = estado; } // ESTE ES EL QUE PIDE EL ERROR
     public User getUsuario() { return usuario; }
     public void setUsuario(User usuario) { this.usuario = usuario; }
     public Envio getEnvio() { return envio; }
@@ -61,4 +60,6 @@ public class Venta {
     public void setItems(List<VentaItem> items) { this.items = items; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public String getCodigoPago() { return codigoPago; }
+    public void setCodigoPago(String val) { this.codigoPago = val; }
 }

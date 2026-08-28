@@ -2,19 +2,17 @@
 <html xmlns:th="http://www.thymeleaf.org" th:fragment="layout(content)">
 <head>
     <meta charset="utf-8">
-    <title>STATELESS</title>
+    <title>STATELESS | Auth</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background:#000; margin:0; font-family:sans-serif; color:#fff; }
-        .auth-card { background:rgba(0,0,0,0.8); padding:40px; border:1px solid #333; width:400px; }
-        .form-control { background:#111; border:1px solid #333; color:#fff; margin-bottom:15px; border-radius:0; }
-        .btn-stateless { width:100%; background:#fff; color:#000; border:none; padding:10px; font-weight:bold; }
-        .auth-brand { position:fixed; top:20px; left:20px; font-size:20px; font-weight:bold; }
+        body { background: #000; color: #fff; font-family: sans-serif; }
+        .min-vh-100 { min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .auth-card { width: 100%; max-width: 400px; padding: 40px; background: rgba(255,255,255,0.05); border: 1px solid #222; }
+        .subtitle { color: #666; font-size: 12px; margin-bottom: 25px; }
     </style>
 </head>
 <body>
-    <div class="auth-brand">STATELESS</div>
-    <div class="min-vh-100 d-flex justify-content-center align-items-center">
+    <div class="min-vh-100">
         <div th:replace="${content}"></div>
     </div>
 </body>
