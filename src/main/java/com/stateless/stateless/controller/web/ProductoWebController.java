@@ -30,28 +30,25 @@ public class ProductoWebController {
         return "welcome";
     }
 
-    @GetMapping("/essentials")
+@GetMapping("/essentials")
     public String essentials(Model model) {
         List<Producto> lista = productoRepository.findByEstadoAndCategoriaNombre("activo", "Essentials");
         model.addAttribute("productos", lista != null ? lista : new ArrayList<>());
-        model.addAttribute("titulo", "ESSENTIALS");
-        return "ecommerce/coleccion";
+        return "ecommerce/essentials"; // <-- cambiado
     }
 
     @GetMapping("/waves")
     public String waves(Model model) {
         List<Producto> lista = productoRepository.findByEstadoAndCategoriaNombre("activo", "Waves");
         model.addAttribute("productos", lista != null ? lista : new ArrayList<>());
-        model.addAttribute("titulo", "WAVES");
-        return "ecommerce/coleccion";
+        return "ecommerce/waves"; // <-- cambiado
     }
 
     @GetMapping("/octane")
     public String octane(Model model) {
         List<Producto> lista = productoRepository.findByEstadoAndCategoriaNombre("activo", "Octane");
         model.addAttribute("productos", lista != null ? lista : new ArrayList<>());
-        model.addAttribute("titulo", "OCTANE");
-        return "ecommerce/coleccion";
+        return "ecommerce/octane"; // <-- cambiado
     }
 
     @GetMapping("/producto/{id}")

@@ -1,120 +1,207 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/app-layout :: layout(content=~{::section})}">
 <body>
-<section style="padding: 60px; max-width: 1100px; margin: 0 auto; background: #fff; color: #000;">
-    <style>
-        .method-card { border: 1px solid #ddd; padding: 20px; text-align: center; cursor: pointer; transition: 0.3s; background: #fdffdf; color: #000; }
-        .method-card.active { border: 2px solid #000; background: #f0f0f0; }
-        .method-card p { margin: 0; pointer-events: none; }
-        .form-control { border-radius: 0; border: 1px solid #ccc; padding: 12px; }
-        .resumen-box { border-left: 1px solid #eee; padding-left: 40px; }
-    </style>
+<section style="background:#fff; color:#000; min-height:90vh; padding:60px 40px;">
 
-    <h1 style="font-family:'Bebas Neue'; font-size:48px; letter-spacing:4px; margin-bottom:40px;">CHECKOUT</h1>
-
-    <div style="display:grid; grid-template-columns: 1.5fr 1fr; gap:60px;">
-        <!-- FORMULARIO -->
-        <div>
-            <h2 style="font-family:'Bebas Neue'; font-size:24px; margin-bottom:24px;">DATOS DE ENVÍO</h2>
-            <form id="checkout-form">
-                <input type="text" id="direccion" placeholder="DIRECCIÓN DE ENTREGA" class="form-control mb-3" required>
-                <input type="text" id="ciudad" placeholder="CIUDAD" class="form-control mb-4" required>
-
-                <h2 style="font-family:'Bebas Neue'; font-size:24px; margin-bottom:24px;">MÉTODO DE PAGO</h2>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:30px;">
-                    <div onclick="seleccionarMetodo('tarjeta')" id="opt-tarjeta" class="method-card active">
-                        <p>💳 TARJETA</p>
-                    </div>
-                    <div onclick="seleccionarMetodo('nequi')" id="opt-nequi" class="method-card">
-                        <p>📱 NEQUI</p>
-                    </div>
-                    <div onclick="seleccionarMetodo('pse')" id="opt-pse" class="method-card">
-                        <p>🏦 PSE</p>
-                    </div>
-                    <div onclick="seleccionarMetodo('efecty')" id="opt-efecty" class="method-card">
-                        <p>💵 EFECTY</p>
-                    </div>
-                </div>
-
-                <div id="panel-pago" class="p-3 bg-light mb-4 border">
-                    <p id="msg-pago" style="font-size: 12px; margin: 0;">Pago seguro con Tarjeta de Crédito/Débito.</p>
-                </div>
-
-                <button type="submit" id="btn-pagar" class="btn btn-dark w-100 p-3" style="font-weight:bold; border-radius:0; letter-spacing:2px;">
-                    CONFIRMAR PEDIDO
-                </button>
-            </form>
+    <div style="max-width:1100px; margin:0 auto;">
+        
+        <div style="margin-bottom:36px; border-bottom:2px solid #000; padding-bottom:14px;">
+            <p style="font-size:11px; letter-spacing:4px; text-transform:uppercase; opacity:0.5; margin:0;">Proceso de Compra</p>
+            <h1 style="font-family:'Bebas Neue'; font-size:44px; letter-spacing:4px; margin:0;">CHECKOUT SEGURO</h1>
         </div>
 
-        <!-- RESUMEN -->
-        <div class="resumen-box">
-            <h2 style="font-family:'Bebas Neue'; font-size:24px; margin-bottom:24px;">RESUMEN</h2>
-            <div th:each="item : ${carrito.items}" style="display:flex; justify-content:space-between; margin-bottom:15px;">
-                <div>
-                    <p th:text="${item.producto.nombre}" style="font-weight:bold; margin:0;"></p>
-                    <p th:text="'CANT: ' + ${item.cantidad}" style="font-size:11px; opacity:0.5;"></p>
+        <div style="display:grid; grid-template-columns:1.2fr 1fr; gap:48px; align-items:start;">
+
+            <!-- FORMULARIO DE ENVÍO Y PAGO -->
+            <div>
+                <form id="checkoutForm">
+                    
+                    <!-- 1. Dirección de Entrega -->
+                    <div style="margin-bottom:32px;">
+                        <h3 style="font-family:'Bebas Neue'; font-size:22px; letter-spacing:2px; margin-bottom:16px; border-bottom:1px solid #eee; padding-bottom:8px;">
+                            1. INFORMACIÓN DE ENVÍO
+                        </h3>
+
+                        <div style="margin-bottom:14px;">
+                            <label style="font-size:11px; letter-spacing:2px; text-transform:uppercase; font-weight:700; display:block; margin-bottom:6px;">Dirección completa</label>
+                            <input type="text" id="direccion" name="direccion" required placeholder="Calle / Carrera # 00 - 00, Barrio, Apto" 
+                                   style="width:100%; padding:12px; border:1px solid #000; font-size:13px; outline:none;">
+                        </div>
+
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                            <div>
+                                <label style="font-size:11px; letter-spacing:2px; text-transform:uppercase; font-weight:700; display:block; margin-bottom:6px;">Ciudad / Municipio</label>
+                                <input type="text" id="ciudad" name="ciudad" required placeholder="ej: Medellín, Bogotá, Cali" 
+                                       style="width:100%; padding:12px; border:1px solid #000; font-size:13px; outline:none;">
+                            </div>
+                            <div>
+                                <label style="font-size:11px; letter-spacing:2px; text-transform:uppercase; font-weight:700; display:block; margin-bottom:6px;">Teléfono</label>
+                                <input type="tel" id="telefono" name="telefono" required placeholder="ej: 3001234567" 
+                                       style="width:100%; padding:12px; border:1px solid #000; font-size:13px; outline:none;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Métodos de Pago Completos -->
+                    <div style="margin-bottom:32px;">
+                        <h3 style="font-family:'Bebas Neue'; font-size:22px; letter-spacing:2px; margin-bottom:16px; border-bottom:1px solid #eee; padding-bottom:8px;">
+                            2. SELECCIONA EL MÉTODO DE PAGO
+                        </h3>
+
+                        <!-- Opción 1: Tarjeta Stripe & Link -->
+                        <div class="payment-option" style="border:1px solid #000; padding:16px; margin-bottom:12px; background:#fff; cursor:pointer;" onclick="selectPayment('tarjeta_stripe')">
+                            <label style="display:flex; align-items:center; gap:12px; cursor:pointer; font-weight:700; font-size:13px; margin:0;">
+                                <input type="radio" name="metodo_pago" value="tarjeta_stripe" id="opt_stripe" checked style="accent-color:#000;">
+                                <span>💳 Tarjeta Débito / Crédito (Stripe & Link)</span>
+                            </label>
+                            <div id="desc_stripe" style="margin-top:10px; font-size:12px; opacity:0.7; padding-left:26px;">
+                                Procesamiento seguro inmediato con soporte de autocompletado en un clic con Stripe Link.
+                            </div>
+                        </div>
+
+                        <!-- Opción 2: Nequi -->
+                        <div class="payment-option" style="border:1px solid #ddd; padding:16px; margin-bottom:12px; background:#fff; cursor:pointer;" onclick="selectPayment('nequi')">
+                            <label style="display:flex; align-items:center; gap:12px; cursor:pointer; font-weight:700; font-size:13px; margin:0;">
+                                <input type="radio" name="metodo_pago" value="nequi" id="opt_nequi" style="accent-color:#000;">
+                                <span>📱 Nequi</span>
+                            </label>
+                            <div id="desc_nequi" style="display:none; margin-top:10px; font-size:12px; opacity:0.8; padding-left:26px; background:#f9f9f9; padding:10px;">
+                                Transfiere al número <strong>300 000 0000</strong>. Adjunta el comprobante al finalizar el pedido.
+                            </div>
+                        </div>
+
+                        <!-- Opción 3: Daviplata -->
+                        <div class="payment-option" style="border:1px solid #ddd; padding:16px; margin-bottom:12px; background:#fff; cursor:pointer;" onclick="selectPayment('daviplata')">
+                            <label style="display:flex; align-items:center; gap:12px; cursor:pointer; font-weight:700; font-size:13px; margin:0;">
+                                <input type="radio" name="metodo_pago" value="daviplata" id="opt_daviplata" style="accent-color:#000;">
+                                <span>🔴 Daviplata</span>
+                            </label>
+                            <div id="desc_daviplata" style="display:none; margin-top:10px; font-size:12px; opacity:0.8; padding-left:26px; background:#f9f9f9; padding:10px;">
+                                Transfiere al número <strong>310 000 0000</strong>. Tu orden se procesará tras validación.
+                            </div>
+                        </div>
+
+                        <!-- Opción 4: Contra Entrega -->
+                        <div class="payment-option" style="border:1px solid #ddd; padding:16px; margin-bottom:20px; background:#fff; cursor:pointer;" onclick="selectPayment('contraentrega')">
+                            <label style="display:flex; align-items:center; gap:12px; cursor:pointer; font-weight:700; font-size:13px; margin:0;">
+                                <input type="radio" name="metodo_pago" value="contraentrega" id="opt_contraentrega" style="accent-color:#000;">
+                                <span>📦 Pago Contra Entrega</span>
+                            </label>
+                            <div id="desc_contraentrega" style="display:none; margin-top:10px; font-size:12px; opacity:0.8; padding-left:26px; background:#f9f9f9; padding:10px;">
+                                Paga en efectivo al recibir tu paquete en tu domicilio.
+                            </div>
+                        </div>
+
+                        <div id="error-msg" style="display:none; color:#c00; font-size:12px; margin-bottom:16px; padding:12px; background:#fff0f0; border:1px solid #ffcccc;"></div>
+
+                        <button type="submit" id="btnProcesar" 
+                                style="width:100%; background:#000; color:#fff; border:none; padding:16px; font-size:12px; font-weight:700; letter-spacing:3px; text-transform:uppercase; cursor:pointer; transition:0.2s;"
+                                onmouseover="this.style.background='#333'" onmouseout="this.style.background='#000'">
+                            CONFIRMAR Y FINALIZAR COMPRA
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+
+            <!-- RESUMEN DE COMPRA -->
+            <div style="background:#fafafa; border:1px solid #eee; padding:32px; position:sticky; top:100px;">
+                <h3 style="font-family:'Bebas Neue'; font-size:24px; letter-spacing:2px; margin-bottom:20px; border-bottom:1px solid #000; padding-bottom:10px;">
+                    RESUMEN DE ORDEN
+                </h3>
+
+                <div th:each="item : ${carrito.items}" style="display:flex; justify-content:space-between; margin-bottom:14px; font-size:12px;">
+                    <div>
+                        <span th:text="${item.producto.nombre}" style="font-weight:700; text-transform:uppercase;"></span>
+                        <span th:if="${item.variante != null}" th:text="' (' + ${item.variante.color} + ')'" style="opacity:0.6;"></span>
+                        <span th:text="' × ' + ${item.cantidad}" style="opacity:0.6;"></span>
+                    </div>
+                    <span th:text="${'$' + #numbers.formatDecimal(item.precioUnitario * item.cantidad, 0, 'COMMA', 0, 'POINT')}"></span>
                 </div>
-                <p th:text="${'$' + #numbers.formatDecimal(item.subtotal, 0, 'COMMA', 0, 'POINT')}" style="font-weight:bold;"></p>
+
+                <hr style="border-color:#ddd; margin:20px 0;">
+
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:13px;">
+                    <span style="opacity:0.6;">Subtotal</span>
+                    <span th:text="${'$' + #numbers.formatDecimal(carrito.total, 0, 'COMMA', 0, 'POINT') + ' COP'}"></span>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:20px; font-size:13px;">
+                    <span style="opacity:0.6;">Envío Nacional</span>
+                    <span style="font-weight:600; color:green;">GRATIS</span>
+                </div>
+
+                <div style="display:flex; justify-content:space-between; padding-top:16px; border-top:2px solid #000;">
+                    <span style="font-weight:700; font-size:14px; letter-spacing:1px;">TOTAL A PAGAR</span>
+                    <span th:text="${'$' + #numbers.formatDecimal(carrito.total, 0, 'COMMA', 0, 'POINT') + ' COP'}" style="font-family:'Bebas Neue'; font-size:28px;"></span>
+                </div>
             </div>
-            <hr>
-            <div style="display:flex; justify-content:space-between;">
-                <p style="font-family:'Bebas Neue'; font-size:24px;">TOTAL</p>
-                <p th:text="${'$' + #numbers.formatDecimal(carrito.total, 0, 'COMMA', 0, 'POINT')}" style="font-family:'Bebas Neue'; font-size:24px;"></p>
-            </div>
+
         </div>
+
     </div>
 
+    <!-- SCRIPT DE SELECCIÓN Y PROCESAMIENTO AJAX -->
     <script>
-        let metodoSeleccionado = 'tarjeta';
+        function selectPayment(metodo) {
+            document.querySelectorAll('.payment-option').forEach(el => el.style.borderColor = '#ddd');
+            ['stripe', 'nequi', 'daviplata', 'contraentrega'].forEach(m => {
+                const desc = document.getElementById('desc_' + m);
+                if (desc) desc.style.display = 'none';
+            });
 
-        function seleccionarMetodo(m) {
-            metodoSeleccionado = m;
-            // Quitar clase activa de todos
-            document.querySelectorAll('.method-card').forEach(el => el.classList.remove('active'));
-            // Poner activa al seleccionado
-            document.getElementById('opt-' + m).classList.add('active');
-            
-            // Cambiar mensaje informativo
-            const msg = document.getElementById('msg-pago');
-            if(m === 'nequi') msg.innerText = "Ingresa tu número de celular Nequi en el siguiente paso.";
-            else if(m === 'pse') msg.innerText = "Serás redirigido a la pasarela de tu banco.";
-            else if(m === 'efecty') msg.innerText = "Se generará un pin para pagar en puntos Efecty.";
-            else msg.innerText = "Pago seguro con Tarjeta de Crédito/Débito.";
+            const radio = document.getElementById('opt_' + metodo);
+            if (radio) radio.checked = true;
+
+            const selectedBox = radio.closest('.payment-option');
+            if (selectedBox) selectedBox.style.borderColor = '#000';
+
+            const selectedDesc = document.getElementById('desc_' + metodo);
+            if (selectedDesc) selectedDesc.style.display = 'block';
         }
 
-        document.getElementById('checkout-form').addEventListener('submit', async function(e) {
+        const form = document.getElementById('checkoutForm');
+        const btn = document.getElementById('btnProcesar');
+        const errorDiv = document.getElementById('error-msg');
+
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const btn = document.getElementById('btn-pagar');
             btn.disabled = true;
-            btn.innerText = "VALIDANDO...";
+            btn.textContent = 'PROCESANDO PEDIDO...';
+            errorDiv.style.display = 'none';
+
+            const payload = {
+                direccion: document.getElementById('direccion').value,
+                ciudad: document.getElementById('ciudad').value,
+                telefono: document.getElementById('telefono').value,
+                metodo_pago: document.querySelector('input[name="metodo_pago"]:checked').value
+            };
 
             try {
                 const response = await fetch('/checkout/procesar', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        direccion: document.getElementById('direccion').value,
-                        ciudad: document.getElementById('ciudad').value,
-                        metodo_pago: metodoSeleccionado
-                    })
+                    body: JSON.stringify(payload)
                 });
 
-                if (response.ok) {
-                    const data = await response.json();
+                const data = await response.json();
+
+                if (response.ok && data.redirect) {
                     window.location.href = data.redirect;
                 } else {
-                    const errorData = await response.json();
-                    alert("Error en el pedido: " + (errorData.error || "Falla en el servidor"));
+                    errorDiv.textContent = data.error || 'Ocurrió un error al registrar el pedido.';
+                    errorDiv.style.display = 'block';
                     btn.disabled = false;
-                    btn.innerText = "CONFIRMAR PEDIDO";
+                    btn.textContent = 'CONFIRMAR Y FINALIZAR COMPRA';
                 }
             } catch (err) {
-                alert("Error de red. Verifica que Docker esté corriendo en el puerto 8081.");
+                errorDiv.textContent = 'Error de comunicación con el servidor.';
+                errorDiv.style.display = 'block';
                 btn.disabled = false;
-                btn.innerText = "CONFIRMAR PEDIDO";
+                btn.textContent = 'CONFIRMAR Y FINALIZAR COMPRA';
             }
         });
     </script>
+
 </section>
 </body>
 </html>

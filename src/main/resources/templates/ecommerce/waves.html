@@ -1,20 +1,128 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/app-layout :: layout(content=~{::section})}">
 <body>
-<section>
-    <div style="background:#fff; color:#000; padding:100px 40px; text-align:center; border-bottom:1px solid #000;">
-        <h1 style="font-family:'Bebas Neue'; font-size:80px; letter-spacing:15px;">WAVES</h1>
-        <p style="letter-spacing:5px;">MÁS ALLÁ DEL RUIDO</p>
+<section style="background:#fff; color:#000; min-height:100vh;">
+
+<!-- CANVAS INTERACTIVO DE WAVES -->
+<div style="background:#fff; height:600px; width:100%; position:relative; overflow:hidden; display:flex; align-items:flex-end; justify-content:center; padding-bottom:50px;">
+    <canvas id="waveCanvas" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:1;"></canvas>
+
+    <div style="position:relative; z-index:2; text-align:center;">
+        <p style="font-size:12px; letter-spacing:5px; text-transform:uppercase; color:#111; margin-bottom:15px; font-weight:700;">
+            MÁS ALLÁ DEL RUIDO
+        </p>
+        <a href="#catalogo-waves" style="display:inline-block; padding:14px 38px; border:1px solid #111; color:#111; text-decoration:none; text-transform:uppercase; letter-spacing:3px; font-size:12px; font-weight:600; background:rgba(255,255,255,0.85); backdrop-filter:blur(10px);">
+            VER COLECCIÓN
+        </a>
     </div>
-    <div style="padding:60px 40px; display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:30px;">
-        <div th:each="p : ${waves}" style="border:1px solid #000; padding:20px;">
-            <a th:href="@{'/producto/' + ${p.id}}" style="text-decoration:none; color:inherit;">
-                <img th:src="${p.imagen}" style="width:100%; aspect-ratio:3/4; object-fit:cover;">
-                <p th:text="${p.nombre}" style="font-family:'Bebas Neue'; font-size:22px; margin-top:15px;"></p>
-                <p th:text="${'$' + p.precio}"></p>
+</div>
+
+<!-- CATÁLOGO WAVES -->
+<div id="catalogo-waves" style="padding:60px 40px; max-width:1200px; margin:0 auto;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:36px; border-bottom:1px solid #000; padding-bottom:16px;">
+        <div>
+            <p style="font-size:11px; letter-spacing:4px; text-transform:uppercase; opacity:0.5; margin:0;">Catálogo</p>
+            <h2 style="font-family:'Bebas Neue'; font-size:48px; letter-spacing:4px; margin:0;">ROPA WAVES</h2>
+        </div>
+        <span style="font-size:11px; letter-spacing:3px; text-transform:uppercase; opacity:0.5;">Frecuencias de audio</span>
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:30px;">
+        <div th:each="p : ${productos}" style="border:1px solid #000; padding:16px; background:#fff;">
+            <a th:href="@{'/producto/' + ${p.id}}" style="text-decoration:none; color:#000;">
+                <img th:src="${p.imagen != null ? (p.imagen.startsWith('http') ? p.imagen : '/images/' + p.imagen) : '/images/placeholder.jpg'}" 
+                     style="width:100%; aspect-ratio:3/4; object-fit:cover; margin-bottom:16px; display:block;">
+                <p th:text="${p.nombre}" style="font-size:13px; font-weight:700; letter-spacing:1px; text-transform:uppercase; margin-bottom:4px;"></p>
+                <p th:if="${p.precio != null}" th:text="${'$' + #numbers.formatDecimal(p.precio, 0, 'COMMA', 0, 'POINT') + ' COP'}" style="font-size:13px; opacity:0.6; margin-bottom:12px;"></p>
             </a>
+            <form th:action="@{'/carrito/agregar/' + ${p.id}}" method="POST">
+                <button type="submit" style="width:100%; background:#000; color:#fff; border:1px solid #000; padding:12px; font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; cursor:pointer;">
+                    Añadir al carrito
+                </button>
+            </form>
         </div>
     </div>
+</div>
+
+<script>
+const canvas = document.getElementById('waveCanvas');
+const ctx = canvas.getContext('2d');
+let t = 0;
+
+function resize() {
+    canvas.width = canvas.parentElement.offsetWidth;
+    canvas.height = canvas.parentElement.offsetHeight;
+}
+window.addEventListener('resize', resize);
+resize();
+
+function drawFrame() {
+    const W = canvas.width;
+    const H = canvas.height;
+
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, W, H);
+
+    const numCols = 64;
+    const numRows = 22;
+    const dotR = 4;
+    const gapX = W / numCols;
+    const gapY = H / numRows;
+
+    for (let col = 0; col < numCols; col++) {
+        const x = col * gapX + gapX / 2;
+        const normX = (col / numCols) * 2 - 1;
+
+        const wave1 = Math.sin(normX * Math.PI * 3 + t * 1.8) * 0.5;
+        const wave2 = Math.sin(normX * Math.PI * 5 - t * 2.3) * 0.3;
+        const wave3 = Math.sin(normX * Math.PI * 1.5 + t * 0.9) * 0.2;
+        const amp = Math.abs(wave1 + wave2 + wave3);
+        const litRows = Math.round(amp * (numRows / 2));
+
+        for (let row = 0; row < numRows; row++) {
+            const y = row * gapY + gapY / 2;
+            const rowFromCenter = Math.abs(row - (numRows / 2 - 0.5));
+            const lit = rowFromCenter <= litRows;
+
+            if (lit) {
+                const intensity = 1 - (rowFromCenter / (numRows / 2)) * 0.4;
+                ctx.fillStyle = `rgba(0,0,0,${intensity})`;
+            } else {
+                ctx.fillStyle = 'rgba(0,0,0,0.07)';
+            }
+
+            ctx.beginPath();
+            ctx.arc(x, y, dotR, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    // Recorte tipográfico WAVES
+    ctx.save();
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.font = `900 ${W * 0.12}px 'Arial Black', sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = 'rgba(255,255,255,1)';
+    ctx.fillText('WAVES', W / 2, H / 2);
+    ctx.restore();
+
+    // Contorno exterior
+    ctx.save();
+    ctx.font = `900 ${W * 0.12}px 'Arial Black', sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.strokeStyle = 'rgba(0,0,0,0.85)';
+    ctx.lineWidth = 2;
+    ctx.strokeText('WAVES', W / 2, H / 2);
+    ctx.restore();
+
+    t += 0.04;
+    requestAnimationFrame(drawFrame);
+}
+drawFrame();
+</script>
+
 </section>
 </body>
 </html>

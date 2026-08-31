@@ -1,18 +1,23 @@
-<div th:replace="~{layouts/admin-layout :: layout(content=~{::section})}">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/admin-layout :: layout(content=~{::section})}">
+<body>
 <section>
+
     <div th:if="${success}" class="alert-success-sl" th:text="${success}"></div>
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}" style="border-radius:0;"></div>
+
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
-        <h2 style="font-family:'Bebas Neue'; font-size:32px; letter-spacing:3px;">Lista de Proveedores</h2>
-        <a th:href="@{/admin/proveedores/create}" class="btn-sl">+ Registrar</a>
+        <h2 style="font-family:'Bebas Neue', sans-serif; font-size:32px; letter-spacing:3px;">Lista de Proveedores</h2>
+        <a th:href="@{/admin/proveedores/create}" class="btn-sl">+ Registrar Proveedor</a>
     </div>
 
     <table class="stateless-table">
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Nombre</th>
+                <th>Empresa</th>
                 <th>Teléfono</th>
-                <th>Correo</th>
+                <th>Correo Electrónico</th>
                 <th>Estado</th>
                 <th>Acciones</th>
             </tr>
@@ -20,21 +25,26 @@
         <tbody>
             <tr th:each="prov : ${proveedores}">
                 <td th:text="${prov.id}"></td>
-                <td th:text="${prov.nombre}"></td>
+                <td style="font-weight:700;" th:text="${prov.nombre}"></td>
                 <td th:text="${prov.telefono}"></td>
                 <td th:text="${prov.correo}"></td>
                 <td>
-                    <span th:text="${prov.estado ? 'ACTIVO' : 'INACTIVO'}" 
-                          th:style="'padding:2px 8px; font-size:10px; color:#fff; background:' + (${prov.estado} ? 'green' : '#c00')"></span>
+                    <span th:if="${prov.estado}" style="background:green; color:#fff; padding:2px 8px; font-size:10px; font-weight:700;">ACTIVO</span>
+                    <span th:unless="${prov.estado}" style="background:#c00; color:#fff; padding:2px 8px; font-size:10px; font-weight:700;">INACTIVO</span>
                 </td>
                 <td style="display:flex; gap:8px;">
-                    <a th:href="@{'/admin/proveedores/edit/' + ${prov.id}}" class="btn-sl-outline">Editar</a>
-                    <form th:action="@{'/admin/proveedores/delete/' + ${prov.id}}" method="POST" onsubmit="return confirm('¿Eliminar?')">
-                        <button type="submit" class="btn-sl-danger">Eliminar</button>
+                    <a th:href="@{'/admin/proveedores/edit/' + ${prov.id}}" class="btn-sl-outline" style="padding:4px 12px; font-size:10px;">Editar</a>
+                    <form th:action="@{'/admin/proveedores/delete/' + ${prov.id}}" method="POST" onsubmit="return confirm('¿Eliminar este proveedor?')">
+                        <button type="submit" class="btn-sl-danger" style="padding:4px 12px; font-size:10px;">Eliminar</button>
                     </form>
                 </td>
             </tr>
+            <tr th:if="${#lists.isEmpty(proveedores)}">
+                <td colspan="6" style="text-align:center; opacity:0.5; padding:40px;">No hay proveedores registrados.</td>
+            </tr>
         </tbody>
     </table>
+
 </section>
-</div>
+</body>
+</html>

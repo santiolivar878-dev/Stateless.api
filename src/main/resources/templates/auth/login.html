@@ -1,48 +1,55 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/guest-layout :: layout(content=~{::section})}">
 <body>
-    <section class="auth-card">
+    <section>
         <h2>INICIAR SESIÓN</h2>
         <p class="subtitle">Accede a tu cuenta Stateless</p>
 
-        <!-- Mensajes de error -->
-        <div th:if="${param.error}" class="alert alert-danger" style="font-size:12px;">
-            Credenciales incorrectas o cuenta inactiva.
+        <!-- Mensajes de feedback -->
+        <div th:if="${param.error}" class="alert alert-danger" style="background:#2b0000; border:1px solid #c00; color:#ff8a8a;">
+            Credenciales incorrectas o cuenta inhabilitada.
         </div>
-        <div th:if="${success}" class="alert alert-success" th:text="${success}" style="font-size:12px;"></div>
+        <div th:if="${success}" class="alert alert-success" th:text="${success}" style="background:#002b0c; border:1px solid #00c030; color:#8affaa;"></div>
 
         <form th:action="@{/login}" method="POST">
-    <label for="email">Correo electrónico</label>
-    <input id="email" name="email" class="form-control" type="email" placeholder="tucorreo@ejemplo.com" required autofocus>
+            <label for="email">Correo electrónico</label>
+            <input id="email" name="email" class="form-control" type="email" placeholder="tucorreo@ejemplo.com" required autofocus>
 
-    <label for="password">Contraseña</label>
-    <input id="password" name="password" class="form-control" type="password" placeholder="••••••••" required>
+            <label for="password">Contraseña</label>
+            <input id="password" name="password" class="form-control" type="password" placeholder="••••••••" required>
 
-    <button type="submit" class="btn-stateless">INGRESAR</button>
+            <button type="submit" class="btn-stateless">INGRESAR</button>
 
-    <!-- ENLACE DE RECUPERACIÓN AÑADIDO -->
-    <div style="text-align: center; margin-top: 15px;">
-        <a th:href="@{/forgot-password}" style="color: rgba(255,255,255,0.6); font-size: 11px; text-decoration: none; letter-spacing: 1px;">
-            ¿OLVIDASTE TU CONTRASEÑA?
-        </a>
-    </div>
+            <!-- Recuperación de contraseña -->
+            <div class="d-flex justify-content-between align-items-center mt-3" style="font-size:11px;">
+                <a th:href="@{/forgot-password}" style="letter-spacing:1px; text-transform:uppercase;">
+                    ¿Olvidaste tu contraseña?
+                </a>
+            </div>
 
-    <p class="text-center mt-3" style="font-size:11px; color:rgba(255,255,255,0.5);">
-        ¿No tienes cuenta? <a th:href="@{/register}" style="color:#fff; font-weight: bold;">Regístrate aquí</a>
-    </p>
-</form>
+            <p class="text-center mt-4" style="font-size:11px; color:rgba(255,255,255,0.5);">
+                ¿No tienes cuenta? <a th:href="@{/register}" style="color:#fff; font-weight: bold;">Regístrate aquí</a>
+            </p>
+        </form>
 
-        <!-- Separador -->
-        <div style="display:flex; align-items:center; gap:16px; margin-top:32px; margin-bottom:24px;">
+        <!-- Separador O -->
+        <div style="display:flex; align-items:center; gap:16px; margin-top:28px; margin-bottom:20px;">
             <div style="flex:1; height:1px; background:rgba(255,255,255,0.1);"></div>
-            <span style="font-size:10px; letter-spacing:2px; color:rgba(255,255,255,0.3); text-transform:uppercase;">O</span>
+            <span style="font-size:10px; letter-spacing:2px; color:rgba(255,255,255,0.4); text-transform:uppercase;">O</span>
             <div style="flex:1; height:1px; background:rgba(255,255,255,0.1);"></div>
         </div>
 
-        <!-- Botón Google -->
+        <!-- Botón Continuar con Google -->
         <a th:href="@{/oauth2/authorization/google}" 
-           style="display:flex; align-items:center; justify-content:center; gap:12px; width:100%; border:1px solid rgba(255,255,255,0.2); padding:14px; color:#fff; text-decoration:none; font-size:12px; letter-spacing:2px; text-transform:uppercase; transition:background 0.2s;">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_\"Logo\".svg\" width="18">
+           style="display:flex; align-items:center; justify-content:center; gap:10px; width:100%; border:1px solid rgba(255,255,255,0.2); padding:11px; color:#fff; text-decoration:none; font-size:11px; letter-spacing:2px; text-transform:uppercase; transition:background 0.2s;"
+           onmouseover="this.style.background='rgba(255,255,255,0.08)'"
+           onmouseout="this.style.background='transparent'">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/>
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/>
+            </svg>
             Continuar con Google
         </a>
     </section>

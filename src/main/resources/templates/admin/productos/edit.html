@@ -1,31 +1,137 @@
-<!-- SECCIÓN DE VARIANTES (Replicando tu Blade) -->
-<div style="background:#fff; border:1px solid #eee; padding:32px; max-width:600px; margin-top:24px;">
-    <h3 style="font-family:'Bebas Neue'; font-size:24px; letter-spacing:3px; margin-bottom:24px;">VARIANTES DE COLOR</h3>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/admin-layout :: layout(content=~{::section})}">
+<body>
+<section>
 
-    <div th:each="v : ${producto.variantes}" style="display:flex; align-items:center; gap:12px; padding:12px; border:1px solid #eee; margin-bottom:12px;">
-        <div th:style="'width:32px; height:32px; border-radius:50%; border:1px solid #ddd; background:' + ${v.hex}"></div>
-        <div style="flex:1;">
-            <p th:text="${v.color}" style="font-size:13px; font-weight:600; margin:0;"></p>
-            <p th:text="'Stock: ' + ${v.stockActual}" style="font-size:12px; opacity:0.5; margin:0;"></p>
+    <div th:if="${success}" class="alert-success-sl" th:text="${success}"></div>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+        <h2 style="font-family:'Bebas Neue', sans-serif; font-size:32px; letter-spacing:3px;">Editar Producto</h2>
+        <a th:href="@{/admin/productos}" class="btn-sl-outline">← Volver</a>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1.2fr 1fr; gap:24px; align-items:start;">
+
+        <!-- FORMULARIO PRINCIPAL -->
+        <div style="background:#fff; border:1px solid #eee; padding:32px;">
+            <form th:action="@{'/admin/productos/update/' + ${producto.id}}" method="POST" enctype="multipart/form-data">
+                
+                <div class="sl-form-group">
+                    <label class="sl-label">Nombre del Producto</label>
+                    <input type="text" name="nombre" th:value="${producto.nombre}" class="sl-input" required>
+                </div>
+
+                <div class="sl-form-group">
+                    <label class="sl-label">Descripción</label>
+                    <textarea name="descripcion" class="sl-input" rows="3" th:text="${producto.descripcion}"></textarea>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                    <div class="sl-form-group">
+                        <label class="sl-label">Precio ($ COP)</label>
+                        <input type="number" step="0.01" name="precio" th:value="${producto.precio}" class="sl-input" required>
+                    </div>
+                    <div class="sl-form-group">
+                        <label class="sl-label">Estado</label>
+                        <select name="estado" class="sl-input">
+                            <option value="activo" th:selected="${producto.estado == 'activo'}">Activo</option>
+                            <option value="inactivo" th:selected="${producto.estado == 'inactivo'}">Inactivo</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                    <div class="sl-form-group">
+                        <label class="sl-label">Stock Actual</label>
+                        <input type="number" name="stockActual" th:value="${producto.stockActual}" class="sl-input" min="0" required>
+                    </div>
+                    <div class="sl-form-group">
+                        <label class="sl-label">Categoría</label>
+                        <select name="categoria.id" class="sl-input">
+                            <option th:each="c : ${categorias}" th:value="${c.id}" th:text="${c.nombre}" 
+                                    th:selected="${producto.categoria != null && c.id == producto.categoria.id}"></option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="sl-form-group">
+                    <label class="sl-label">Proveedor</label>
+                    <select name="proveedor.id" class="sl-input">
+                        <option th:each="prov : ${proveedores}" th:value="${prov.id}" th:text="${prov.nombre}" 
+                                th:selected="${producto.proveedor != null && prov.id == producto.proveedor.id}"></option>
+                    </select>
+                </div>
+
+                <div class="sl-form-group">
+                    <label class="sl-label">Cambiar Imagen <small style="opacity:0.5; font-size:10px;">(Opcional)</small></label>
+                    <input type="file" name="imagen_file" class="sl-input" accept="image/*">
+                </div>
+
+                <div style="display:flex; gap:12px; margin-top:12px;">
+                    <button type="submit" class="btn-sl">Actualizar Datos</button>
+                    <a th:href="@{/admin/productos}" class="btn-sl-outline">Cancelar</a>
+                </div>
+
+            </form>
         </div>
-        <form th:action="@{'/admin/variantes/delete/' + ${v.id}}" method="POST">
-            <button type="submit" class="btn-sl-danger" style="font-size:11px; padding:6px 12px;">Eliminar</button>
-        </form>
+
+        <!-- SECCIÓN DE VARIANTES DE COLOR -->
+        <div style="background:#fff; border:1px solid #eee; padding:32px;">
+            <h3 style="font-family:'Bebas Neue', sans-serif; font-size:24px; letter-spacing:2px; margin-bottom:20px;">
+                VARIANTES DE COLOR
+            </h3>
+
+            <!-- Lista de variantes existentes -->
+            <div th:each="v : ${producto.variantes}" 
+                 style="display:flex; align-items:center; gap:12px; padding:12px; border:1px solid #eee; margin-bottom:12px; background:#fafafa;">
+                <div th:style="'width:32px; height:32px; border-radius:50%; border:1px solid #ddd; background:' + ${v.hex}"></div>
+                <div style="flex:1;">
+                    <p th:text="${v.color}" style="font-size:13px; font-weight:700; margin:0;"></p>
+                    <p th:text="'Stock: ' + ${v.stockActual}" style="font-size:11px; opacity:0.5; margin:0; font-family:monospace;"></p>
+                </div>
+                <form th:action="@{'/admin/variantes/delete/' + ${v.id}}" method="POST">
+                    <button type="submit" class="btn-sl-danger" style="font-size:10px; padding:4px 10px;" onclick="return confirm('¿Eliminar variante?')">Eliminar</button>
+                </form>
+            </div>
+
+            <div th:if="${#lists.isEmpty(producto.variantes)}" style="padding:16px 0; text-align:center; opacity:0.4; font-size:12px;">
+                No hay variantes registradas.
+            </div>
+
+            <!-- Formulario para agregar nueva variante -->
+            <div style="border-top:1px solid #eee; padding-top:24px; margin-top:16px;">
+                <h4 style="font-size:11px; letter-spacing:2px; text-transform:uppercase; margin-bottom:14px; font-weight:700;">+ Agregar Variante</h4>
+                
+                <form th:action="@{'/admin/variantes/store/' + ${producto.id}}" method="POST" enctype="multipart/form-data">
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+                        <div>
+                            <label class="sl-label" style="font-size:10px;">Color</label>
+                            <input type="text" name="color" class="sl-input" placeholder="ej: Blanco" required>
+                        </div>
+                        <div>
+                            <label class="sl-label" style="font-size:10px;">Muestra Hex</label>
+                            <input type="color" name="hex" value="#000000" style="width:100%; height:40px; border:1px solid #ddd; cursor:pointer; padding:2px;">
+                        </div>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">
+                        <div>
+                            <label class="sl-label" style="font-size:10px;">Stock</label>
+                            <input type="number" name="stockActual" class="sl-input" value="0" min="0" required>
+                        </div>
+                        <div>
+                            <label class="sl-label" style="font-size:10px;">Foto</label>
+                            <input type="file" name="imagen_file" class="sl-input">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-sl" style="width:100%;">Añadir Variante</button>
+                </form>
+            </div>
+        </div>
+
     </div>
 
-    <!-- Formulario para nueva variante -->
-    <div style="border-top:1px solid #eee; padding-top:24px; margin-top:8px;">
-        <h4 style="font-size:13px; text-transform:uppercase; margin-bottom:16px;">Agregar variante</h4>
-        <form th:action="@{'/admin/variantes/store/' + ${producto.id}}" method="POST" enctype="multipart/form-data">
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
-                <input type="text" name="color" class="sl-input" placeholder="Nombre (ej: Negro)" required>
-                <input type="color" name="hex" value="#000000" style="width:100%; height:40px; cursor:pointer;">
-            </div>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
-                <input type="number" name="stockActual" class="sl-input" placeholder="Stock" required>
-                <input type="file" name="imagen_file" class="sl-input">
-            </div>
-            <button type="submit" class="btn-sl">+ Agregar variante</button>
-        </form>
-    </div>
-</div>
+</section>
+</body>
+</html>

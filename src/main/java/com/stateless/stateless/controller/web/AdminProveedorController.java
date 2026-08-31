@@ -11,7 +11,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/admin/proveedores")
-@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasAnyRole('ADMIN', 'EMPLEADO')")
 public class AdminProveedorController {
 
     @Autowired private ProveedorRepository proveedorRepository;
@@ -25,6 +25,13 @@ public class AdminProveedorController {
     @GetMapping("/create")
     public String create(Model model) {
         model.addAttribute("proveedor", new Proveedor());
+        return "admin/proveedores/form"; // Usaremos este archivo
+    }
+
+    @GetMapping("/edit/{id}")
+    public String edit(@PathVariable Long id, Model model) {
+        Proveedor proveedor = proveedorRepository.findById(id).orElseThrow();
+        model.addAttribute("proveedor", proveedor);
         return "admin/proveedores/form";
     }
 
@@ -35,19 +42,13 @@ public class AdminProveedorController {
         return "redirect:/admin/proveedores";
     }
 
-    @GetMapping("/edit/{id}")
-    public String edit(@PathVariable Long id, Model model) {
-        model.addAttribute("proveedor", proveedorRepository.findById(id).orElseThrow());
-        return "admin/proveedores/form";
-    }
-
     @PostMapping("/delete/{id}")
     public String delete(@PathVariable Long id, RedirectAttributes ra) {
         try {
             proveedorRepository.deleteById(id);
             ra.addFlashAttribute("success", "Proveedor eliminado.");
         } catch (Exception e) {
-            ra.addFlashAttribute("error", "No se puede eliminar: tiene productos asociados.");
+            ra.addFlashAttribute("error", "Error: Tiene productos asociados.");
         }
         return "redirect:/admin/proveedores";
     }

@@ -1,49 +1,206 @@
-<div th:replace="~{layouts/app-layout :: layout(content=~{::section})}">
-<section style="padding: 80px 60px; max-width: 800px; margin: 0 auto;">
-    
-    <a th:href="@{/account/pedidos}" style="font-size:12px; opacity:0.5; text-decoration:none;">← Volver</a>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/app-layout :: layout(content=~{::section})}">
+<body>
+<section style="background:#000; color:#fff; min-height:90vh; padding:60px 24px;">
 
-    <h1 style="font-family:'Bebas Neue'; font-size:40px; letter-spacing:3px; margin:16px 0 8px;"
-        th:text="'PEDIDO #' + ${#strings.substring('000000' + venta.id, #strings.length('' + venta.id))}"></h1>
-    
-    <p style="font-size:13px; opacity:0.5; margin-bottom:48px;" 
-       th:text="${envio.direccion + ', ' + envio.ciudad}"></p>
+<style>
+    .tracking-container {
+        max-width: 850px;
+        margin: 0 auto;
+    }
+    .timeline {
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+        margin: 48px 0;
+    }
+    .timeline::before {
+        content: '';
+        position: absolute;
+        top: 15px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: rgba(255, 255, 255, 0.15);
+        z-index: 1;
+    }
+    .timeline-step {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+        width: 25%;
+    }
+    .step-dot {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #111;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        margin: 0 auto 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 700;
+        transition: all 0.3s ease;
+    }
+    .step-dot.active {
+        background: #fff;
+        color: #000;
+        border-color: #fff;
+        box-shadow: 0 0 16px rgba(255, 255, 255, 0.5);
+    }
+    .step-dot.completed {
+        background: #fff;
+        color: #000;
+        border-color: #fff;
+    }
+    .step-title {
+        font-size: 11px;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.4);
+    }
+    .step-title.active {
+        color: #fff;
+    }
+    .tracking-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        padding: 32px;
+        backdrop-filter: blur(8px);
+        margin-bottom: 24px;
+    }
+    .info-label {
+        font-size: 10px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        opacity: 0.5;
+        margin-bottom: 4px;
+        font-weight: 700;
+    }
+    .info-val {
+        font-size: 14px;
+        font-weight: 600;
+        margin: 0;
+    }
+</style>
 
-    <!-- LISTA DE PASOS (Timeline) -->
-    <div style="display:flex; flex-direction:column;">
+<div class="tracking-container">
+
+    <!-- HEADER -->
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; border-bottom:1px solid rgba(255,255,255,0.15); padding-bottom:20px; margin-bottom:32px;">
+        <div>
+            <p style="font-size:11px; letter-spacing:4px; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:6px;">Logística & Seguimiento</p>
+            <h1 style="font-family:'Bebas Neue', sans-serif; font-size:42px; letter-spacing:5px; margin:0;" th:text="'RASTREO DE PEDIDO #' + ${venta.id}">
+                RASTREO DE PEDIDO #24
+            </h1>
+        </div>
+        <a th:href="@{/account/pedidos}" style="color:#fff; font-size:11px; letter-spacing:2px; text-transform:uppercase; text-decoration:underline;">
+            ← Volver a Mis Pedidos
+        </a>
+    </div>
+
+    <!-- LÍNEA DE TIEMPO / ESTADOS -->
+    <div class="tracking-card">
+        <p class="info-label" style="text-align:center; margin-bottom:28px;">Estado del Envío en Tiempo Real</p>
         
-        <!-- Paso 1: Confirmado -->
-        <div th:with="completado=${envio.pasoActual >= 2}" style="display:flex; gap:16px; align-items:flex-start;">
-            <div style="display:flex; flex-direction:column; align-items:center;">
-                <div th:style="'width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:1px solid #000; font-size:14px; ' + 
-                     (${completado} ? 'background:#000; color:#fff;' : 'background:#fff; color:#000;')">
-                    <span th:text="${completado ? '✓' : '1'}"></span>
-                </div>
-                <div th:style="'width:2px; height:40px; ' + (${envio.pasoActual >= 3} ? 'background:#000;' : 'background:#eee;')"></div>
+        <div class="timeline">
+            <!-- Paso 1: Pedido Recibido -->
+            <div class="timeline-step">
+                <div class="step-dot completed">✓</div>
+                <div class="step-title active">Orden Recibida</div>
             </div>
-            <div>
-                <p th:style="'font-family:Bebas Neue; font-size:18px; letter-spacing:1px; ' + (${completado} ? 'opacity:1;' : 'opacity:0.3;')">Pedido Confirmado</p>
-                <p th:if="${envio.fecha_confirmado}" th:text="${#temporals.format(envio.fecha_confirmado, 'dd MMM yyyy, hh:mm a')}" style="font-size:11px; opacity:0.4;"></p>
+
+            <!-- Paso 2: En Preparación -->
+            <div class="timeline-step">
+                <div class="step-dot" 
+                     th:classappend="${venta.estado == 'en_preparacion' || venta.estado == 'enviado' || venta.estado == 'entregado' || (envio != null && envio.estado != 'pendiente') ? 'completed active' : ''}">
+                    2
+                </div>
+                <div class="step-title" 
+                     th:classappend="${venta.estado == 'en_preparacion' || venta.estado == 'enviado' || venta.estado == 'entregado' ? 'active' : ''}">
+                    En Bodega
+                </div>
+            </div>
+
+            <!-- Paso 3: En Camino -->
+            <div class="timeline-step">
+                <div class="step-dot" 
+                     th:classappend="${venta.estado == 'enviado' || venta.estado == 'entregado' || (envio != null && (envio.estado == 'en_curso' || envio.estado == 'entregado')) ? 'completed active' : ''}">
+                    3
+                </div>
+                <div class="step-title" 
+                     th:classappend="${venta.estado == 'enviado' || venta.estado == 'entregado' || (envio != null && envio.estado == 'en_curso') ? 'active' : ''}">
+                    En Camino
+                </div>
+            </div>
+
+            <!-- Paso 4: Entregado -->
+            <div class="timeline-step">
+                <div class="step-dot" 
+                     th:classappend="${venta.estado == 'entregado' || (envio != null && envio.estado == 'entregado') ? 'completed active' : ''}">
+                    4
+                </div>
+                <div class="step-title" 
+                     th:classappend="${venta.estado == 'entregado' || (envio != null && envio.estado == 'entregado') ? 'active' : ''}">
+                    Entregado
+                </div>
             </div>
         </div>
+    </div>
 
-        <!-- Paso 2: Preparando (Repetir lógica para en_curso y entregado) -->
-        <div th:with="completado=${envio.pasoActual >= 3}" style="display:flex; gap:16px; align-items:flex-start;">
-            <div style="display:flex; flex-direction:column; align-items:center;">
-                <div th:style="'width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:1px solid #000; font-size:14px; ' + 
-                     (${completado} ? 'background:#000; color:#fff;' : 'background:#fff; color:#000;')">
-                    <span th:text="${completado ? '✓' : '2'}"></span>
-                </div>
-                <div th:style="'width:2px; height:40px; ' + (${envio.pasoActual >= 4} ? 'background:#000;' : 'background:#eee;')"></div>
-            </div>
-            <div>
-                <p th:style="'font-family:Bebas Neue; font-size:18px; letter-spacing:1px; ' + (${completado} ? 'opacity:1;' : 'opacity:0.3;')">Preparando pedido</p>
-                <p th:if="${envio.fecha_preparando}" th:text="${#temporals.format(envio.fecha_preparando, 'dd MMM yyyy, hh:mm a')}" style="font-size:11px; opacity:0.4;"></p>
-            </div>
+    <!-- DETALLES DE GUÍA Y TRANSPORTE -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:24px;">
+        
+        <div class="tracking-card">
+            <p class="info-label">Empresa Transportadora</p>
+            <p class="info-val" th:text="${envio != null && envio.transportadora != null ? envio.transportadora : 'En proceso de asignación'}"></p>
+            
+            <hr style="border-color:rgba(255,255,255,0.08); margin:16px 0;">
+            
+            <p class="info-label">Número de Guía de Rastreo</p>
+            <p class="info-val" style="font-family:monospace; font-size:16px; letter-spacing:1px;" 
+               th:text="${envio != null && envio.numeroGuia != null ? envio.numeroGuia : 'Pendiente de despacho'}"></p>
         </div>
 
-        <!-- ... (Repetir para En camino y Entregado) ... -->
+        <div class="tracking-card">
+            <p class="info-label">Dirección de Destino</p>
+            <p class="info-val" th:text="${envio != null ? envio.direccion : 'Dirección registrada'}"></p>
+            <p class="info-val" style="opacity:0.6; font-size:12px; margin-top:2px;" th:text="${envio != null ? envio.ciudad : ''}"></p>
+            
+            <hr style="border-color:rgba(255,255,255,0.08); margin:16px 0;">
+            
+            <p class="info-label">Fecha del Pedido</p>
+            <p class="info-val" th:text="${#temporals.format(venta.createdAt, 'dd/MM/yyyy HH:mm')}"></p>
+        </div>
 
     </div>
-</section>
+
+    <!-- PRENDAS DEL PEDIDO -->
+    <div class="tracking-card">
+        <p class="info-label" style="margin-bottom:16px;">Prendas en esta Entrega</p>
+        
+        <div th:each="item : ${venta.items}" style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.08);">
+            <div>
+                <span th:text="${item.producto != null ? item.producto.nombre : 'Prenda'}" style="font-weight:700; text-transform:uppercase; font-size:13px;"></span>
+                <span th:if="${item.variante != null}" th:text="' (' + ${item.variante.color} + ')'" style="font-size:11px; opacity:0.5;"></span>
+                <span th:text="' × ' + ${item.cantidad}" style="font-size:12px; opacity:0.6;"></span>
+            </div>
+            <span th:text="${'$' + #numbers.formatDecimal(item.precioUnitario * item.cantidad, 0, 'COMMA', 0, 'POINT') + ' COP'}" style="font-size:13px; font-weight:700;"></span>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px; padding-top:12px;">
+            <a th:href="@{'/checkout/factura/' + ${venta.id}}" style="color:#fff; font-size:11px; letter-spacing:2px; text-transform:uppercase; text-decoration:underline;">
+                Ver Factura Completa →
+            </a>
+            <span style="font-family:'Bebas Neue'; font-size:24px;" th:text="'Total: $' + #numbers.formatDecimal(venta.total, 0, 'COMMA', 0, 'POINT') + ' COP'"></span>
+        </div>
+    </div>
+
 </div>
+
+</section>
+</body>
+</html>

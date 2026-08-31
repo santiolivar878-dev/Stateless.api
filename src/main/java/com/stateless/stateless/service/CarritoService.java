@@ -9,11 +9,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CarritoService {
+
     @Autowired private CarritoRepository carritoRepository;
     @Autowired private ProductoRepository productoRepository;
     @Autowired private ProductoVarianteRepository varianteRepository;
 
-    // Método principal para obtener el carrito
+    // 1. Obtener carrito (DB si está autenticado, o Sesión si es invitado)
     public Carrito obtenerCarritoDeCualquierFuente(User user, HttpSession session) {
         if (user != null) {
             return carritoRepository.findByUserId(user.getId()).orElseGet(() -> {
@@ -31,6 +32,29 @@ public class CarritoService {
         return carritoSesion;
     }
 
+    // 2. Migrar carrito de invitado a base de datos al iniciar sesión
+    @Transactional
+    public void migrarCarritoSesionAUsuario(HttpSession session, User user) {
+        if (session == null || user == null) return;
+        
+        // Leemos con la clave correcta "guest_cart"
+        Carrito carritoSesion = (Carrito) session.getAttribute("guest_cart");
+        
+        if (carritoSesion != null && carritoSesion.getItems() != null && !carritoSesion.getItems().isEmpty()) {
+            for (CarritoItem item : carritoSesion.getItems()) {
+                Long varianteId = (item.getVariante() != null) ? item.getVariante().getId() : null;
+                
+                // Pasamos los ítems a la base de datos del usuario
+                for (int i = 0; i < item.getCantidad(); i++) {
+                    this.agregarProducto(item.getProducto().getId(), varianteId, user, null);
+                }
+            }
+            // Limpiamos el carrito temporal de la sesión
+            session.removeAttribute("guest_cart");
+        }
+    }
+
+    // 3. Agregar producto
     @Transactional
     public void agregarProducto(Long productoId, Long varianteId, User user, HttpSession session) {
         Producto producto = productoRepository.findById(productoId).orElseThrow();
@@ -58,11 +82,13 @@ public class CarritoService {
 
         if (user != null) {
             carritoRepository.save(carrito);
-        } else {
+        } else if (session != null) {
             session.setAttribute("guest_cart", carrito);
         }
         
-        int count = carrito.getItems().stream().mapToInt(CarritoItem::getCantidad).sum();
-        session.setAttribute("cartCount", count);
+        if (session != null) {
+            int count = carrito.getItems().stream().mapToInt(CarritoItem::getCantidad).sum();
+            session.setAttribute("cartCount", count);
+        }
     }
 }

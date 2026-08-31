@@ -34,7 +34,6 @@ public class ReporteService {
     }
     
     public byte[] exportarVentasExcel(LocalDateTime desde, LocalDateTime hasta) {
-        // Implementación básica para evitar errores de compilación
         return new byte[0];
     }
 }

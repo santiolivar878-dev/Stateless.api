@@ -37,7 +37,7 @@ public class Venta {
     private List<VentaItem> items = new ArrayList<>();
 
     @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt; // Nombre exacto para el Repositorio
 
     public Venta() {}
 
@@ -51,7 +51,7 @@ public class Venta {
     public BigDecimal getTotal() { return total; }
     public void setTotal(BigDecimal total) { this.total = total; }
     public String getEstado() { return estado; }
-    public void setEstado(String estado) { this.estado = estado; } // ESTE ES EL QUE PIDE EL ERROR
+    public void setEstado(String estado) { this.estado = estado; }
     public User getUsuario() { return usuario; }
     public void setUsuario(User usuario) { this.usuario = usuario; }
     public Envio getEnvio() { return envio; }

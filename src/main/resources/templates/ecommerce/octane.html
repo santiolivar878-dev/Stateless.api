@@ -1,20 +1,200 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/app-layout :: layout(content=~{::section})}">
 <body>
-<section style="background:#000; color:#fff; min-height:100vh;">
-    <div style="padding:100px 40px; text-align:center;">
-        <h1 style="font-family:'Bebas Neue'; font-size:80px; letter-spacing:10px; color:#af0eaf;">OCTANE</h1>
-        <p style="letter-spacing:4px; opacity:0.8;">MIDNIGHT DRIFT DIVISION</p>
+<section style="background:#000; color:#fff; min-height:100vh; position:relative; overflow:hidden;">
+
+<style>
+:root {
+    --drift-blue: #af0eaf;
+    --drift-border: #232323;
+}
+.hero-octane {
+    min-height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    background: #000;
+}
+.rpm-section {
+    background: #050505;
+    padding: 50px 40px;
+    display: flex;
+    justify-content: center;
+    gap: 60px;
+    border-top: 1px solid #1a1a1a;
+    border-bottom: 1px solid #1a1a1a;
+    flex-wrap: wrap;
+}
+.rpm-gauge { text-align: center; }
+.rpm-bars { display: flex; gap: 4px; align-items: flex-end; height: 50px; justify-content: center; margin: 10px 0; }
+.rpm-bar-item { width: 7px; border-radius: 2px 2px 0 0; background: #1a1a1a; }
+.product-card-octane {
+    background: #101010;
+    border: 1px solid var(--drift-border);
+    transition: 0.3s;
+    overflow: hidden;
+}
+.product-card-octane:hover {
+    transform: translateY(-8px);
+    border-color: var(--drift-blue);
+    box-shadow: 0 0 25px rgba(175, 14, 175, .3);
+}
+.btn-octane-cart {
+    width: 100%;
+    border: none;
+    background: transparent;
+    border-top: 1px solid var(--drift-border);
+    color: #fff;
+    padding: 14px;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-family: monospace;
+    font-weight: bold;
+    transition: 0.3s;
+}
+.btn-octane-cart:hover {
+    background: var(--drift-blue);
+    color: #000;
+}
+</style>
+
+<!-- CANVAS HUMO -->
+<canvas id="smokeCanvas" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; opacity:0.18;"></canvas>
+
+<!-- HERO -->
+<div class="hero-octane">
+    <div id="hero-drift-content" style="position:relative; z-index:2;">
+        <div style="font-size:12px; letter-spacing:6px; text-transform:uppercase; color:var(--drift-blue); margin-bottom:15px; font-weight:bold;">OCTANE // DRIFT DIVISION</div>
+        <h1 style="font-family:'Bebas Neue'; font-size:clamp(5rem, 12vw, 10rem); letter-spacing:10px; line-height:0.9; margin-bottom:20px;">MIDNIGHT<br>DRIFT</h1>
+        <p style="letter-spacing:4px; text-transform:uppercase; opacity:0.8; margin-bottom:30px;">CONTROL THROUGH CHAOS</p>
+        <a href="#catalogo-octane" style="border:1px solid var(--drift-blue); color:#fff; padding:14px 35px; text-decoration:none; display:inline-block; letter-spacing:2px; text-transform:uppercase;">ENTER THE GARAGE</a>
     </div>
-    <div style="padding:60px 40px; display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:30px;">
-        <div th:each="p : ${octane}" style="border:1px solid #222; background:#111; padding:20px;">
-            <a th:href="@{'/producto/' + ${p.id}}" style="text-decoration:none; color:inherit;">
-                <img th:src="${p.imagen}" style="width:100%; aspect-ratio:3/4; object-fit:cover;">
-                <p th:text="${p.nombre}" style="font-family:'Bebas Neue'; font-size:22px; margin-top:15px;"></p>
-                <p th:text="${'$' + p.precio}" style="color:#af0eaf; font-weight:bold;"></p>
+</div>
+
+<!-- TELEMETRÍA RPM -->
+<div class="rpm-section">
+    <div class="rpm-gauge">
+        <span style="font-size:10px; letter-spacing:3px; opacity:0.4; text-transform:uppercase;">Drift Angle</span>
+        <div class="rpm-bars" id="bars-angle"></div>
+        <div style="font-family:'Bebas Neue'; font-size:24px; color:var(--drift-blue);" id="val-angle">48°</div>
+    </div>
+    <div class="rpm-gauge">
+        <span style="font-size:10px; letter-spacing:3px; opacity:0.4; text-transform:uppercase;">Grip Level</span>
+        <div class="rpm-bars" id="bars-grip"></div>
+        <div style="font-family:'Bebas Neue'; font-size:24px; color:var(--drift-blue);" id="val-grip">62%</div>
+    </div>
+    <div class="rpm-gauge">
+        <span style="font-size:10px; letter-spacing:3px; opacity:0.4; text-transform:uppercase;">Tire Smoke</span>
+        <div class="rpm-bars" id="bars-smoke"></div>
+        <div style="font-family:'Bebas Neue'; font-size:24px; color:var(--drift-blue);" id="val-smoke">95%</div>
+    </div>
+    <div class="rpm-gauge">
+        <span style="font-size:10px; letter-spacing:3px; opacity:0.4; text-transform:uppercase;">Turbo Boost</span>
+        <div class="rpm-bars" id="bars-boost"></div>
+        <div style="font-family:'Bebas Neue'; font-size:24px; color:var(--drift-blue);" id="val-boost">1.6 BAR</div>
+    </div>
+</div>
+
+<!-- CATÁLOGO -->
+<div id="catalogo-octane" style="padding:100px 40px; background:#000;">
+    <div style="text-align:center; margin-bottom:50px;">
+        <p style="opacity:0.5; letter-spacing:4px; font-size:12px;">MIDNIGHT RUN COLLECTION</p>
+        <h2 style="font-family:'Bebas Neue'; font-size:4rem; letter-spacing:5px; margin:0;">DRIFT GARAGE</h2>
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:30px;">
+        <div th:each="p : ${productos}" class="product-card-octane">
+            <a th:href="@{'/producto/' + ${p.id}}" style="text-decoration:none; color:#fff;">
+                <img th:src="${p.imagen != null ? (p.imagen.startsWith('http') ? p.imagen : '/images/' + p.imagen) : '/images/placeholder.jpg'}" 
+                     style="width:100%; aspect-ratio:3/4; object-fit:cover; display:block;">
+                <div style="padding:20px;">
+                    <div style="font-size:10px; letter-spacing:2px; opacity:0.3; font-family:monospace; margin-bottom:6px;">UNIT // OCTANE</div>
+                    <h3 th:text="${p.nombre}" style="font-size:16px; letter-spacing:2px; text-transform:uppercase; margin-bottom:8px;"></h3>
+                    <div style="opacity:0.6; font-size:13px; font-family:monospace;" th:if="${p.precio != null}" th:text="${'PRICE >> $' + #numbers.formatDecimal(p.precio, 0, 'COMMA', 0, 'POINT') + ' COP'}"></div>
+                </div>
             </a>
+
+            <form th:action="@{'/carrito/agregar/' + ${p.id}}" method="POST">
+                <button type="submit" class="btn-octane-cart">
+                    [ JOIN THE GARAGE ]
+                </button>
+            </form>
         </div>
     </div>
+</div>
+
+<script>
+/* HUMO CANVAS */
+const canvas = document.getElementById('smokeCanvas');
+const ctx = canvas.getContext('2d');
+function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+const particles = [];
+class Particle {
+    constructor() { this.reset(); }
+    reset() {
+        this.x = Math.random() * canvas.width;
+        this.y = canvas.height + 40;
+        this.size = Math.random() * 80 + 30;
+        this.speedY = -(Math.random() * 0.6 + 0.2);
+        this.speedX = (Math.random() - 0.5) * 0.4;
+        this.opacity = Math.random() * 0.35 + 0.1;
+    }
+    update() {
+        this.y += this.speedY; this.x += this.speedX; this.size += 0.2; this.opacity -= 0.002;
+        if(this.opacity <= 0) this.reset();
+    }
+    draw() {
+        const grad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size);
+        grad.addColorStop(0, `rgba(175,14,175,${this.opacity})`);
+        grad.addColorStop(1, 'transparent');
+        ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fillStyle = grad; ctx.fill();
+    }
+}
+for(let i=0; i<20; i++) particles.push(new Particle());
+function animateSmoke() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => { p.update(); p.draw(); });
+    requestAnimationFrame(animateSmoke);
+}
+animateSmoke();
+
+/* TELEMETRÍA BARS */
+const gauges = [
+    { id: 'bars-angle', valId: 'val-angle', min: 35, max: 60, suffix: '°' },
+    { id: 'bars-grip', valId: 'val-grip', min: 50, max: 90, suffix: '%' },
+    { id: 'bars-smoke', valId: 'val-smoke', min: 80, max: 100, suffix: '%' },
+    { id: 'bars-boost', valId: 'val-boost', min: 1.2, max: 2.0, suffix: ' BAR', decimal: true }
+];
+
+gauges.forEach(g => {
+    const el = document.getElementById(g.id);
+    for(let i=0; i<10; i++) {
+        const bar = document.createElement('div');
+        bar.className = 'rpm-bar-item';
+        bar.style.height = (10 + i * 4) + 'px';
+        el.appendChild(bar);
+    }
+});
+
+setInterval(() => {
+    gauges.forEach(g => {
+        const val = g.decimal ? (Math.random() * (g.max - g.min) + g.min) : Math.floor(Math.random() * (g.max - g.min) + g.min);
+        const el = document.getElementById(g.id);
+        const active = Math.round(((val - g.min)/(g.max - g.min)) * 10);
+        el.querySelectorAll('.rpm-bar-item').forEach((b, i) => {
+            b.style.background = i < active ? '#af0eaf' : '#1a1a1a';
+        });
+        document.getElementById(g.valId).textContent = g.decimal ? val.toFixed(1) + g.suffix : val + g.suffix;
+    });
+}, 900);
+</script>
+
 </section>
 </body>
 </html>

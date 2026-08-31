@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layouts/app-layout :: layout(content=~{::section})}">
+<body>
+<section style="padding: 80px 60px; max-width: 900px; margin: 0 auto; color: #fff; background: #000;">
+    
+    <h1 style="font-family:'Bebas Neue'; font-size:48px; letter-spacing:4px; margin-bottom:8px;">MI CUENTA</h1>
+    <p style="font-size:13px; opacity:0.5; letter-spacing:1px; margin-bottom:40px;">Bienvenido, <span th:text="${user.name}">Usuario</span></p>
+
+    <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:20px;">
+
+        <!-- Opción: MI PERFIL (Para todos) -->
+        <a th:href="@{/account/profile}" style="text-decoration:none; color:#fff;">
+            <div style="border:1px solid #333; padding:30px; background: #111; transition: 0.3s;" onmouseover="this.style.borderColor='#fff'">
+                <p style="font-size:10px; opacity:0.4; letter-spacing:2px; margin-bottom:10px;">DATOS PERSONALES</p>
+                <h3 style="font-family:'Bebas Neue'; letter-spacing:2px;">MI PERFIL</h3>
+            </div>
+        </a>
+
+        <!-- Opción: MIS PEDIDOS (Solo para Clientes) -->
+        <a th:href="@{/account/pedidos}" sec:authorize="hasRole('CLIENTE')" style="text-decoration:none; color:#fff;">
+            <div style="border:1px solid #333; padding:30px; background: #111; transition: 0.3s;" onmouseover="this.style.borderColor='#fff'">
+                <p style="font-size:10px; opacity:0.4; letter-spacing:2px; margin-bottom:10px;">COMPRAS</p>
+                <h3 style="font-family:'Bebas Neue'; letter-spacing:2px;">MIS PEDIDOS</h3>
+            </div>
+        </a>
+
+        <!-- Opción: PANEL ADMIN (Solo para Admin y Empleado) -->
+        <a th:href="@{/admin/dashboard}" sec:authorize="hasAnyRole('ADMIN', 'EMPLEADO')" style="text-decoration:none; color:#000;">
+            <div style="border:1px solid #fff; padding:30px; background: #fff; transition: 0.3s;">
+                <p style="font-size:10px; opacity:0.6; letter-spacing:2px; margin-bottom:10px;">GESTIÓN</p>
+                <h3 style="font-family:'Bebas Neue'; letter-spacing:2px;">PANEL DE CONTROL</h3>
+            </div>
+        </a>
+
+    </div>
+
+    <!-- Botón de Salir -->
+    <div style="margin-top:50px; border-top:1px solid #222; padding-top:20px; text-align:center;">
+        <form th:action="@{/logout}" method="POST">
+            <button type="submit" style="background:none; border:none; color:#666; font-size:11px; letter-spacing:2px; cursor:pointer;">CERRAR SESIÓN</button>
+        </form>
+    </div>
+
+</section>
+</body>
+</html>

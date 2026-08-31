@@ -2,40 +2,79 @@
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/admin-layout :: layout(content=~{::section})}">
 <body>
 <section>
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
-        <h2 style="font-family:'Bebas Neue'; font-size:28px;">Gestión de Catálogo</h2>
-        <a th:href="@{/admin/productos/create}" class="btn-sl" style="background:#000; color:#fff; text-decoration:none; padding:10px 20px; font-size:11px;">+ NUEVO PRODUCTO</a>
+
+    <div th:if="${success}" class="alert-success-sl" th:text="${success}"></div>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+        <h2 style="font-family:'Bebas Neue', sans-serif; font-size:32px; letter-spacing:3px;">Gestión de Productos</h2>
+        <a th:href="@{/admin/productos/create}" class="btn-sl">+ Registrar Producto</a>
     </div>
 
-    <div th:if="${success}" class="alert alert-success" th:text="${success}" style="border-radius:0; font-size:12px;"></div>
+    <!-- STATS -->
+    <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:20px; margin-bottom:32px;">
+        <div class="stat-card">
+            <div class="stat-label">Total Productos</div>
+            <div class="stat-value" th:text="${productos.size()}">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Stock Bajo</div>
+            <div class="stat-value" style="color:#f59e0b;" 
+                 th:text="${#lists.size(productos.?[stockActual <= stockMinimo])}">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Sin Stock</div>
+            <div class="stat-value" style="color:#c00;" 
+                 th:text="${#lists.size(productos.?[stockActual == 0])}">0</div>
+        </div>
+    </div>
 
-    <table class="table align-middle bg-white border">
-        <thead class="table-dark">
+    <table class="stateless-table">
+        <thead>
             <tr>
+                <th>ID</th>
                 <th>Imagen</th>
                 <th>Nombre</th>
                 <th>Precio</th>
-                <th>Stock</th>
+                <th>Estado</th>
+                <th>Stock Actual</th>
+                <th>Stock Mín</th>
                 <th>Categoría</th>
+                <th>Proveedor</th>
                 <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
             <tr th:each="p : ${productos}">
-                <td><img th:src="${p.imagen}" style="width:50px; height:60px; object-fit:cover; background:#eee;"></td>
-                <td th:text="${p.nombre}"></td>
-                <td th:text="${'$' + p.precio}"></td>
-                <td th:text="${p.stockActual}" th:style="${p.stockActual <= 5 ? 'color:red; font-weight:bold' : ''}"></td>
-                <td th:text="${p.categoria != null ? p.categoria.nombre : 'Sin categoría'}"></td>
+                <td th:text="${p.id}"></td>
                 <td>
-                    <a th:href="@{'/admin/productos/edit/' + ${p.id}}" class="btn btn-sm btn-outline-dark" style="font-size:10px;">EDITAR</a>
-                    <form th:action="@{'/admin/productos/delete/' + ${p.id}}" method="POST" style="display:inline;">
-                        <button type="submit" class="btn btn-sm btn-link text-danger" style="font-size:10px;" onclick="return confirm('¿Eliminar?')">BORRAR</button>
+                    <img th:if="${p.imagen}" th:src="${p.imagen.startsWith('http') ? p.imagen : '/images/' + p.imagen}" 
+                         style="width:48px; height:60px; object-fit:cover; border:1px solid #ddd; background:#f4f4f4;">
+                    <div th:unless="${p.imagen}" style="width:48px; height:60px; background:#eee; border:1px solid #ddd;"></div>
+                </td>
+                <td style="font-weight:600;" th:text="${p.nombre}"></td>
+                <td th:if="${p.precio != null}" th:text="${'$' + #numbers.formatDecimal(p.precio, 0, 'COMMA', 0, 'POINT')}"></td>
+                <td th:unless="${p.precio != null}">$0</td>
+                <td>
+                    <span th:if="${p.estado == 'activo'}" style="background:green; color:#fff; padding:2px 8px; font-size:10px; font-weight:700;">ACTIVO</span>
+                    <span th:unless="${p.estado == 'activo'}" style="background:#666; color:#fff; padding:2px 8px; font-size:10px; font-weight:700;">INACTIVO</span>
+                </td>
+                <td th:style="${p.stockActual <= p.stockMinimo ? 'color:#c00; font-weight:700;' : ''}" th:text="${p.stockActual}"></td>
+                <td th:text="${p.stockMinimo}"></td>
+                <td th:text="${p.categoria != null ? p.categoria.nombre : '—'}"></td>
+                <td th:text="${p.proveedor != null ? p.proveedor.nombre : '—'}"></td>
+                <td style="display:flex; gap:8px;">
+                    <a th:href="@{'/admin/productos/edit/' + ${p.id}}" class="btn-sl-outline" style="padding:4px 12px; font-size:10px;">Editar</a>
+                    <form th:action="@{'/admin/productos/delete/' + ${p.id}}" method="POST" onsubmit="return confirm('¿Eliminar este producto?')">
+                        <button type="submit" class="btn-sl-danger" style="padding:4px 12px; font-size:10px;">Eliminar</button>
                     </form>
                 </td>
             </tr>
+            <tr th:if="${#lists.isEmpty(productos)}">
+                <td colspan="10" style="text-align:center; opacity:0.5; padding:40px;">No hay productos registrados.</td>
+            </tr>
         </tbody>
     </table>
+
 </section>
 </body>
 </html>

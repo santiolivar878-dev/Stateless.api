@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="'Rastreo de Pedido #' + ${venta.id} + ' - STATELESS'">Rastreo de Pedido - STATELESS</title>
+    <title>Seguimiento de Pedido - STATELESS</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
@@ -31,13 +31,11 @@
 
 <div class="container">
 
-    <!-- BARRA SUPERIOR -->
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px; padding-bottom:15px; border-bottom:1px solid #111;">
         <a th:href="@{/}" style="font-family:'Bebas Neue'; font-size:28px; letter-spacing:4px; color:#fff; text-decoration:none;">STATELESS</a>
         <a th:href="@{/account/pedidos}" class="nav-back">← Volver a Mis Compras</a>
     </div>
 
-    <!-- TITULO -->
     <div class="header">
         <div>
             <p style="font-size:11px; letter-spacing:4px; text-transform:uppercase; color:#888; margin-bottom:4px;">Seguimiento en Vivo</p>
@@ -49,7 +47,6 @@
         </div>
     </div>
 
-    <!-- LÍNEA DE TIEMPO INTERACTIVA -->
     <div class="card">
         <p class="label" style="text-align:center; margin-bottom:28px;">Progreso de Envío</p>
         
@@ -80,7 +77,6 @@
         </div>
     </div>
 
-    <!-- DATOS DE GUÍA Y DESTINO -->
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:24px;">
         <div class="card">
             <p class="label">Transportadora</p>
@@ -105,7 +101,6 @@
         </div>
     </div>
 
-    <!-- PIE / FACTURA -->
     <div class="card">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
             <div>

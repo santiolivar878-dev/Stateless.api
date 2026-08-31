@@ -19,6 +19,6 @@ public class EmpleadoVentaController {
     @GetMapping
     public String index(Model model) {
         model.addAttribute("ventas", ventaRepository.findAllByOrderByCreatedAtDesc());
-        return "admin/ventas/index"; // Reutilizamos la vista de ventas del admin
+        return "admin/ventas/index"; 
     }
 }

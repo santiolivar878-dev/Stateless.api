@@ -1,45 +1,357 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/app-layout :: layout(content=~{::section})}">
 <body>
-<section>
-    <div style="background:#000; height:70vh; display:flex; align-items:center; justify-content:center; text-align:center; color:#fff;">
-        <div class="hero-content">
-            <p style="font-size: 11px; letter-spacing: 5px; color: rgba(255,255,255,0.5); margin-bottom: 20px;">NUEVA COLECCIÓN 2026</p>
-            <h1 style="font-family: 'Bebas Neue'; font-size: 100px; letter-spacing: 12px; line-height: 0.9; margin: 0;">STATELESS</h1>
-            <p style="font-size: 13px; letter-spacing: 4px; opacity: 0.6; margin-top: 30px; margin-bottom: 40px;">DEFINE TU MUNDO. SIN ETIQUETAS.</p>
-            <a th:href="@{/essentials}" style="border: 1px solid #fff; color: #fff; padding: 15px 40px; text-decoration: none; font-size: 12px; letter-spacing: 3px; font-weight: 600;">VER ESSENTIALS</a>
+<section style="background:#000; color:#fff;">
+
+<style>
+/* HERO */
+.hero-slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+    pointer-events: none;
+}
+.hero-slide.active {
+    opacity: 1;
+    pointer-events: all;
+}
+.hero-slide .slide-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    transform: scale(1.08);
+    transition: transform 6s ease;
+    filter: brightness(0.35);
+}
+.hero-slide.active .slide-bg {
+    transform: scale(1);
+}
+.slide-content {
+    position: relative;
+    z-index: 2;
+}
+.slide-tag {
+    font-size: 11px;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 20px;
+}
+.slide-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(60px, 12vw, 130px);
+    letter-spacing: 10px;
+    line-height: 0.9;
+    margin-bottom: 16px;
+    color: #fff;
+}
+.slide-line {
+    width: 60px;
+    height: 1px;
+    background: rgba(255,255,255,0.4);
+    margin: 0 auto 20px;
+}
+.slide-sub {
+    font-size: 12px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 40px;
+}
+.slide-cta {
+    display: inline-block;
+    padding: 14px 40px;
+    border: 1px solid rgba(255,255,255,0.8);
+    color: #fff;
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    transition: all 0.3s;
+}
+.slide-cta:hover {
+    background: #fff;
+    color: #000;
+}
+.hero-ctrl {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff;
+    width: 48px;
+    height: 48px;
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.3s;
+}
+.hero-ctrl:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.6);
+}
+.hero-dots {
+    position: absolute;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    z-index: 10;
+}
+.hero-dot {
+    width: 24px;
+    height: 2px;
+    background: rgba(255,255,255,0.3);
+    cursor: pointer;
+    border: none;
+    padding: 0;
+    transition: all 0.3s;
+}
+.hero-dot.active {
+    background: #fff;
+    width: 40px;
+}
+
+/* ESSENTIALS */
+.essentials-section {
+    padding: 100px 40px;
+    background: #ffffff;
+    color: #000000;
+}
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 56px;
+    border-bottom: 1px solid #1a1a1a;
+    padding-bottom: 24px;
+}
+.section-header-left p {
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #888;
+    margin-bottom: 8px;
+}
+.section-header-left h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 52px;
+    letter-spacing: 4px;
+    line-height: 1;
+}
+.essentials-track-wrap {
+    position: relative;
+    overflow: hidden;
+}
+.essentials-track {
+    display: flex;
+    gap: 20px;
+    transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.essentials-item {
+    min-width: calc(33.333% - 14px);
+    flex-shrink: 0;
+    border: 1px solid #eee;
+    background: #0d0d0d;
+    color: #fff;
+}
+.essentials-img-wrap {
+    overflow: hidden;
+    position: relative;
+    background: #111;
+}
+.essentials-img-wrap img {
+    width: 100%;
+    height: 440px;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.6s ease;
+}
+.essentials-item:hover .essentials-img-wrap img {
+    transform: scale(1.04);
+}
+.essentials-item-body {
+    padding: 20px 20px 24px;
+}
+.essentials-item-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 4px;
+}
+.essentials-item-price {
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 20px;
+}
+.btn-stateless-card {
+    display: block;
+    width: 100%;
+    background: transparent;
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.btn-stateless-card:hover {
+    background: #fff;
+    color: #000;
+    border-color: #fff;
+}
+</style>
+
+<!-- HERO SLIDER -->
+<div style="position:relative; height:90vh; overflow:hidden;">
+
+    <!-- Slide 1 -->
+    <div class="hero-slide active">
+        <div class="slide-bg" style="background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0d0d0d 100%);"></div>
+        <div class="slide-content">
+            <p class="slide-tag">Nueva Colección 2026</p>
+            <h1 class="slide-title">STATELESS</h1>
+            <div class="slide-line"></div>
+            <p class="slide-sub">Define tu mundo. Sin etiquetas.</p>
+            <a th:href="@{/essentials}" class="slide-cta">Ver Essentials</a>
         </div>
     </div>
 
-    <!-- PRODUCTOS DESTACADOS -->
-    <div style="padding:80px 40px; background:#fff; color:#000;">
-        <h2 style="font-family:'Bebas Neue'; font-size:40px; margin-bottom:40px;">DESTACADOS</h2>
-        
-        <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:30px;">
-            <!-- Iteramos sobre essentials -->
-            <div th:each="p : ${essentials}" style="border:1px solid #eee; padding:15px;">
-                <a th:href="@{'/producto/' + ${p.id}}" style="text-decoration:none; color:inherit;">
-                    <!-- Protección contra imagen nula -->
-                    <!-- Reemplaza solo la etiqueta img por esta lógica -->
-<img th:src="${p.imagen != null ? (p.imagen.startsWith('http') ? p.imagen : '/images/' + p.imagen) : 'https://via.placeholder.com/300x400'}" 
-     style="width:100%; aspect-ratio:3/4; object-fit:cover; margin-bottom:15px;">
-                    
-                    <p th:text="${p.nombre}" style="font-family:'Bebas Neue'; font-size:22px; margin:0;"></p>
-                    
-                    <!-- Protección contra precio nulo -->
-                    <p th:if="${p.precio != null}" 
-                       th:text="${'$' + #numbers.formatDecimal(p.precio, 0, 'COMMA', 0, 'POINT')}" 
-                       style="font-weight:700; margin-top:5px;"></p>
-                    <p th:unless="${p.precio != null}">$ --.--</p>
+    <!-- Slide 2 -->
+    <div class="hero-slide">
+        <div class="slide-bg" style="background: linear-gradient(135deg, #111 0%, #1c1c1c 50%, #0a0a0a 100%);"></div>
+        <div class="slide-content">
+            <p class="slide-tag">Colección</p>
+            <h1 class="slide-title">WAVES</h1>
+            <div class="slide-line"></div>
+            <p class="slide-sub">Fluye. Sin resistencia.</p>
+            <a th:href="@{/waves}" class="slide-cta">Explorar colección</a>
+        </div>
+    </div>
+
+    <!-- Slide 3 -->
+    <div class="hero-slide">
+        <div class="slide-bg" style="background: linear-gradient(135deg, #0a0a0a 0%, #120012 50%, #1a1a1a 100%);"></div>
+        <div class="slide-content">
+            <p class="slide-tag">Colección</p>
+            <h1 class="slide-title">OCTANE</h1>
+            <div class="slide-line"></div>
+            <p class="slide-sub">Velocidad, calle y actitud.</p>
+            <a th:href="@{/octane}" class="slide-cta">Explorar colección</a>
+        </div>
+    </div>
+
+    <!-- Controles -->
+    <button class="hero-ctrl" onclick="cambiarSlide(-1)" style="left:24px;">‹</button>
+    <button class="hero-ctrl" onclick="cambiarSlide(1)" style="right:24px;">›</button>
+
+    <!-- Dots -->
+    <div class="hero-dots">
+        <button class="hero-dot active" onclick="irASlide(0)"></button>
+        <button class="hero-dot" onclick="irASlide(1)"></button>
+        <button class="hero-dot" onclick="irASlide(2)"></button>
+    </div>
+
+    <!-- Contador -->
+    <div style="position:absolute; bottom:32px; right:40px; font-family:'Bebas Neue'; font-size:14px; letter-spacing:3px; color:rgba(255,255,255,0.4); z-index:10;">
+        <span id="slide-num">01</span> / 03
+    </div>
+</div>
+
+<!-- SECCIÓN ESSENTIALS -->
+<div class="essentials-section" id="essentials">
+    <div class="section-header">
+        <div class="section-header-left">
+            <p>Destacados</p>
+            <h2>ESSENTIALS</h2>
+        </div>
+        <div>
+            <a th:href="@{/essentials}" style="font-size:11px; letter-spacing:3px; text-transform:uppercase; color:#000; text-decoration:underline;">Ver toda la colección →</a>
+        </div>
+    </div>
+
+    <div class="essentials-track-wrap">
+        <div class="essentials-track" id="essentials-track">
+            <div th:each="p, iter : ${essentials}" class="essentials-item">
+                <a th:href="@{'/producto/' + ${p.id}}" style="text-decoration:none;">
+                    <div class="essentials-img-wrap">
+                        <span th:text="${iter.count < 10 ? '0' + iter.count : iter.count}" style="position:absolute; top:16px; left:16px; font-family:'Bebas Neue'; font-size:13px; color:rgba(255,255,255,0.4); z-index:2;"></span>
+                        <img th:src="${p.imagen != null ? (p.imagen.startsWith('http') ? p.imagen : '/images/' + p.imagen) : '/images/placeholder.jpg'}" th:alt="${p.nombre}">
+                    </div>
                 </a>
+
+                <div class="essentials-item-body">
+                    <a th:href="@{'/producto/' + ${p.id}}" style="text-decoration:none;">
+                        <p class="essentials-item-name" th:text="${p.nombre}"></p>
+                    </a>
+                    <p class="essentials-item-price" th:if="${p.precio != null}" th:text="${'$' + #numbers.formatDecimal(p.precio, 0, 'COMMA', 0, 'POINT') + ' COP'}"></p>
+
+                    <form th:action="@{'/carrito/agregar/' + ${p.id}}" method="POST">
+                        <button type="submit" class="btn-stateless-card">
+                            Añadir al carrito
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
 
-        <!-- Si no hay productos, mostramos un mensaje en lugar de error -->
-        <div th:if="${#lists.isEmpty(essentials)}" style="text-align:center; padding:40px; opacity:0.3;">
-            <p>No hay productos destacados para mostrar.</p>
-        </div>
+        <button class="hero-ctrl" onclick="moverEssentials(-1)" style="left:0; top:40%; background:#000; color:#fff;">‹</button>
+        <button class="hero-ctrl" onclick="moverEssentials(1)" style="right:0; top:40%; background:#000; color:#fff;">›</button>
     </div>
+</div>
+
+<script th:inline="javascript">
+/* HERO CARRUSEL */
+let slideActual = 0;
+const slides = document.querySelectorAll('.hero-slide');
+const dots = document.querySelectorAll('.hero-dot');
+const totalSlides = slides.length;
+
+function irASlide(index) {
+    slides[slideActual].classList.remove('active');
+    dots[slideActual].classList.remove('active');
+    slideActual = (index + totalSlides) % totalSlides;
+    slides[slideActual].classList.add('active');
+    dots[slideActual].classList.add('active');
+    document.getElementById('slide-num').textContent = String(slideActual + 1).padStart(2, '0');
+}
+
+function cambiarSlide(dir) { irASlide(slideActual + dir); }
+setInterval(() => cambiarSlide(1), 5500);
+
+/* ESSENTIALS TRACK */
+let essentialsIndex = 0;
+const track = document.getElementById('essentials-track');
+function moverEssentials(dir) {
+    const totalItems = track.children.length;
+    const visibles = 3;
+    const max = Math.max(0, totalItems - visibles);
+    essentialsIndex = Math.max(0, Math.min(essentialsIndex + dir, max));
+    const step = track.offsetWidth / visibles;
+    track.style.transform = `translateX(-${essentialsIndex * step}px)`;
+}
+</script>
+
 </section>
 </body>
 </html>

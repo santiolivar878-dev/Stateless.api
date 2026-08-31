@@ -11,7 +11,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/admin/categorias")
-@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasAnyRole('ADMIN', 'EMPLEADO')")
 public class AdminCategoriaController {
 
     @Autowired private CategoriaRepository categoriaRepository;
@@ -31,7 +31,7 @@ public class AdminCategoriaController {
     @PostMapping("/save")
     public String save(@ModelAttribute Categoria categoria, RedirectAttributes ra) {
         categoriaRepository.save(categoria);
-        ra.addFlashAttribute("success", "Categoría guardada correctamente.");
+        ra.addFlashAttribute("success", "Categoría gestionada correctamente.");
         return "redirect:/admin/categorias";
     }
 
@@ -47,7 +47,7 @@ public class AdminCategoriaController {
             categoriaRepository.deleteById(id);
             ra.addFlashAttribute("success", "Categoría eliminada.");
         } catch (Exception e) {
-            ra.addFlashAttribute("error", "No se puede eliminar: existen productos vinculados.");
+            ra.addFlashAttribute("error", "No se puede eliminar: tiene productos vinculados.");
         }
         return "redirect:/admin/categorias";
     }

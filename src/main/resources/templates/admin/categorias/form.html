@@ -1,14 +1,30 @@
-<div th:replace="~{layouts/admin-layout :: layout(content=~{::section})}">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/admin-layout :: layout(content=~{::section})}">
+<body>
 <section>
-    <h2 style="font-family:'Bebas Neue'; margin-bottom:20px;" th:text="${categoria.id == null ? 'Crear Categoría' : 'Editar Categoría'}"></h2>
-    <form th:action="@{/admin/categorias/save}" th:object="${categoria}" method="POST" class="bg-white p-4 border">
-        <input type="hidden" th:field="*{id}">
-        <div class="mb-3">
-            <label class="form-label">Nombre</label>
-            <input type="text" th:field="*{nombre}" class="form-control" required>
-        </div>
-        <button type="submit" class="btn btn-dark">GUARDAR</button>
-        <a th:href="@{/admin/categorias}" class="ms-2 text-decoration-none">Cancelar</a>
-    </form>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+        <h2 style="font-family:'Bebas Neue', sans-serif; font-size:32px; letter-spacing:3px;" 
+            th:text="${categoria.id == null ? 'NUEVA CATEGORÍA' : 'EDITAR CATEGORÍA'}"></h2>
+        <a th:href="@{/admin/categorias}" class="btn-sl-outline">← Volver</a>
+    </div>
+
+    <div style="background:#fff; border:1px solid #eee; padding:32px; max-width:550px;">
+        <form th:action="@{/admin/categorias/save}" th:object="${categoria}" method="POST">
+            <input type="hidden" th:field="*{id}">
+            
+            <div class="sl-form-group">
+                <label class="sl-label">Nombre de Categoría / Colección</label>
+                <input type="text" th:field="*{nombre}" class="sl-input" placeholder="ej: Essentials, Waves, Octane" required>
+            </div>
+
+            <div style="display:flex; gap:12px; margin-top:8px;">
+                <button type="submit" class="btn-sl">Guardar Categoría</button>
+                <a th:href="@{/admin/categorias}" class="btn-sl-outline">Cancelar</a>
+            </div>
+        </form>
+    </div>
+
 </section>
-</div>
+</body>
+</html>

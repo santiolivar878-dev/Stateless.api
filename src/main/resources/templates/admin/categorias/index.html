@@ -1,30 +1,41 @@
-<div th:replace="~{layouts/admin-layout :: layout(content=~{::section})}">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/admin-layout :: layout(content=~{::section})}">
+<body>
 <section>
-    <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
-        <h2 style="font-family:'Bebas Neue';">Categorías</h2>
-        <a th:href="@{/admin/categorias/create}" class="btn btn-dark btn-sm">+ NUEVA</a>
-    </div>
-    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
-    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
-    <table class="table border bg-white">
-        <thead class="table-light">
+    <div th:if="${success}" class="alert-success-sl" th:text="${success}"></div>
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}" style="border-radius:0;"></div>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+        <h2 style="font-family:'Bebas Neue', sans-serif; font-size:32px; letter-spacing:3px;">Lista de Categorías</h2>
+        <a th:href="@{/admin/categorias/create}" class="btn-sl">+ Registrar Categoría</a>
+    </div>
+
+    <table class="stateless-table">
+        <thead>
             <tr>
-                <th>Nombre</th>
+                <th>ID</th>
+                <th>Nombre de la Colección</th>
                 <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
             <tr th:each="c : ${categorias}">
-                <td th:text="${c.nombre}"></td>
-                <td>
-                    <a th:href="@{'/admin/categorias/edit/' + ${c.id}}" class="btn btn-sm btn-outline-primary">Editar</a>
-                    <form th:action="@{'/admin/categorias/delete/' + ${c.id}}" method="POST" style="display:inline;">
-                        <button type="submit" class="btn btn-sm btn-link text-danger">Borrar</button>
+                <td th:text="${c.id}"></td>
+                <td style="font-weight:700; letter-spacing:1px; text-transform:uppercase;" th:text="${c.nombre}"></td>
+                <td style="display:flex; gap:8px;">
+                    <a th:href="@{'/admin/categorias/edit/' + ${c.id}}" class="btn-sl-outline" style="padding:4px 12px; font-size:10px;">Editar</a>
+                    <form th:action="@{'/admin/categorias/delete/' + ${c.id}}" method="POST" onsubmit="return confirm('¿Eliminar esta categoría?')">
+                        <button type="submit" class="btn-sl-danger" style="padding:4px 12px; font-size:10px;">Eliminar</button>
                     </form>
                 </td>
             </tr>
+            <tr th:if="${#lists.isEmpty(categorias)}">
+                <td colspan="3" style="text-align:center; opacity:0.5; padding:40px;">No hay categorías registradas.</td>
+            </tr>
         </tbody>
     </table>
+
 </section>
-</div>
+</body>
+</html>

@@ -9,6 +9,10 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.logout.HeaderWriterLogoutHandler;
+import org.springframework.security.web.header.writers.ClearSiteDataHeaderWriter;
+import static org.springframework.security.web.header.writers.ClearSiteDataHeaderWriter.Directive.COOKIES;
+import static org.springframework.security.web.header.writers.ClearSiteDataHeaderWriter.Directive.STORAGE;
 
 @Configuration
 @EnableWebSecurity
@@ -27,20 +31,23 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
+            // 1. Desactivar el almacenamiento en caché del navegador en rutas protegidas
+            .headers(headers -> headers
+                .cacheControl(cache -> {})
+            )
             .authorizeHttpRequests(auth -> auth
-                // 1. Recursos estáticos y rutas básicas de error
+                // 1. Recursos estáticos y rutas públicas
                 .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico", "/error").permitAll()
-                
-                // 2. Vistas públicas (Asegúrate de que cada una sea un String separado)
                 .requestMatchers("/", "/login", "/register", "/essentials", "/octane", "/waves", "/buscar/**", "/catalogo/**").permitAll()
-                .requestMatchers("/forgot-password", "/reset-password/**").permitAll()
+                .requestMatchers("/producto/**", "/carrito", "/carrito/**", "/forgot-password", "/reset-password/**").permitAll()
                 
-                // 3. Detalle de producto y Carrito
-                .requestMatchers("/producto/**", "/carrito/**").permitAll()
+                // 2. RUTAS EXCLUSIVAS DE ADMIN (Usuarios y Reportes)
+                .requestMatchers("/admin/usuarios/**", "/admin/reportes/**").hasRole("ADMIN")
                 
-                // 4. Rutas protegidas
-                .requestMatchers("/admin/**", "/reportes/**").hasRole("ADMIN")
-                .requestMatchers("/empleado/**").hasAnyRole("ADMIN", "EMPLEADO")
+                // 3. RUTAS COMPARTIDAS (Admin y Empleado pueden gestionar la tienda)
+                .requestMatchers("/admin/ventas/**", "/admin/envios/**", "/admin/productos/**", "/admin/categorias/**", "/admin/proveedores/**", "/admin/dashboard").hasAnyRole("ADMIN", "EMPLEADO")
+                
+                // 4. RUTAS DE CLIENTE
                 .requestMatchers("/account/**", "/checkout/**").authenticated() 
                 
                 .anyRequest().authenticated()
@@ -54,7 +61,11 @@ public class SecurityConfig {
             )
             .logout(logout -> logout
                 .logoutUrl("/logout")
-                .logoutSuccessUrl("/")
+                .logoutSuccessUrl("/login?logout")
+                .invalidateHttpSession(true)           // Invalida la sesión actual en el servidor
+                .clearAuthentication(true)             // Limpia el contexto de seguridad
+                .deleteCookies("JSESSIONID")           // Elimina la cookie de sesión del navegador
+                .addLogoutHandler(new HeaderWriterLogoutHandler(new ClearSiteDataHeaderWriter(COOKIES, STORAGE))) // Limpia almacenamiento y cookies
                 .permitAll()
             )
             .oauth2Login(oauth2 -> oauth2

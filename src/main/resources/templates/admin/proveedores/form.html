@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/admin-layout :: layout(content=~{::section})}">
+<body>
+<section>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+        <h2 style="font-family:'Bebas Neue', sans-serif; font-size:32px; letter-spacing:3px;" 
+            th:text="${proveedor.id == null ? 'REGISTRAR PROVEEDOR' : 'EDITAR PROVEEDOR'}"></h2>
+        <a th:href="@{/admin/proveedores}" class="btn-sl-outline">← Volver</a>
+    </div>
+
+    <div style="background:#fff; border:1px solid #eee; padding:32px; max-width:600px;">
+        <form th:action="@{/admin/proveedores/save}" th:object="${proveedor}" method="POST">
+            <input type="hidden" th:field="*{id}">
+            
+            <div class="sl-form-group">
+                <label class="sl-label">Nombre de la Empresa</label>
+                <input type="text" th:field="*{nombre}" class="sl-input" required>
+            </div>
+
+            <div class="sl-form-group">
+                <label class="sl-label">Teléfono de Contacto</label>
+                <input type="text" th:field="*{telefono}" class="sl-input" required>
+            </div>
+
+            <div class="sl-form-group">
+                <label class="sl-label">Correo Electrónico</label>
+                <input type="email" th:field="*{correo}" class="sl-input" required>
+            </div>
+
+            <div class="sl-form-group">
+                <label class="sl-label">Estado</label>
+                <select th:field="*{estado}" class="sl-input">
+                    <option th:value="true">Activo</option>
+                    <option th:value="false">Inactivo</option>
+                </select>
+            </div>
+
+            <div style="display:flex; gap:12px; margin-top:8px;">
+                <button type="submit" class="btn-sl">Guardar Proveedor</button>
+                <a th:href="@{/admin/proveedores}" class="btn-sl-outline">Cancelar</a>
+            </div>
+        </form>
+    </div>
+
+</section>
+</body>
+</html>

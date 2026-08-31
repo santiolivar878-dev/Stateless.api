@@ -2,16 +2,18 @@
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/admin-layout :: layout(content=~{::section})}">
 <body>
 <section>
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
-        <h2 style="font-family:'Bebas Neue'; font-size:28px; letter-spacing:2px;">GESTIÓN DE USUARIOS</h2>
-    </div>
 
-    <div th:if="${success}" class="alert alert-success" th:text="${success}" style="border-radius:0;"></div>
+    <div th:if="${success}" class="alert-success-sl" th:text="${success}"></div>
     <div th:if="${error}" class="alert alert-danger" th:text="${error}" style="border-radius:0;"></div>
 
-    <table class="table align-middle bg-white border">
-        <thead class="table-dark">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+        <h2 style="font-family:'Bebas Neue', sans-serif; font-size:32px; letter-spacing:3px;">Gestión de Usuarios</h2>
+    </div>
+
+    <table class="stateless-table">
+        <thead>
             <tr>
+                <th>ID</th>
                 <th>Nombre</th>
                 <th>Email</th>
                 <th>Rol</th>
@@ -21,29 +23,31 @@
         </thead>
         <tbody>
             <tr th:each="u : ${users}">
-                <td th:text="${u.name}" style="font-weight:bold;"></td>
+                <td th:text="${u.id}"></td>
+                <td style="font-weight:600;" th:text="${u.name}"></td>
                 <td th:text="${u.email}"></td>
                 <td>
-                    <span th:text="${#strings.toUpperCase(u.role.name)}" class="badge bg-light text-dark border"></span>
+                    <span th:text="${#strings.toUpperCase(u.role != null ? u.role.name : 'cliente')}" 
+                          style="background:#000; color:#fff; font-size:10px; padding:3px 8px; font-weight:700; letter-spacing:1px;"></span>
                 </td>
                 <td>
-                    <span th:if="${u.estado == 'activo'}" class="text-success" style="font-size:11px; font-weight:bold;">● ACTIVO</span>
-                    <span th:unless="${u.estado == 'activo'}" class="text-danger" style="font-size:11px; font-weight:bold;">● INACTIVO</span>
+                    <span th:if="${u.estado == 'activo'}" style="background:green; color:#fff; padding:2px 8px; font-size:10px; font-weight:700;">ACTIVO</span>
+                    <span th:unless="${u.estado == 'activo'}" style="background:#c00; color:#fff; padding:2px 8px; font-size:10px; font-weight:700;">INACTIVO</span>
                 </td>
-                <td style="display:flex; gap:10px;">
-                    <a th:href="@{'/admin/usuarios/edit/' + ${u.id}}" class="btn btn-sm btn-outline-dark">EDITAR</a>
+                <td style="display:flex; gap:8px;">
+                    <a th:href="@{'/admin/usuarios/edit/' + ${u.id}}" class="btn-sl-outline" style="padding:4px 12px; font-size:10px;">Editar</a>
                     
-                    <!-- Botón Habilitar/Inhabilitar -->
                     <form th:action="@{'/admin/usuarios/toggle/' + ${u.id}}" method="POST">
                         <button type="submit" 
-                                th:class="${u.estado == 'activo' ? 'btn btn-sm btn-danger' : 'btn btn-sm btn-success'}"
-                                th:text="${u.estado == 'activo' ? 'INHABILITAR' : 'HABILITAR'}"
-                                style="font-size:10px;"></button>
+                                th:class="${u.estado == 'activo' ? 'btn-sl-danger' : 'btn-sl'}"
+                                th:text="${u.estado == 'activo' ? 'Inhabilitar' : 'Habilitar'}"
+                                style="padding:4px 12px; font-size:10px;"></button>
                     </form>
                 </td>
             </tr>
         </tbody>
     </table>
+
 </section>
 </body>
 </html>

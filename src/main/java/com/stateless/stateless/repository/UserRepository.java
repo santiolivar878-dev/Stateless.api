@@ -9,13 +9,11 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
-    
     Optional<User> findByEmailToken(String emailToken);
     
-    @Query("SELECT u FROM User u WHERE (:search IS NULL OR u.name LIKE %:search% OR u.email LIKE %:search%) AND (:roleId IS NULL OR u.role.id = :roleId)")
-    List<User> searchUsers(@Param("search") String search, @Param("roleId") Long roleId);
-
-    // Método que cuenta usuarios por el nombre del rol (admin, cliente, empleado)
-    @Query("SELECT COUNT(u) FROM User u WHERE u.role.name = :roleName")
+    @Query("SELECT COUNT(u) FROM User u JOIN u.role r WHERE r.name = :roleName")
     long countByRoleName(@Param("roleName") String roleName);
+
+    @Query("SELECT u FROM User u WHERE (:search IS NULL OR u.name LIKE %:search% OR u.email LIKE %:search%)")
+    List<User> searchUsers(@Param("search") String search);
 }
