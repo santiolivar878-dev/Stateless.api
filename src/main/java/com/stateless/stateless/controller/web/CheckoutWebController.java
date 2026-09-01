@@ -6,6 +6,7 @@ import com.stateless.stateless.model.Venta;
 import com.stateless.stateless.repository.VentaRepository;
 import com.stateless.stateless.service.CarritoService;
 import com.stateless.stateless.service.CheckoutService;
+import com.stateless.stateless.service.EmailService;
 import com.stateless.stateless.service.FacturaPdfService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,32 +38,34 @@ public class CheckoutWebController {
     @Autowired
     private FacturaPdfService facturaPdfService;
 
+    @Autowired
+    private EmailService emailService;
+
     // 1. Mostrar la página de Checkout
     @GetMapping
     public String index(Model model, @AuthenticationPrincipal User user, HttpSession session) {
         Carrito carrito = carritoService.obtenerCarritoDeCualquierFuente(user, session);
         
-        if (carrito.getItems().isEmpty()) {
+        if (carrito == null || carrito.getItems() == null || carrito.getItems().isEmpty()) {
             return "redirect:/carrito";
         }
 
         model.addAttribute("carrito", carrito);
+        model.addAttribute("user", user);
         return "checkout/index";
     }
 
-    // 2. Procesar el pago (Petición AJAX desde el navegador)
+    // 2. Procesar el pago y devolver la URL de confirmación con el mapa
     @PostMapping("/procesar")
     @ResponseBody
     public ResponseEntity<?> procesar(@RequestBody Map<String, String> payload, 
                                        @AuthenticationPrincipal User user) {
         try {
-            // Verificación de sesión
             if (user == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(Map.of("error", "Debes iniciar sesión para finalizar la compra."));
             }
 
-            // Llamada al servicio de lógica de negocio (Resta stock y crea Venta)
             Venta venta = checkoutService.procesarPedido(
                 user, 
                 payload.get("direccion"), 
@@ -70,17 +73,34 @@ public class CheckoutWebController {
                 payload.get("metodo_pago")
             );
 
-            // Devolvemos la URL a la que el JavaScript debe redirigir
-            return ResponseEntity.ok(Map.of("redirect", "/checkout/factura/" + venta.getId()));
+            // Disparo del correo de compra en segundo plano
+            try {
+                emailService.enviarConfirmacionCompra(venta);
+            } catch (Exception mailEx) {
+                System.err.println("Aviso: Correo no enviado: " + mailEx.getMessage());
+            }
+
+            // REDIRECCIÓN A LA PANTALLA DE CONFIRMACIÓN CON EL MAPA
+            return ResponseEntity.ok(Map.of("redirect", "/checkout/confirmacion/" + venta.getId()));
 
         } catch (Exception e) {
-            e.printStackTrace(); // Imprime el error en la terminal de Docker para debug
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Error en el servidor: " + e.getMessage()));
         }
     }
 
-    // 3. Mostrar la factura en pantalla
+    // 3. NUEVA PANTALLA: Confirmación de compra con mapa y resumen
+    @GetMapping("/confirmacion/{id}")
+    public String confirmacion(@PathVariable Long id, Model model) {
+        Venta venta = ventaRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Orden no encontrada"));
+        
+        model.addAttribute("venta", venta);
+        return "checkout/confirmacion";
+    }
+
+    // 4. Factura en pantalla
     @GetMapping("/factura/{id}")
     public String factura(@PathVariable Long id, Model model) {
         Venta venta = ventaRepository.findById(id)
@@ -90,7 +110,7 @@ public class CheckoutWebController {
         return "checkout/factura";
     }
 
-    // 4. Descargar la factura en PDF
+    // 5. Descargar PDF
     @GetMapping("/factura/{ventaId}/descargar")
     public ResponseEntity<byte[]> descargarFactura(@PathVariable Long ventaId) {
         Venta venta = ventaRepository.findById(ventaId)

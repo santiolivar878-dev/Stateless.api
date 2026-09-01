@@ -1,207 +1,598 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/app-layout :: layout(content=~{::section})}">
-<body>
-<section style="background:#fff; color:#000; min-height:90vh; padding:60px 40px;">
-
-    <div style="max-width:1100px; margin:0 auto;">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - STATELESS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Space Grotesk', -apple-system, sans-serif; }
+        body { background: #fff; color: #111; font-size: 13px; min-height: 100vh; }
         
-        <div style="margin-bottom:36px; border-bottom:2px solid #000; padding-bottom:14px;">
-            <p style="font-size:11px; letter-spacing:4px; text-transform:uppercase; opacity:0.5; margin:0;">Proceso de Compra</p>
-            <h1 style="font-family:'Bebas Neue'; font-size:44px; letter-spacing:4px; margin:0;">CHECKOUT SEGURO</h1>
-        </div>
-
-        <div style="display:grid; grid-template-columns:1.2fr 1fr; gap:48px; align-items:start;">
-
-            <!-- FORMULARIO DE ENVÍO Y PAGO -->
-            <div>
-                <form id="checkoutForm">
-                    
-                    <!-- 1. Dirección de Entrega -->
-                    <div style="margin-bottom:32px;">
-                        <h3 style="font-family:'Bebas Neue'; font-size:22px; letter-spacing:2px; margin-bottom:16px; border-bottom:1px solid #eee; padding-bottom:8px;">
-                            1. INFORMACIÓN DE ENVÍO
-                        </h3>
-
-                        <div style="margin-bottom:14px;">
-                            <label style="font-size:11px; letter-spacing:2px; text-transform:uppercase; font-weight:700; display:block; margin-bottom:6px;">Dirección completa</label>
-                            <input type="text" id="direccion" name="direccion" required placeholder="Calle / Carrera # 00 - 00, Barrio, Apto" 
-                                   style="width:100%; padding:12px; border:1px solid #000; font-size:13px; outline:none;">
-                        </div>
-
-                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
-                            <div>
-                                <label style="font-size:11px; letter-spacing:2px; text-transform:uppercase; font-weight:700; display:block; margin-bottom:6px;">Ciudad / Municipio</label>
-                                <input type="text" id="ciudad" name="ciudad" required placeholder="ej: Medellín, Bogotá, Cali" 
-                                       style="width:100%; padding:12px; border:1px solid #000; font-size:13px; outline:none;">
-                            </div>
-                            <div>
-                                <label style="font-size:11px; letter-spacing:2px; text-transform:uppercase; font-weight:700; display:block; margin-bottom:6px;">Teléfono</label>
-                                <input type="tel" id="telefono" name="telefono" required placeholder="ej: 3001234567" 
-                                       style="width:100%; padding:12px; border:1px solid #000; font-size:13px; outline:none;">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 2. Métodos de Pago Completos -->
-                    <div style="margin-bottom:32px;">
-                        <h3 style="font-family:'Bebas Neue'; font-size:22px; letter-spacing:2px; margin-bottom:16px; border-bottom:1px solid #eee; padding-bottom:8px;">
-                            2. SELECCIONA EL MÉTODO DE PAGO
-                        </h3>
-
-                        <!-- Opción 1: Tarjeta Stripe & Link -->
-                        <div class="payment-option" style="border:1px solid #000; padding:16px; margin-bottom:12px; background:#fff; cursor:pointer;" onclick="selectPayment('tarjeta_stripe')">
-                            <label style="display:flex; align-items:center; gap:12px; cursor:pointer; font-weight:700; font-size:13px; margin:0;">
-                                <input type="radio" name="metodo_pago" value="tarjeta_stripe" id="opt_stripe" checked style="accent-color:#000;">
-                                <span>💳 Tarjeta Débito / Crédito (Stripe & Link)</span>
-                            </label>
-                            <div id="desc_stripe" style="margin-top:10px; font-size:12px; opacity:0.7; padding-left:26px;">
-                                Procesamiento seguro inmediato con soporte de autocompletado en un clic con Stripe Link.
-                            </div>
-                        </div>
-
-                        <!-- Opción 2: Nequi -->
-                        <div class="payment-option" style="border:1px solid #ddd; padding:16px; margin-bottom:12px; background:#fff; cursor:pointer;" onclick="selectPayment('nequi')">
-                            <label style="display:flex; align-items:center; gap:12px; cursor:pointer; font-weight:700; font-size:13px; margin:0;">
-                                <input type="radio" name="metodo_pago" value="nequi" id="opt_nequi" style="accent-color:#000;">
-                                <span>📱 Nequi</span>
-                            </label>
-                            <div id="desc_nequi" style="display:none; margin-top:10px; font-size:12px; opacity:0.8; padding-left:26px; background:#f9f9f9; padding:10px;">
-                                Transfiere al número <strong>300 000 0000</strong>. Adjunta el comprobante al finalizar el pedido.
-                            </div>
-                        </div>
-
-                        <!-- Opción 3: Daviplata -->
-                        <div class="payment-option" style="border:1px solid #ddd; padding:16px; margin-bottom:12px; background:#fff; cursor:pointer;" onclick="selectPayment('daviplata')">
-                            <label style="display:flex; align-items:center; gap:12px; cursor:pointer; font-weight:700; font-size:13px; margin:0;">
-                                <input type="radio" name="metodo_pago" value="daviplata" id="opt_daviplata" style="accent-color:#000;">
-                                <span>🔴 Daviplata</span>
-                            </label>
-                            <div id="desc_daviplata" style="display:none; margin-top:10px; font-size:12px; opacity:0.8; padding-left:26px; background:#f9f9f9; padding:10px;">
-                                Transfiere al número <strong>310 000 0000</strong>. Tu orden se procesará tras validación.
-                            </div>
-                        </div>
-
-                        <!-- Opción 4: Contra Entrega -->
-                        <div class="payment-option" style="border:1px solid #ddd; padding:16px; margin-bottom:20px; background:#fff; cursor:pointer;" onclick="selectPayment('contraentrega')">
-                            <label style="display:flex; align-items:center; gap:12px; cursor:pointer; font-weight:700; font-size:13px; margin:0;">
-                                <input type="radio" name="metodo_pago" value="contraentrega" id="opt_contraentrega" style="accent-color:#000;">
-                                <span>📦 Pago Contra Entrega</span>
-                            </label>
-                            <div id="desc_contraentrega" style="display:none; margin-top:10px; font-size:12px; opacity:0.8; padding-left:26px; background:#f9f9f9; padding:10px;">
-                                Paga en efectivo al recibir tu paquete en tu domicilio.
-                            </div>
-                        </div>
-
-                        <div id="error-msg" style="display:none; color:#c00; font-size:12px; margin-bottom:16px; padding:12px; background:#fff0f0; border:1px solid #ffcccc;"></div>
-
-                        <button type="submit" id="btnProcesar" 
-                                style="width:100%; background:#000; color:#fff; border:none; padding:16px; font-size:12px; font-weight:700; letter-spacing:3px; text-transform:uppercase; cursor:pointer; transition:0.2s;"
-                                onmouseover="this.style.background='#333'" onmouseout="this.style.background='#000'">
-                            CONFIRMAR Y FINALIZAR COMPRA
-                        </button>
-                    </div>
-
-                </form>
-            </div>
-
-            <!-- RESUMEN DE COMPRA -->
-            <div style="background:#fafafa; border:1px solid #eee; padding:32px; position:sticky; top:100px;">
-                <h3 style="font-family:'Bebas Neue'; font-size:24px; letter-spacing:2px; margin-bottom:20px; border-bottom:1px solid #000; padding-bottom:10px;">
-                    RESUMEN DE ORDEN
-                </h3>
-
-                <div th:each="item : ${carrito.items}" style="display:flex; justify-content:space-between; margin-bottom:14px; font-size:12px;">
-                    <div>
-                        <span th:text="${item.producto.nombre}" style="font-weight:700; text-transform:uppercase;"></span>
-                        <span th:if="${item.variante != null}" th:text="' (' + ${item.variante.color} + ')'" style="opacity:0.6;"></span>
-                        <span th:text="' × ' + ${item.cantidad}" style="opacity:0.6;"></span>
-                    </div>
-                    <span th:text="${'$' + #numbers.formatDecimal(item.precioUnitario * item.cantidad, 0, 'COMMA', 0, 'POINT')}"></span>
-                </div>
-
-                <hr style="border-color:#ddd; margin:20px 0;">
-
-                <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:13px;">
-                    <span style="opacity:0.6;">Subtotal</span>
-                    <span th:text="${'$' + #numbers.formatDecimal(carrito.total, 0, 'COMMA', 0, 'POINT') + ' COP'}"></span>
-                </div>
-                <div style="display:flex; justify-content:space-between; margin-bottom:20px; font-size:13px;">
-                    <span style="opacity:0.6;">Envío Nacional</span>
-                    <span style="font-weight:600; color:green;">GRATIS</span>
-                </div>
-
-                <div style="display:flex; justify-content:space-between; padding-top:16px; border-top:2px solid #000;">
-                    <span style="font-weight:700; font-size:14px; letter-spacing:1px;">TOTAL A PAGAR</span>
-                    <span th:text="${'$' + #numbers.formatDecimal(carrito.total, 0, 'COMMA', 0, 'POINT') + ' COP'}" style="font-family:'Bebas Neue'; font-size:28px;"></span>
-                </div>
-            </div>
-
-        </div>
-
-    </div>
-
-    <!-- SCRIPT DE SELECCIÓN Y PROCESAMIENTO AJAX -->
-    <script>
-        function selectPayment(metodo) {
-            document.querySelectorAll('.payment-option').forEach(el => el.style.borderColor = '#ddd');
-            ['stripe', 'nequi', 'daviplata', 'contraentrega'].forEach(m => {
-                const desc = document.getElementById('desc_' + m);
-                if (desc) desc.style.display = 'none';
-            });
-
-            const radio = document.getElementById('opt_' + metodo);
-            if (radio) radio.checked = true;
-
-            const selectedBox = radio.closest('.payment-option');
-            if (selectedBox) selectedBox.style.borderColor = '#000';
-
-            const selectedDesc = document.getElementById('desc_' + metodo);
-            if (selectedDesc) selectedDesc.style.display = 'block';
+        .checkout-layout {
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            min-height: 100vh;
         }
 
-        const form = document.getElementById('checkoutForm');
-        const btn = document.getElementById('btnProcesar');
-        const errorDiv = document.getElementById('error-msg');
+        /* COLUMNA IZQUIERDA */
+        .left-col {
+            padding: 48px 64px;
+            max-width: 680px;
+            margin-left: auto;
+            width: 100%;
+        }
 
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            btn.disabled = true;
-            btn.textContent = 'PROCESANDO PEDIDO...';
-            errorDiv.style.display = 'none';
+        .logo-header {
+            margin-bottom: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .logo-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 34px;
+            letter-spacing: 4px;
+            color: #000;
+            text-decoration: none;
+        }
 
-            const payload = {
-                direccion: document.getElementById('direccion').value,
-                ciudad: document.getElementById('ciudad').value,
-                telefono: document.getElementById('telefono').value,
-                metodo_pago: document.querySelector('input[name="metodo_pago"]:checked').value
-            };
+        /* EXPRESS CHECKOUT BUTTONS */
+        .express-box {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .express-label {
+            font-size: 11px;
+            color: #737373;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+        .express-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+        }
+        .btn-express {
+            height: 44px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            transition: opacity 0.2s;
+        }
+        .btn-express:hover { opacity: 0.9; }
+        .btn-shop { background: #5a31f4; color: #fff; }
+        .btn-paypal { background: #ffc439; color: #003087; font-style: italic; }
+        .btn-gpay { background: #000; color: #fff; }
 
-            try {
-                const response = await fetch('/checkout/procesar', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: #737373;
+            font-size: 12px;
+            margin: 24px 0;
+        }
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #e1e1e1;
+        }
+        .divider span { padding: 0 14px; }
 
-                const data = await response.json();
+        /* FORM INPUTS */
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #111;
+            margin: 24px 0 12px;
+        }
+        .form-group { margin-bottom: 12px; }
+        .input-field {
+            width: 100%;
+            height: 46px;
+            padding: 0 14px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 13px;
+            outline: none;
+            background: #fff;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .input-field:focus {
+            border-color: #000;
+            box-shadow: 0 0 0 1px #000;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr 1fr;
+            gap: 12px;
+        }
 
-                if (response.ok && data.redirect) {
-                    window.location.href = data.redirect;
-                } else {
-                    errorDiv.textContent = data.error || 'Ocurrió un error al registrar el pedido.';
-                    errorDiv.style.display = 'block';
-                    btn.disabled = false;
-                    btn.textContent = 'CONFIRMAR Y FINALIZAR COMPRA';
-                }
-            } catch (err) {
-                errorDiv.textContent = 'Error de comunicación con el servidor.';
-                errorDiv.style.display = 'block';
-                btn.disabled = false;
-                btn.textContent = 'CONFIRMAR Y FINALIZAR COMPRA';
-            }
+        /* PAYMENT BOXES */
+        .payment-card-box {
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-top: 14px;
+        }
+        .payment-header {
+            padding: 14px 16px;
+            background: #f9f9f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e1e1e1;
+        }
+        .payment-body {
+            padding: 16px;
+            background: #f4f4f4;
+        }
+
+        /* BOTON PAGAR AHORA */
+        .btn-submit-glitch {
+            width: 100%;
+            height: 52px;
+            background: #000;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            margin-top: 28px;
+            transition: background 0.2s, transform 0.1s;
+        }
+        .btn-submit-glitch:hover { background: #222; }
+        .btn-submit-glitch:active { transform: scale(0.99); }
+
+        /* COLUMNA DERECHA: NEGRO STATELESS */
+        .right-col {
+            background: #0a0a0a;
+            padding: 48px 54px;
+            color: #fff;
+            border-left: 1px solid #222;
+        }
+        .right-inner {
+            max-width: 440px;
+            width: 100%;
+        }
+
+        .cart-item-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid #1a1a1a;
+        }
+        .item-thumb-wrapper {
+            position: relative;
+            width: 56px;
+            height: 56px;
+            background: #141414;
+            border-radius: 10px;
+            border: 1px solid #2a2a2a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 14px;
+        }
+        .item-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #fff;
+            color: #000;
+            font-size: 10px;
+            font-weight: 800;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+
+        /* CUPON */
+        .coupon-group {
+            display: flex;
+            gap: 10px;
+            margin: 24px 0;
+        }
+        .coupon-input {
+            flex: 1;
+            height: 44px;
+            padding: 0 14px;
+            border: 1px solid #222;
+            border-radius: 6px;
+            background: #141414;
+            color: #fff;
+            outline: none;
+            font-size: 13px;
+        }
+        .coupon-input:focus { border-color: #555; }
+        .btn-coupon {
+            height: 44px;
+            padding: 0 20px;
+            background: #fff;
+            color: #000;
+            border: none;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-size: 11px;
+        }
+        .btn-coupon:hover { background: #e0e0e0; }
+
+        /* CROSS-SELLING */
+        .cross-sell-title {
+            text-align: center;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #777;
+            margin: 32px 0 16px;
+        }
+        .cross-sell-card {
+            background: #121212;
+            border: 1px solid #222;
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: border-color 0.2s;
+        }
+        .cross-sell-card:hover { border-color: #333; }
+        .btn-add-cross {
+            background: #fff;
+            border: none;
+            color: #000;
+            padding: 7px 16px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-add-cross:hover { background: #00ff88; color: #000; }
+
+        @media (max-width: 900px) {
+            .checkout-layout { grid-template-columns: 1fr; }
+            .left-col, .right-col { padding: 24px; }
+            .right-col { order: -1; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="checkout-layout">
+
+    <!-- COLUMNA IZQUIERDA -->
+    <div class="left-col">
+        <div class="logo-header">
+            <a th:href="@{/}" class="logo-title">STATELESS</a>
+            <a th:href="@{/carrito}" style="color:#000; text-decoration:none; font-size:18px;">🛒</a>
+        </div>
+
+        <!-- PAGO EXPRÉS -->
+        <div class="express-box">
+            <p class="express-label">Pago exprés</p>
+            <div class="express-grid">
+                <button type="button" class="btn-express btn-shop" onclick="quickFill('Shop Pay')">shop</button>
+                <button type="button" class="btn-express btn-paypal" onclick="quickFill('PayPal')">PayPal</button>
+                <button type="button" class="btn-express btn-gpay" onclick="quickFill('Google Pay')">G Pay</button>
+            </div>
+        </div>
+
+        <div class="divider">
+            <span>O</span>
+        </div>
+
+        <form id="checkoutForm">
+
+            <!-- CONTACTO -->
+            <div class="section-title">Contacto</div>
+            <div class="form-group">
+                <input type="email" id="email" name="email" class="input-field" placeholder="Correo electrónico" 
+                       th:value="${user != null ? user.email : ''}" required>
+            </div>
+            <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#555; margin-bottom:20px; cursor:pointer;">
+                <input type="checkbox" checked style="accent-color:#000;">
+                Enviarme novedades y confirmación de envío por correo
+            </label>
+
+            <!-- ENTREGA -->
+            <div class="section-title">Entrega y Domicilio</div>
+
+            <div class="form-group">
+                <select class="input-field" id="pais">
+                    <option value="Colombia" selected>Colombia</option>
+                </select>
+            </div>
+
+            <div class="grid-2 form-group">
+                <input type="text" id="nombre" class="input-field" placeholder="Nombre" 
+                       th:value="${user != null ? user.name : ''}" required>
+                <input type="text" id="apellidos" class="input-field" placeholder="Apellidos" required>
+            </div>
+
+            <div class="form-group">
+                <input type="text" id="direccion" name="direccion" class="input-field" placeholder="Dirección exacta (ej. Calle 100 # 15-20)" required>
+            </div>
+
+            <div class="form-group">
+                <input type="text" id="apartamento" class="input-field" placeholder="Apartamento, torre, unidad, etc. (opcional)">
+            </div>
+
+            <div class="grid-3 form-group">
+                <input type="text" id="ciudad" name="ciudad" class="input-field" placeholder="Ciudad" value="Bogotá" required>
+                <select class="input-field" id="departamento">
+                    <option value="Bogota">Bogotá D.C.</option>
+                    <option value="Antioquia">Antioquia / Medellín</option>
+                    <option value="Valle del Cauca">Valle / Cali</option>
+                    <option value="Atlantico">Atlántico / Barranquilla</option>
+                    <option value="Santander">Santander / Bucaramanga</option>
+                </select>
+                <input type="text" id="codigoPostal" class="input-field" placeholder="Código postal">
+            </div>
+
+            <div class="form-group">
+                <input type="tel" id="telefono" name="telefono" class="input-field" placeholder="Teléfono celular de contacto" required>
+            </div>
+
+            <!-- MÉTODOS DE ENVÍO -->
+            <div class="section-title">Método de Envío</div>
+            <div style="border:1px solid #000; border-radius:6px; padding:16px; display:flex; justify-content:space-between; align-items:center; background:#fff;">
+                <div>
+                    <strong style="display:block; font-size:13px;">Standard Express Nacional</strong>
+                    <span style="font-size:11px; color:#777;">Despacho directo (2 - 4 días hábiles)</span>
+                </div>
+                <strong style="font-size:13px; color:#000;">$ 0 COP (Gratis)</strong>
+            </div>
+
+            <!-- SECCIÓN PAGO -->
+            <div class="section-title">Método de Pago</div>
+            <p style="font-size:12px; color:#777; margin-bottom:12px;">Todas las transacciones son seguras y están encriptadas.</p>
+
+            <div class="payment-card-box">
+                <div class="payment-header">
+                    <label style="display:flex; align-items:center; gap:10px; font-weight:700; cursor:pointer;">
+                        <input type="radio" name="metodo_pago" value="tarjeta_credito" checked style="accent-color:#000;">
+                        <span>Tarjeta de crédito / débito</span>
+                    </label>
+                    <span style="font-size:11px; color:#666;">VISA • MASTERCARD • AMEX</span>
+                </div>
+
+                <div class="payment-body" id="tarjetaFields">
+                    <div class="form-group">
+                        <input type="text" class="input-field" placeholder="Número de tarjeta (ej. 4242 4242 4242 4242)" maxlength="19">
+                    </div>
+                    <div class="grid-2 form-group">
+                        <input type="text" class="input-field" placeholder="Fecha de vencimiento (MM / AA)" maxlength="5">
+                        <input type="text" class="input-field" placeholder="Código CVV" maxlength="4">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="input-field" placeholder="Nombre del titular en la tarjeta (ej. Tu Nombre / APRO)">
+                    </div>
+                </div>
+
+                <div class="payment-header" style="background:#fff; border-top:1px solid #e1e1e1;">
+                    <label style="display:flex; align-items:center; gap:10px; font-weight:700; cursor:pointer;">
+                        <input type="radio" name="metodo_pago" value="paypal" style="accent-color:#000;">
+                        <span>PayPal / Saldo Digital</span>
+                    </label>
+                    <span style="font-weight:bold; font-style:italic; color:#003087;">PayPal</span>
+                </div>
+            </div>
+
+            <div id="error-msg" style="display:none; color:#c00; font-size:12px; margin-top:16px; padding:12px; background:#fff0f0; border:1px solid #ffcccc; border-radius:6px;"></div>
+
+            <button type="submit" id="btnProcesar" class="btn-submit-glitch">
+                Pagar ahora
+            </button>
+        </form>
+    </div>
+
+    <!-- COLUMNA DERECHA -->
+    <div class="right-col">
+        <div class="right-inner">
+
+            <div id="cart-items-container">
+                <div th:each="item : ${carrito.items}" class="cart-item-row" th:id="'cart-row-' + ${item.id}">
+                    <div style="display:flex; align-items:center;">
+                        <div class="item-thumb-wrapper">
+                            <span class="item-badge" th:text="${item.cantidad}">1</span>
+                            <span style="font-size:24px;">👕</span>
+                        </div>
+                        <div>
+                            <p th:text="${item.producto != null ? item.producto.nombre : 'Prenda'}" style="font-weight:700; font-size:13px; margin-bottom:2px; text-transform:uppercase; color:#fff;"></p>
+                            <p th:if="${item.variante != null}" th:text="${item.variante.color}" style="font-size:11px; color:#888;"></p>
+                        </div>
+                    </div>
+                    <div style="font-weight:700; font-size:13px; color:#fff;" 
+                         th:text="${'$' + #numbers.formatDecimal(item.precioUnitario * item.cantidad, 0, 'COMMA', 0, 'POINT')}">
+                    </div>
+                </div>
+            </div>
+
+            <!-- CUPON -->
+            <div class="coupon-group">
+                <input type="text" id="codigoCupon" placeholder="Código de descuento" class="coupon-input">
+                <button type="button" class="btn-coupon" onclick="aplicarDescuento()">Aplicar</button>
+            </div>
+
+            <!-- TOTALES -->
+            <div style="border-top:1px solid #222; border-bottom:1px solid #222; padding:16px 0; margin-bottom:24px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px; color:#aaa;">
+                    <span>Subtotal</span>
+                    <span id="subtotal-val" th:text="${'$' + #numbers.formatDecimal(carrito.total, 0, 'COMMA', 0, 'POINT')}"></span>
+                </div>
+                <div style="display:flex; justify-content:space-between; color:#aaa;">
+                    <span>Envío Nacional</span>
+                    <span style="color:#00ff88; font-weight:700;">GRATIS</span>
+                </div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+                <span style="font-size:15px; font-weight:700; letter-spacing:1px; text-transform:uppercase;">Total</span>
+                <div>
+                    <span style="font-size:11px; color:#777; margin-right:6px;">COP</span>
+                    <span id="total-val" style="font-family:'Bebas Neue'; font-size:32px; letter-spacing:2px;" th:text="${'$' + #numbers.formatDecimal(carrito.total, 0, 'COMMA', 0, 'POINT')}"></span>
+                </div>
+            </div>
+
+            <!-- FREQUENTLY BOUGHT TOGETHER -->
+            <div class="cross-sell-title">
+                — Frequently bought together —
+            </div>
+
+            <div class="cross-sell-card" id="cross-cap">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div style="width:42px; height:42px; background:#1a1a1a; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:20px;">🧢</div>
+                    <div>
+                        <p style="font-weight:700; font-size:12px; margin:0; color:#fff;">Cap Stateless Classic</p>
+                        <span style="font-size:11px; color:#888;">$ 49.000 COP</span>
+                    </div>
+                </div>
+                <button type="button" class="btn-add-cross" onclick="agregarSugerido('Cap Stateless Classic', 49000, 'cross-cap')">Add</button>
+            </div>
+
+            <div class="cross-sell-card" id="cross-socks">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div style="width:42px; height:42px; background:#1a1a1a; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:20px;">🧦</div>
+                    <div>
+                        <p style="font-weight:700; font-size:12px; margin:0; color:#fff;">Socks Pack Black</p>
+                        <span style="font-size:11px; color:#888;">$ 25.000 COP</span>
+                    </div>
+                </div>
+                <button type="button" class="btn-add-cross" onclick="agregarSugerido('Socks Pack Black', 25000, 'cross-socks')">Add</button>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<!-- SCRIPT DE PAGO Y REDIRECCIÓN -->
+<script>
+let totalActual = parseFloat(document.getElementById('total-val').textContent.replace(/[^0-9]/g, '')) || 0;
+
+function agregarSugerido(nombre, precio, cardId) {
+    const card = document.getElementById(cardId);
+    if (card) {
+        card.style.opacity = '0.4';
+        card.querySelector('button').textContent = '✓ Added';
+        card.querySelector('button').disabled = true;
+    }
+
+    const container = document.getElementById('cart-items-container');
+    const newRow = document.createElement('div');
+    newRow.className = 'cart-item-row';
+    newRow.innerHTML = `
+        <div style="display:flex; align-items:center;">
+            <div class="item-thumb-wrapper">
+                <span class="item-badge">1</span>
+                <span style="font-size:24px;">✨</span>
+            </div>
+            <div>
+                <p style="font-weight:700; font-size:13px; margin-bottom:2px; text-transform:uppercase; color:#fff;">${nombre}</p>
+                <p style="font-size:11px; color:#888;">Accesorio Añadido</p>
+            </div>
+        </div>
+        <div style="font-weight:700; font-size:13px; color:#fff;">
+            $ ${precio.toLocaleString('es-CO')}
+        </div>
+    `;
+    container.appendChild(newRow);
+
+    totalActual += precio;
+    document.getElementById('subtotal-val').textContent = '$ ' + totalActual.toLocaleString('es-CO');
+    document.getElementById('total-val').textContent = '$ ' + totalActual.toLocaleString('es-CO');
+}
+
+function aplicarDescuento() {
+    const cupon = document.getElementById('codigoCupon').value.trim().toUpperCase();
+    if (cupon === 'STATELESS10') {
+        totalActual = Math.round(totalActual * 0.9);
+        document.getElementById('total-val').textContent = '$ ' + totalActual.toLocaleString('es-CO');
+        alert('¡Cupón STATELESS10 aplicado! 10% de descuento concedido.');
+    } else {
+        alert('Cupón no válido o expirado.');
+    }
+}
+
+function quickFill(provider) {
+    alert('Has seleccionado ' + provider + '. Los datos se procesarán de forma segura.');
+}
+
+const form = document.getElementById('checkoutForm');
+const btn = document.getElementById('btnProcesar');
+const errorDiv = document.getElementById('error-msg');
+
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    btn.disabled = true;
+    btn.textContent = 'PROCESANDO PAGO SEGURO...';
+    errorDiv.style.display = 'none';
+
+    const dirTexto = document.getElementById('direccion').value + 
+                     (document.getElementById('apartamento').value ? ' - ' + document.getElementById('apartamento').value : '');
+
+    const payload = {
+        direccion: dirTexto,
+        ciudad: document.getElementById('ciudad').value + ' (' + document.getElementById('departamento').value + ')',
+        telefono: document.getElementById('telefono').value,
+        metodo_pago: document.querySelector('input[name="metodo_pago"]:checked').value
+    };
+
+    try {
+        const response = await fetch('/checkout/procesar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
         });
-    </script>
 
-</section>
+        const data = await response.json();
+
+        if (response.ok && data.redirect) {
+            window.location.href = data.redirect; // Redirige a /checkout/confirmacion/{id}
+        } else {
+            errorDiv.textContent = data.error || 'No se pudo procesar el pago.';
+            errorDiv.style.display = 'block';
+            btn.disabled = false;
+            btn.textContent = 'Pagar ahora';
+        }
+    } catch (err) {
+        errorDiv.textContent = 'Error de conexión con el servidor.';
+        errorDiv.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Pagar ahora';
+    }
+});
+</script>
+
 </body>
 </html>
