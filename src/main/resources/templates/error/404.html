@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página No Encontrada - STATELESS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Space Grotesk', sans-serif; }
+        body {
+            background: #000000;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            text-align: center;
+        }
+        .error-card {
+            max-width: 520px;
+            width: 100%;
+            border: 1px solid #222222;
+            background: #080808;
+            padding: 56px 36px;
+            border-radius: 8px;
+        }
+        .brand-logo {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 36px;
+            letter-spacing: 6px;
+            color: #ffffff;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 24px;
+        }
+        .code-badge {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #aaaaaa;
+            border: 1px solid #333333;
+            background: #141414;
+            padding: 6px 14px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 44px;
+            letter-spacing: 3px;
+            margin-bottom: 12px;
+            color: #ffffff;
+        }
+        p {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #888888;
+            margin-bottom: 32px;
+        }
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 12px 24px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: 0.2s;
+        }
+        .btn-primary { background: #ffffff; color: #000000; }
+        .btn-primary:hover { background: #cccccc; }
+        .btn-secondary { background: transparent; color: #ffffff; border: 1px solid #333333; }
+        .btn-secondary:hover { border-color: #ffffff; }
+    </style>
+</head>
+<body>
+
+    <div class="error-card">
+        <a th:href="@{/}" class="brand-logo">STATELESS</a>
+        <br>
+        <div class="code-badge">ERROR 404 • NO ENCONTRADO</div>
+        <h1>RUTA INEXISTENTE</h1>
+        <p>La página o recurso al que intentas acceder no existe, ha sido trasladado o la URL escrita no es correcta.</p>
+        
+        <div class="btn-group">
+            <button onclick="history.back()" class="btn btn-secondary">← Volver Atrás</button>
+            <a th:href="@{/}" class="btn btn-primary">Volver al Inicio</a>
+        </div>
+    </div>
+
+</body>
+</html>

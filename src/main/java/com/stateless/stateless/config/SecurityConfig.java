@@ -40,6 +40,7 @@ public class SecurityConfig {
                 .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico", "/error").permitAll()
                 .requestMatchers("/", "/login", "/register", "/essentials", "/octane", "/waves", "/buscar/**", "/catalogo/**").permitAll()
                 .requestMatchers("/producto/**", "/carrito", "/carrito/**", "/forgot-password", "/reset-password/**").permitAll()
+                .requestMatchers("/error", "/error/**", "/css/**", "/js/**", "/images/**").permitAll()
                 
                 // 2. RUTAS EXCLUSIVAS DE ADMIN (Usuarios y Reportes)
                 .requestMatchers("/admin/usuarios/**", "/admin/reportes/**").hasRole("ADMIN")

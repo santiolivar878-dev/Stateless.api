@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checkout - STATELESS</title>
+    <title>Checkout Seguro - STATELESS</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -17,7 +17,7 @@
             min-height: 100vh;
         }
 
-        /* COLUMNA IZQUIERDA */
+        /* COLUMNA IZQUIERDA (FORMULARIO) */
         .left-col {
             padding: 48px 64px;
             max-width: 680px;
@@ -39,7 +39,6 @@
             text-decoration: none;
         }
 
-        /* EXPRESS CHECKOUT BUTTONS */
         .express-box {
             text-align: center;
             margin-bottom: 24px;
@@ -87,7 +86,6 @@
         }
         .divider span { padding: 0 14px; }
 
-        /* FORM INPUTS */
         .section-title {
             font-size: 16px;
             font-weight: 700;
@@ -121,7 +119,6 @@
             gap: 12px;
         }
 
-        /* PAYMENT BOXES */
         .payment-card-box {
             border: 1px solid #d9d9d9;
             border-radius: 6px;
@@ -141,7 +138,6 @@
             background: #f4f4f4;
         }
 
-        /* BOTON PAGAR AHORA */
         .btn-submit-glitch {
             width: 100%;
             height: 52px;
@@ -160,7 +156,7 @@
         .btn-submit-glitch:hover { background: #222; }
         .btn-submit-glitch:active { transform: scale(0.99); }
 
-        /* COLUMNA DERECHA: NEGRO STATELESS */
+        /* COLUMNA DERECHA (NEGRO STATELESS) */
         .right-col {
             background: #0a0a0a;
             padding: 48px 54px;
@@ -209,7 +205,6 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.5);
         }
 
-        /* CUPON */
         .coupon-group {
             display: flex;
             gap: 10px;
@@ -226,7 +221,6 @@
             outline: none;
             font-size: 13px;
         }
-        .coupon-input:focus { border-color: #555; }
         .btn-coupon {
             height: 44px;
             padding: 0 20px;
@@ -240,9 +234,7 @@
             text-transform: uppercase;
             font-size: 11px;
         }
-        .btn-coupon:hover { background: #e0e0e0; }
 
-        /* CROSS-SELLING */
         .cross-sell-title {
             text-align: center;
             font-size: 11px;
@@ -261,9 +253,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            transition: border-color 0.2s;
         }
-        .cross-sell-card:hover { border-color: #333; }
         .btn-add-cross {
             background: #fff;
             border: none;
@@ -275,7 +265,6 @@
             letter-spacing: 1px;
             text-transform: uppercase;
             cursor: pointer;
-            transition: all 0.2s;
         }
         .btn-add-cross:hover { background: #00ff88; color: #000; }
 
@@ -297,7 +286,6 @@
             <a th:href="@{/carrito}" style="color:#000; text-decoration:none; font-size:18px;">🛒</a>
         </div>
 
-        <!-- PAGO EXPRÉS -->
         <div class="express-box">
             <p class="express-label">Pago exprés</p>
             <div class="express-grid">
@@ -307,9 +295,7 @@
             </div>
         </div>
 
-        <div class="divider">
-            <span>O</span>
-        </div>
+        <div class="divider"><span>O</span></div>
 
         <form id="checkoutForm">
 
@@ -321,7 +307,7 @@
             </div>
             <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#555; margin-bottom:20px; cursor:pointer;">
                 <input type="checkbox" checked style="accent-color:#000;">
-                Enviarme novedades y confirmación de envío por correo
+                Enviarme confirmación y guía de transporte por correo
             </label>
 
             <!-- ENTREGA -->
@@ -340,11 +326,11 @@
             </div>
 
             <div class="form-group">
-                <input type="text" id="direccion" name="direccion" class="input-field" placeholder="Dirección exacta (ej. Calle 100 # 15-20)" required>
+                <input type="text" id="direccion" name="direccion" class="input-field" placeholder="Dirección exacta (ej. Carrera 11A # 93-93)" required>
             </div>
 
             <div class="form-group">
-                <input type="text" id="apartamento" class="input-field" placeholder="Apartamento, torre, unidad, etc. (opcional)">
+                <input type="text" id="apartamento" class="input-field" placeholder="Casa, apartamento, torre, etc. (opcional)">
             </div>
 
             <div class="grid-3 form-group">
@@ -356,7 +342,7 @@
                     <option value="Atlantico">Atlántico / Barranquilla</option>
                     <option value="Santander">Santander / Bucaramanga</option>
                 </select>
-                <input type="text" id="codigoPostal" class="input-field" placeholder="Código postal">
+                <input type="text" id="codigoPostal" class="input-field" placeholder="Código postal (ej. 110221)" required>
             </div>
 
             <div class="form-group">
@@ -368,19 +354,19 @@
             <div style="border:1px solid #000; border-radius:6px; padding:16px; display:flex; justify-content:space-between; align-items:center; background:#fff;">
                 <div>
                     <strong style="display:block; font-size:13px;">Standard Express Nacional</strong>
-                    <span style="font-size:11px; color:#777;">Despacho directo (2 - 4 días hábiles)</span>
+                    <span style="font-size:11px; color:#777;">Despacho directo asegurado (2 - 4 días hábiles)</span>
                 </div>
                 <strong style="font-size:13px; color:#000;">$ 0 COP (Gratis)</strong>
             </div>
 
             <!-- SECCIÓN PAGO -->
             <div class="section-title">Método de Pago</div>
-            <p style="font-size:12px; color:#777; margin-bottom:12px;">Todas las transacciones son seguras y están encriptadas.</p>
+            <p style="font-size:12px; color:#777; margin-bottom:12px;">Transacciones encriptadas con protocolo TLS 1.3 de alta seguridad.</p>
 
             <div class="payment-card-box">
                 <div class="payment-header">
                     <label style="display:flex; align-items:center; gap:10px; font-weight:700; cursor:pointer;">
-                        <input type="radio" name="metodo_pago" value="tarjeta_credito" checked style="accent-color:#000;">
+                        <input type="radio" name="metodo_pago" value="tarjeta_credito" checked style="accent-color:#000;" onchange="togglePayment('tarjeta')">
                         <span>Tarjeta de crédito / débito</span>
                     </label>
                     <span style="font-size:11px; color:#666;">VISA • MASTERCARD • AMEX</span>
@@ -388,27 +374,27 @@
 
                 <div class="payment-body" id="tarjetaFields">
                     <div class="form-group">
-                        <input type="text" class="input-field" placeholder="Número de tarjeta (ej. 4242 4242 4242 4242)" maxlength="19">
+                        <input type="text" id="cc_numero" class="input-field" placeholder="Número de tarjeta (16 dígitos)" maxlength="19">
                     </div>
                     <div class="grid-2 form-group">
-                        <input type="text" class="input-field" placeholder="Fecha de vencimiento (MM / AA)" maxlength="5">
-                        <input type="text" class="input-field" placeholder="Código CVV" maxlength="4">
+                        <input type="text" id="cc_exp" class="input-field" placeholder="Vencimiento (MM / AA)" maxlength="5">
+                        <input type="password" id="cc_cvv" class="input-field" placeholder="Código CVV" maxlength="4">
                     </div>
                     <div class="form-group">
-                        <input type="text" class="input-field" placeholder="Nombre del titular en la tarjeta (ej. Tu Nombre / APRO)">
+                        <input type="text" id="cc_titular" class="input-field" placeholder="Nombre completo del titular">
                     </div>
                 </div>
 
                 <div class="payment-header" style="background:#fff; border-top:1px solid #e1e1e1;">
                     <label style="display:flex; align-items:center; gap:10px; font-weight:700; cursor:pointer;">
-                        <input type="radio" name="metodo_pago" value="paypal" style="accent-color:#000;">
-                        <span>PayPal / Saldo Digital</span>
+                        <input type="radio" name="metodo_pago" value="paypal" style="accent-color:#000;" onchange="togglePayment('paypal')">
+                        <span>PayPal / Billetera Digital</span>
                     </label>
                     <span style="font-weight:bold; font-style:italic; color:#003087;">PayPal</span>
                 </div>
             </div>
 
-            <div id="error-msg" style="display:none; color:#c00; font-size:12px; margin-top:16px; padding:12px; background:#fff0f0; border:1px solid #ffcccc; border-radius:6px;"></div>
+            <div id="error-msg" style="display:none; color:#c00; font-size:12px; margin-top:16px; padding:12px; background:#fff0f0; border:1px solid #ffcccc; border-radius:6px; font-weight:600;"></div>
 
             <button type="submit" id="btnProcesar" class="btn-submit-glitch">
                 Pagar ahora
@@ -416,7 +402,7 @@
         </form>
     </div>
 
-    <!-- COLUMNA DERECHA -->
+    <!-- COLUMNA DERECHA CON DESGLOSE DE IVA (19%) -->
     <div class="right-col">
         <div class="right-inner">
 
@@ -444,11 +430,15 @@
                 <button type="button" class="btn-coupon" onclick="aplicarDescuento()">Aplicar</button>
             </div>
 
-            <!-- TOTALES -->
+            <!-- TOTALES CON DESGLOSE DE IVA (19%) -->
             <div style="border-top:1px solid #222; border-bottom:1px solid #222; padding:16px 0; margin-bottom:24px;">
                 <div style="display:flex; justify-content:space-between; margin-bottom:8px; color:#aaa;">
-                    <span>Subtotal</span>
-                    <span id="subtotal-val" th:text="${'$' + #numbers.formatDecimal(carrito.total, 0, 'COMMA', 0, 'POINT')}"></span>
+                    <span>Subtotal Neto</span>
+                    <span id="subtotal-base-val" th:text="${'$' + #numbers.formatDecimal((carrito.total != null ? (carrito.total / 1.19) : 0), 0, 'COMMA', 0, 'POINT')}">$ 0</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px; color:#aaa;">
+                    <span>IVA (19%)</span>
+                    <span id="iva-val" style="color:#fff; font-weight:600;" th:text="${'$' + #numbers.formatDecimal((carrito.total != null ? (carrito.total - (carrito.total / 1.19)) : 0), 0, 'COMMA', 0, 'POINT')}">$ 0</span>
                 </div>
                 <div style="display:flex; justify-content:space-between; color:#aaa;">
                     <span>Envío Nacional</span>
@@ -457,10 +447,11 @@
             </div>
 
             <div style="display:flex; justify-content:space-between; align-items:flex-end;">
-                <span style="font-size:15px; font-weight:700; letter-spacing:1px; text-transform:uppercase;">Total</span>
+                <span style="font-size:15px; font-weight:700; letter-spacing:1px; text-transform:uppercase;">Total a Pagar</span>
                 <div>
                     <span style="font-size:11px; color:#777; margin-right:6px;">COP</span>
-                    <span id="total-val" style="font-family:'Bebas Neue'; font-size:32px; letter-spacing:2px;" th:text="${'$' + #numbers.formatDecimal(carrito.total, 0, 'COMMA', 0, 'POINT')}"></span>
+                    <span id="total-val" style="font-family:'Bebas Neue'; font-size:32px; letter-spacing:2px;" 
+                          th:text="${'$' + #numbers.formatDecimal(carrito.total, 0, 'COMMA', 0, 'POINT')}"></span>
                 </div>
             </div>
 
@@ -496,9 +487,52 @@
 
 </div>
 
-<!-- SCRIPT DE PAGO Y REDIRECCIÓN -->
+<!-- SCRIPT DE VALIDACIÓN ESTRICTA Y CÁLCULO DE IVA -->
 <script>
 let totalActual = parseFloat(document.getElementById('total-val').textContent.replace(/[^0-9]/g, '')) || 0;
+
+function actualizarDesgloseIva() {
+    const base = Math.round(totalActual / 1.19);
+    const iva = totalActual - base;
+    
+    document.getElementById('subtotal-base-val').textContent = '$ ' + base.toLocaleString('es-CO');
+    document.getElementById('iva-val').textContent = '$ ' + iva.toLocaleString('es-CO');
+    document.getElementById('total-val').textContent = '$ ' + totalActual.toLocaleString('es-CO');
+}
+actualizarDesgloseIva();
+
+// Autoformato de tarjeta (espacio cada 4 números)
+const ccNum = document.getElementById('cc_numero');
+if (ccNum) {
+    ccNum.addEventListener('input', (e) => {
+        let val = e.target.value.replace(/\D/g, '').substring(0, 16);
+        let parts = [];
+        for (let i = 0; i < val.length; i += 4) {
+            parts.push(val.substring(i, i + 4));
+        }
+        e.target.value = parts.join(' ');
+    });
+}
+
+// Autoformato de expiración (MM/AA)
+const ccExp = document.getElementById('cc_exp');
+if (ccExp) {
+    ccExp.addEventListener('input', (e) => {
+        let val = e.target.value.replace(/\D/g, '').substring(0, 4);
+        if (val.length >= 2) {
+            e.target.value = val.substring(0, 2) + '/' + val.substring(2);
+        } else {
+            e.target.value = val;
+        }
+    });
+}
+
+function togglePayment(metodo) {
+    const fields = document.getElementById('tarjetaFields');
+    if (fields) {
+        fields.style.display = (metodo === 'tarjeta') ? 'block' : 'none';
+    }
+}
 
 function agregarSugerido(nombre, precio, cardId) {
     const card = document.getElementById(cardId);
@@ -529,15 +563,14 @@ function agregarSugerido(nombre, precio, cardId) {
     container.appendChild(newRow);
 
     totalActual += precio;
-    document.getElementById('subtotal-val').textContent = '$ ' + totalActual.toLocaleString('es-CO');
-    document.getElementById('total-val').textContent = '$ ' + totalActual.toLocaleString('es-CO');
+    actualizarDesgloseIva();
 }
 
 function aplicarDescuento() {
     const cupon = document.getElementById('codigoCupon').value.trim().toUpperCase();
     if (cupon === 'STATELESS10') {
         totalActual = Math.round(totalActual * 0.9);
-        document.getElementById('total-val').textContent = '$ ' + totalActual.toLocaleString('es-CO');
+        actualizarDesgloseIva();
         alert('¡Cupón STATELESS10 aplicado! 10% de descuento concedido.');
     } else {
         alert('Cupón no válido o expirado.');
@@ -545,7 +578,7 @@ function aplicarDescuento() {
 }
 
 function quickFill(provider) {
-    alert('Has seleccionado ' + provider + '. Los datos se procesarán de forma segura.');
+    alert('Has seleccionado ' + provider + '. Los datos de pago han sido pre-autorizados.');
 }
 
 const form = document.getElementById('checkoutForm');
@@ -554,9 +587,49 @@ const errorDiv = document.getElementById('error-msg');
 
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    errorDiv.style.display = 'none';
+
+    const metodo = document.querySelector('input[name="metodo_pago"]:checked').value;
+
+    // VALIDACIÓN ESTRICTA DEL MÉTODO DE PAGO
+    if (metodo === 'tarjeta_credito') {
+        const num = ccNum.value.replace(/\s/g, '');
+        const exp = ccExp.value.trim();
+        const cvv = document.getElementById('cc_cvv').value.trim();
+        const titular = document.getElementById('cc_titular').value.trim();
+
+        if (num.length !== 16) {
+            errorDiv.textContent = '❌ El número de tarjeta debe tener exactamente 16 dígitos.';
+            errorDiv.style.display = 'block';
+            ccNum.focus();
+            return;
+        }
+
+        const expParts = exp.split('/');
+        if (expParts.length !== 2 || expParts[0] < 1 || expParts[0] > 12 || expParts[1].length !== 2) {
+            errorDiv.textContent = '❌ Fecha de vencimiento inválida. Usa el formato MM/AA (ej. 12/28).';
+            errorDiv.style.display = 'block';
+            ccExp.focus();
+            return;
+        }
+
+        if (cvv.length < 3 || cvv.length > 4) {
+            errorDiv.textContent = '❌ El código de seguridad CVV debe tener 3 o 4 dígitos.';
+            errorDiv.style.display = 'block';
+            document.getElementById('cc_cvv').focus();
+            return;
+        }
+
+        if (titular.length < 3) {
+            errorDiv.textContent = '❌ Debes ingresar el nombre del titular como figura en la tarjeta.';
+            errorDiv.style.display = 'block';
+            document.getElementById('cc_titular').focus();
+            return;
+        }
+    }
+
     btn.disabled = true;
     btn.textContent = 'PROCESANDO PAGO SEGURO...';
-    errorDiv.style.display = 'none';
 
     const dirTexto = document.getElementById('direccion').value + 
                      (document.getElementById('apartamento').value ? ' - ' + document.getElementById('apartamento').value : '');
@@ -565,7 +638,7 @@ form.addEventListener('submit', async (e) => {
         direccion: dirTexto,
         ciudad: document.getElementById('ciudad').value + ' (' + document.getElementById('departamento').value + ')',
         telefono: document.getElementById('telefono').value,
-        metodo_pago: document.querySelector('input[name="metodo_pago"]:checked').value
+        metodo_pago: metodo
     };
 
     try {
@@ -578,7 +651,7 @@ form.addEventListener('submit', async (e) => {
         const data = await response.json();
 
         if (response.ok && data.redirect) {
-            window.location.href = data.redirect; // Redirige a /checkout/confirmacion/{id}
+            window.location.href = data.redirect;
         } else {
             errorDiv.textContent = data.error || 'No se pudo procesar el pago.';
             errorDiv.style.display = 'block';

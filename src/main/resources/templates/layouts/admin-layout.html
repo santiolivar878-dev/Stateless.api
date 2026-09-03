@@ -298,7 +298,9 @@
             <a th:href="@{/admin/productos}">Productos</a>
             <a th:href="@{/admin/proveedores}">Proveedores</a>
             <a th:href="@{/admin/categorias}">Categorías</a>
-            <a th:href="@{/admin/reportes}">Reportes</a>
+            <a th:href="@{/admin/reportes/ventas}" sec:authorize="hasAnyRole('ADMIN') or hasAnyAuthority('ADMIN', 'ROLE_ADMIN')">
+                REPORTES
+            </a>
         </nav>
 
         <div class="sidebar-footer">

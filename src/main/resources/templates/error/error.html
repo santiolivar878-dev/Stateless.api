@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error del Sistema - STATELESS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Space Grotesk', sans-serif; }
+        body {
+            background: #000000;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            text-align: center;
+        }
+        .error-card {
+            max-width: 520px;
+            width: 100%;
+            border: 1px solid #222222;
+            background: #080808;
+            padding: 56px 36px;
+            border-radius: 8px;
+        }
+        .brand-logo {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 36px;
+            letter-spacing: 6px;
+            color: #ffffff;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 24px;
+        }
+        .code-badge {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #ffaa00;
+            border: 1px solid #443300;
+            background: #1a1200;
+            padding: 6px 14px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 42px;
+            letter-spacing: 3px;
+            margin-bottom: 12px;
+            color: #ffffff;
+        }
+        p {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #888888;
+            margin-bottom: 32px;
+        }
+        .btn {
+            padding: 12px 28px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-decoration: none;
+            border-radius: 4px;
+            background: #ffffff;
+            color: #000000;
+            display: inline-block;
+        }
+        .btn:hover { background: #cccccc; }
+    </style>
+</head>
+<body>
+
+    <div class="error-card">
+        <a th:href="@{/}" class="brand-logo">STATELESS</a>
+        <br>
+        <div class="code-badge">INCIDENCIA EN EL SERVIDOR</div>
+        <h1>ALGO SALIÓ MAL</h1>
+        <p>El servidor encontró una eventualidad al procesar la solicitud. Nuestro equipo ya ha sido notificado para resolverlo a la brevedad.</p>
+        
+        <a th:href="@{/}" class="btn">Volver a STATELESS</a>
+    </div>
+
+</body>
+</html>

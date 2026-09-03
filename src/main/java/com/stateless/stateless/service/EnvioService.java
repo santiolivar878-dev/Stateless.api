@@ -7,13 +7,15 @@ import com.stateless.stateless.repository.VentaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.time.LocalDateTime;
 
 @Service
 public class EnvioService {
 
-    @Autowired private EnvioRepository envioRepository;
-    @Autowired private VentaRepository ventaRepository;
+    @Autowired 
+    private EnvioRepository envioRepository;
+
+    @Autowired 
+    private VentaRepository ventaRepository;
 
     @Transactional
     public void actualizarEstado(Long envioId, String nuevoEstado) {
@@ -22,13 +24,13 @@ public class EnvioService {
 
         Venta venta = envio.getVenta();
         if (venta != null) {
-            String estadoVenta = switch (nuevoEstado) {
+            String estadoVenta = switch (nuevoEstado.toLowerCase().trim()) {
                 case "preparando" -> "en_preparacion";
                 case "en_curso" -> "enviado";
                 case "entregado" -> "entregado";
                 default -> venta.getEstado();
             };
-            venta.setEstado(estadoVenta); // Llamada corregida
+            venta.setEstado(estadoVenta);
             ventaRepository.save(venta);
         }
         envioRepository.save(envio);

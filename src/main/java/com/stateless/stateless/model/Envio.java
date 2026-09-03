@@ -1,7 +1,14 @@
 package com.stateless.stateless.model;
 
-import jakarta.persistence.*;
 import java.time.LocalDateTime;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "envios")
@@ -50,10 +57,13 @@ public class Envio {
     public void setFecha_entregado(LocalDateTime f) { this.fecha_entregado = f; }
 
     public int getPasoActual() {
-        return switch (this.estado) {
-            case "confirmado" -> 2;
-            case "preparando" -> 3;
-            case "en_curso" -> 4;
+        if (this.estado == null) {
+            return 1;
+        }
+        return switch (this.estado.toLowerCase().trim()) {
+            case "confirmado", "pago_confirmado", "pagado" -> 2;
+            case "preparando", "en_preparacion" -> 3;
+            case "en_curso", "enviado" -> 4;
             case "entregado" -> 5;
             default -> 1;
         };

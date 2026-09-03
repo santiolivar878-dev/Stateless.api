@@ -1,10 +1,9 @@
 package com.stateless.stateless.controller.web;
 
-import com.stateless.stateless.model.User;
-import com.stateless.stateless.model.Venta;
-import com.stateless.stateless.model.Envio;
-import com.stateless.stateless.repository.VentaRepository;
-import com.stateless.stateless.repository.UserRepository;
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,11 +11,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.List;
+import com.stateless.stateless.model.Envio;
+import com.stateless.stateless.model.User;
+import com.stateless.stateless.model.Venta;
+import com.stateless.stateless.repository.UserRepository;
+import com.stateless.stateless.repository.VentaRepository;
 
 @Controller
 @RequestMapping("/account")
@@ -36,11 +36,9 @@ public class ClientePedidoController {
         }
 
         User user = userRepository.findByEmail(principal.getName()).orElse(null);
-        List<Venta> ventas = new ArrayList<>();
-
-        if (user != null) {
-            ventas = ventaRepository.findByUsuarioOrderByCreatedAtDesc(user);
-        }
+        List<Venta> ventas = (user != null) 
+            ? ventaRepository.findByUsuarioOrderByCreatedAtDesc(user) 
+            : new ArrayList<>();
 
         model.addAttribute("ventas", ventas != null ? ventas : new ArrayList<>());
         return "cliente/pedidos/index";
@@ -53,37 +51,24 @@ public class ClientePedidoController {
             return "redirect:/login";
         }
 
-        try {
-            Venta venta = ventaRepository.findById(id).orElse(null);
-            if (venta == null) {
-                return "redirect:/account/pedidos";
-            }
-
-            // Forzar inicialización de relaciones
-            if (venta.getItems() != null) {
-                venta.getItems().size();
-            }
-
-            Envio envio = venta.getEnvio();
-
-            model.addAttribute("venta", venta);
-            model.addAttribute("envio", envio);
-            
-            return "tracking";
-        } catch (Exception e) {
-            e.printStackTrace();
-            model.addAttribute("errorMsg", e.getMessage());
-            return "cliente/pedidos/index";
-        }
-    }
-
-    // Endpoint de prueba rápida directa para verificar si la data llega bien
-    @GetMapping("/tracking/{id}/test")
-    @ResponseBody
-    public String trackingTest(@PathVariable("id") Long id) {
         Venta venta = ventaRepository.findById(id).orElse(null);
-        if (venta == null) return "Venta no encontrada en BD";
-        return "OK - Venta #" + venta.getId() + ", Total: " + venta.getTotal() + 
-               ", Envio: " + (venta.getEnvio() != null ? venta.getEnvio().getEstado() : "Sin envío");
+        if (venta == null) {
+            return "redirect:/account/pedidos";
+        }
+
+        // Si no tiene envío asociado, creamos uno en memoria para que la plantilla no reviente
+        Envio envio = venta.getEnvio();
+        if (envio == null) {
+            envio = new Envio();
+            envio.setVenta(venta);
+            envio.setEstado(venta.getEstado() != null ? venta.getEstado() : "pendiente");
+            envio.setDireccion("Dirección registrada en compra");
+            envio.setCiudad("Colombia");
+        }
+
+        model.addAttribute("venta", venta);
+        model.addAttribute("envio", envio);
+        
+        return "tracking";
     }
 }

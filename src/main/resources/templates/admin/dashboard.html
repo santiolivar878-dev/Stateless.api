@@ -72,24 +72,26 @@
         </div>
 
         <!-- Módulo de Gestión Rápida -->
-        <div style="background:#fff; border:1px solid #eee; padding:24px;">
-            <p style="font-size:11px; letter-spacing:2px; text-transform:uppercase; opacity:0.5; margin-bottom:16px; font-weight:700;">Accesos Rápidos</p>
-            
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-                <a th:href="@{/admin/productos/create}" class="btn-sl-outline" style="text-align:center; padding:16px 10px;">
-                    + Nuevo Producto
-                </a>
-                <a th:href="@{/admin/proveedores/create}" class="btn-sl-outline" style="text-align:center; padding:16px 10px;">
-                    + Nuevo Proveedor
-                </a>
-                <a th:href="@{/admin/categorias/create}" class="btn-sl-outline" style="text-align:center; padding:16px 10px;">
-                    + Nueva Categoría
-                </a>
-                <a th:href="@{/admin/reportes/ventas}" class="btn-sl" style="text-align:center; padding:16px 10px;">
-                    📊 Reporte Financiero
-                </a>
-            </div>
-        </div>
+        <div class="accesos-rapidos">
+    <!-- Estos 3 botones los ven todos (o según permisos) -->
+    <a th:href="@{/admin/productos/nuevo}" class="btn-acceso">+ NUEVO PRODUCTO</a>
+    <a th:href="@{/admin/proveedores/nuevo}" class="btn-acceso">+ NUEVO PROVEEDOR</a>
+    <a th:href="@{/admin/categorias/nueva}" class="btn-acceso">+ NUEVA CATEGORÍA</a>
+
+    <!-- El botón de REPORTE FINANCIERO solo para ADMIN -->
+    <a th:href="@{/admin/reportes/ventas}" 
+       sec:authorize="hasAnyRole('ADMIN') or hasAnyAuthority('ADMIN', 'ROLE_ADMIN')"
+       class="btn-acceso btn-reporte-financiero">
+        📊 REPORTE FINANCIERO
+    </a>
+
+    <!-- Acceso alternativo útil para EMPLEADOS en su lugar -->
+    <a th:href="@{/admin/envios}" 
+       sec:authorize="!hasAnyRole('ADMIN') and !hasAnyAuthority('ADMIN', 'ROLE_ADMIN')"
+       class="btn-acceso btn-reporte-financiero">
+        📦 GESTIONAR ENVÍOS
+    </a>
+</div>
 
     </div>
 
