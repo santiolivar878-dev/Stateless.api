@@ -4,12 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout Seguro - STATELESS</title>
+    <!-- Metas para Token CSRF de Spring Security -->
+    <meta name="_csrf" th:content="${_csrf != null ? _csrf.token : ''}"/>
+    <meta name="_csrf_header" th:content="${_csrf != null ? _csrf.headerName : 'X-CSRF-TOKEN'}"/>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Space Grotesk', -apple-system, sans-serif; }
-        body { background: #fff; color: #111; font-size: 13px; min-height: 100vh; }
+        body { background: #ffffff; color: #111111; font-size: 13px; min-height: 100vh; }
         
         .checkout-layout {
             display: grid;
@@ -17,12 +21,13 @@
             min-height: 100vh;
         }
 
-        /* COLUMNA IZQUIERDA (FORMULARIO) */
+        /* COLUMNA IZQUIERDA */
         .left-col {
             padding: 48px 64px;
             max-width: 680px;
             margin-left: auto;
             width: 100%;
+            background: #ffffff;
         }
 
         .logo-header {
@@ -35,19 +40,17 @@
             font-family: 'Bebas Neue', sans-serif;
             font-size: 34px;
             letter-spacing: 4px;
-            color: #000;
+            color: #000000;
             text-decoration: none;
         }
 
-        .express-box {
-            text-align: center;
-            margin-bottom: 24px;
-        }
+        .express-box { text-align: center; margin-bottom: 24px; }
         .express-label {
             font-size: 11px;
             color: #737373;
             margin-bottom: 12px;
             letter-spacing: 0.5px;
+            text-transform: uppercase;
         }
         .express-grid {
             display: grid;
@@ -57,19 +60,21 @@
         .btn-express {
             height: 44px;
             border-radius: 6px;
-            border: none;
+            border: 2px solid transparent;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
             font-size: 14px;
-            transition: opacity 0.2s;
+            transition: all 0.2s;
         }
-        .btn-express:hover { opacity: 0.9; }
+        .btn-express:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-express.active { border-color: #00ff88; box-shadow: 0 0 10px rgba(0,255,136,0.3); }
+        
         .btn-shop { background: #5a31f4; color: #fff; }
         .btn-paypal { background: #ffc439; color: #003087; font-style: italic; }
-        .btn-gpay { background: #000; color: #fff; }
+        .btn-gpay { background: #000000; color: #fff; }
 
         .divider {
             display: flex;
@@ -102,6 +107,7 @@
             font-size: 13px;
             outline: none;
             background: #fff;
+            color: #000;
             transition: border-color 0.2s, box-shadow 0.2s;
         }
         .input-field:focus {
@@ -160,8 +166,8 @@
         .right-col {
             background: #0a0a0a;
             padding: 48px 54px;
-            color: #fff;
-            border-left: 1px solid #222;
+            color: #ffffff;
+            border-left: 1px solid #222222;
         }
         .right-inner {
             max-width: 440px;
@@ -176,25 +182,33 @@
             padding-bottom: 14px;
             border-bottom: 1px solid #1a1a1a;
         }
+
         .item-thumb-wrapper {
             position: relative;
-            width: 56px;
-            height: 56px;
+            width: 58px;
+            height: 58px;
             background: #141414;
-            border-radius: 10px;
+            border-radius: 8px;
             border: 1px solid #2a2a2a;
             display: flex;
             align-items: center;
             justify-content: center;
             margin-right: 14px;
+            flex-shrink: 0;
+        }
+        .item-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 7px;
         }
         .item-badge {
             position: absolute;
-            top: -6px;
-            right: -6px;
-            background: #fff;
-            color: #000;
-            font-size: 10px;
+            top: -7px;
+            right: -7px;
+            background: #ffffff;
+            color: #000000;
+            font-size: 11px;
             font-weight: 800;
             width: 20px;
             height: 20px;
@@ -202,37 +216,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-        }
-
-        .coupon-group {
-            display: flex;
-            gap: 10px;
-            margin: 24px 0;
-        }
-        .coupon-input {
-            flex: 1;
-            height: 44px;
-            padding: 0 14px;
-            border: 1px solid #222;
-            border-radius: 6px;
-            background: #141414;
-            color: #fff;
-            outline: none;
-            font-size: 13px;
-        }
-        .btn-coupon {
-            height: 44px;
-            padding: 0 20px;
-            background: #fff;
-            color: #000;
-            border: none;
-            border-radius: 6px;
-            font-weight: 700;
-            cursor: pointer;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            font-size: 11px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+            z-index: 2;
         }
 
         .cross-sell-title {
@@ -258,15 +243,30 @@
             background: #fff;
             border: none;
             color: #000;
-            padding: 7px 16px;
+            padding: 8px 18px;
             border-radius: 6px;
             font-size: 11px;
             font-weight: 800;
             letter-spacing: 1px;
             text-transform: uppercase;
             cursor: pointer;
+            transition: all 0.2s;
         }
         .btn-add-cross:hover { background: #00ff88; color: #000; }
+        .btn-add-cross.added { background: #222; color: #00ff88; cursor: default; }
+
+        .alert-express {
+            background: #111;
+            border: 1px solid #333;
+            color: #fff;
+            padding: 12px 14px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            font-size: 12px;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+        }
 
         @media (max-width: 900px) {
             .checkout-layout { grid-template-columns: 1fr; }
@@ -283,19 +283,25 @@
     <div class="left-col">
         <div class="logo-header">
             <a th:href="@{/}" class="logo-title">STATELESS</a>
-            <a th:href="@{/carrito}" style="color:#000; text-decoration:none; font-size:18px;">🛒</a>
+            <a th:href="@{/carrito}" style="color:#000; text-decoration:none; font-size:18px;" title="Ver carrito">🛒</a>
         </div>
 
+        <!-- 1. PAGO EXPRÉS -->
         <div class="express-box">
             <p class="express-label">Pago exprés</p>
             <div class="express-grid">
-                <button type="button" class="btn-express btn-shop" onclick="quickFill('Shop Pay')">shop</button>
-                <button type="button" class="btn-express btn-paypal" onclick="quickFill('PayPal')">PayPal</button>
-                <button type="button" class="btn-express btn-gpay" onclick="quickFill('Google Pay')">G Pay</button>
+                <button type="button" id="btn-shop" class="btn-express btn-shop" onclick="seleccionarExpress('Shop Pay')">shop</button>
+                <button type="button" id="btn-paypal" class="btn-express btn-paypal" onclick="seleccionarExpress('PayPal')">PayPal</button>
+                <button type="button" id="btn-gpay" class="btn-express btn-gpay" onclick="seleccionarExpress('Google Pay')">G Pay</button>
             </div>
         </div>
 
-        <div class="divider"><span>O</span></div>
+        <div id="expressNotice" class="alert-express">
+            <span id="expressNoticeText">✓ Método Exprés seleccionado.</span>
+            <button type="button" onclick="cancelarExpress()" style="background:none; border:none; color:#888; cursor:pointer; font-size:11px; text-decoration:underline;">Restablecer</button>
+        </div>
+
+        <div class="divider"><span>O CONTINUAR CON EL FORMULARIO</span></div>
 
         <form id="checkoutForm">
 
@@ -303,7 +309,7 @@
             <div class="section-title">Contacto</div>
             <div class="form-group">
                 <input type="email" id="email" name="email" class="input-field" placeholder="Correo electrónico" 
-                       th:value="${user != null ? user.email : ''}" required>
+                       th:value="${user != null ? user.email : 'santiolivar878@gmail.com'}" required>
             </div>
             <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#555; margin-bottom:20px; cursor:pointer;">
                 <input type="checkbox" checked style="accent-color:#000;">
@@ -321,12 +327,12 @@
 
             <div class="grid-2 form-group">
                 <input type="text" id="nombre" class="input-field" placeholder="Nombre" 
-                       th:value="${user != null ? user.name : ''}" required>
-                <input type="text" id="apellidos" class="input-field" placeholder="Apellidos" required>
+                       th:value="${user != null && user.name != null ? user.name : 'Santiago'}" required>
+                <input type="text" id="apellidos" class="input-field" placeholder="Apellidos" value="Olivar" required>
             </div>
 
             <div class="form-group">
-                <input type="text" id="direccion" name="direccion" class="input-field" placeholder="Dirección exacta (ej. Carrera 11A # 93-93)" required>
+                <input type="text" id="direccion" name="direccion" class="input-field" placeholder="Dirección exacta (ej. Carrera 11A # 93-93)" value="Carrera 11A # 93-93" required>
             </div>
 
             <div class="form-group">
@@ -336,20 +342,19 @@
             <div class="grid-3 form-group">
                 <input type="text" id="ciudad" name="ciudad" class="input-field" placeholder="Ciudad" value="Bogotá" required>
                 <select class="input-field" id="departamento">
-                    <option value="Bogota">Bogotá D.C.</option>
+                    <option value="Bogota" selected>Bogotá D.C.</option>
                     <option value="Antioquia">Antioquia / Medellín</option>
                     <option value="Valle del Cauca">Valle / Cali</option>
                     <option value="Atlantico">Atlántico / Barranquilla</option>
-                    <option value="Santander">Santander / Bucaramanga</option>
                 </select>
-                <input type="text" id="codigoPostal" class="input-field" placeholder="Código postal (ej. 110221)" required>
+                <input type="text" id="codigoPostal" class="input-field" placeholder="Código postal" value="110111" required>
             </div>
 
             <div class="form-group">
-                <input type="tel" id="telefono" name="telefono" class="input-field" placeholder="Teléfono celular de contacto" required>
+                <input type="tel" id="telefono" name="telefono" class="input-field" placeholder="Teléfono celular de contacto" value="3101234567" required>
             </div>
 
-            <!-- MÉTODOS DE ENVÍO -->
+            <!-- ENVÍO -->
             <div class="section-title">Método de Envío</div>
             <div style="border:1px solid #000; border-radius:6px; padding:16px; display:flex; justify-content:space-between; align-items:center; background:#fff;">
                 <div>
@@ -361,15 +366,14 @@
 
             <!-- SECCIÓN PAGO -->
             <div class="section-title">Método de Pago</div>
-            <p style="font-size:12px; color:#777; margin-bottom:12px;">Transacciones encriptadas con protocolo TLS 1.3 de alta seguridad.</p>
 
             <div class="payment-card-box">
                 <div class="payment-header">
                     <label style="display:flex; align-items:center; gap:10px; font-weight:700; cursor:pointer;">
-                        <input type="radio" name="metodo_pago" value="tarjeta_credito" checked style="accent-color:#000;" onchange="togglePayment('tarjeta')">
+                        <input type="radio" id="rb_tarjeta" name="metodo_pago" value="tarjeta_credito" checked style="accent-color:#000;" onchange="togglePayment('tarjeta')">
                         <span>Tarjeta de crédito / débito</span>
                     </label>
-                    <span style="font-size:11px; color:#666;">VISA • MASTERCARD • AMEX</span>
+                    <span style="font-size:11px; color:#666;">VISA • MASTERCARD</span>
                 </div>
 
                 <div class="payment-body" id="tarjetaFields">
@@ -387,7 +391,7 @@
 
                 <div class="payment-header" style="background:#fff; border-top:1px solid #e1e1e1;">
                     <label style="display:flex; align-items:center; gap:10px; font-weight:700; cursor:pointer;">
-                        <input type="radio" name="metodo_pago" value="paypal" style="accent-color:#000;" onchange="togglePayment('paypal')">
+                        <input type="radio" id="rb_paypal" name="metodo_pago" value="paypal" style="accent-color:#000;" onchange="togglePayment('paypal')">
                         <span>PayPal / Billetera Digital</span>
                     </label>
                     <span style="font-weight:bold; font-style:italic; color:#003087;">PayPal</span>
@@ -402,7 +406,7 @@
         </form>
     </div>
 
-    <!-- COLUMNA DERECHA CON DESGLOSE DE IVA (19%) -->
+    <!-- COLUMNA DERECHA -->
     <div class="right-col">
         <div class="right-inner">
 
@@ -411,7 +415,15 @@
                     <div style="display:flex; align-items:center;">
                         <div class="item-thumb-wrapper">
                             <span class="item-badge" th:text="${item.cantidad}">1</span>
-                            <span style="font-size:24px;">👕</span>
+                            
+                            <img th:if="${item.producto != null and item.producto.imagen != null and !#strings.isEmpty(item.producto.imagen)}"
+                                 th:src="${#strings.startsWith(item.producto.imagen, 'http') ? item.producto.imagen : ('/uploads/' + item.producto.imagen)}"
+                                 alt="Prenda" class="item-img"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+
+                            <div th:style="${item.producto != null and item.producto.imagen != null and !#strings.isEmpty(item.producto.imagen)} ? 'display:none; width:100%; height:100%; align-items:center; justify-content:center; background:#181818; border-radius:7px; font-size:22px;' : 'display:flex; width:100%; height:100%; align-items:center; justify-content:center; background:#181818; border-radius:7px; font-size:22px;'">
+                                👕
+                            </div>
                         </div>
                         <div>
                             <p th:text="${item.producto != null ? item.producto.nombre : 'Prenda'}" style="font-weight:700; font-size:13px; margin-bottom:2px; text-transform:uppercase; color:#fff;"></p>
@@ -424,21 +436,15 @@
                 </div>
             </div>
 
-            <!-- CUPON -->
-            <div class="coupon-group">
-                <input type="text" id="codigoCupon" placeholder="Código de descuento" class="coupon-input">
-                <button type="button" class="btn-coupon" onclick="aplicarDescuento()">Aplicar</button>
-            </div>
-
-            <!-- TOTALES CON DESGLOSE DE IVA (19%) -->
+            <!-- TOTALES CON IVA -->
             <div style="border-top:1px solid #222; border-bottom:1px solid #222; padding:16px 0; margin-bottom:24px;">
                 <div style="display:flex; justify-content:space-between; margin-bottom:8px; color:#aaa;">
                     <span>Subtotal Neto</span>
-                    <span id="subtotal-base-val" th:text="${'$' + #numbers.formatDecimal((carrito.total != null ? (carrito.total / 1.19) : 0), 0, 'COMMA', 0, 'POINT')}">$ 0</span>
+                    <span id="subtotal-base-val" th:text="${'$ ' + #numbers.formatDecimal((carrito.total != null ? (carrito.total / 1.19) : 0), 0, 'COMMA', 0, 'POINT')}">$ 0</span>
                 </div>
                 <div style="display:flex; justify-content:space-between; margin-bottom:8px; color:#aaa;">
                     <span>IVA (19%)</span>
-                    <span id="iva-val" style="color:#fff; font-weight:600;" th:text="${'$' + #numbers.formatDecimal((carrito.total != null ? (carrito.total - (carrito.total / 1.19)) : 0), 0, 'COMMA', 0, 'POINT')}">$ 0</span>
+                    <span id="iva-val" style="color:#fff; font-weight:600;" th:text="${'$ ' + #numbers.formatDecimal((carrito.total != null ? (carrito.total - (carrito.total / 1.19)) : 0), 0, 'COMMA', 0, 'POINT')}">$ 0</span>
                 </div>
                 <div style="display:flex; justify-content:space-between; color:#aaa;">
                     <span>Envío Nacional</span>
@@ -451,35 +457,53 @@
                 <div>
                     <span style="font-size:11px; color:#777; margin-right:6px;">COP</span>
                     <span id="total-val" style="font-family:'Bebas Neue'; font-size:32px; letter-spacing:2px;" 
-                          th:text="${'$' + #numbers.formatDecimal(carrito.total, 0, 'COMMA', 0, 'POINT')}"></span>
+                          th:text="${'$ ' + #numbers.formatDecimal(carrito.total, 0, 'COMMA', 0, 'POINT')}"></span>
                 </div>
             </div>
 
-            <!-- FREQUENTLY BOUGHT TOGETHER -->
+            <!-- 2. PRENDAS REALES DE TU TIENDA STATELESS -->
             <div class="cross-sell-title">
-                — Frequently bought together —
+                — Completa tu outfit STATELESS —
             </div>
 
-            <div class="cross-sell-card" id="cross-cap">
-                <div style="display:flex; align-items:center; gap:12px;">
-                    <div style="width:42px; height:42px; background:#1a1a1a; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:20px;">🧢</div>
-                    <div>
-                        <p style="font-weight:700; font-size:12px; margin:0; color:#fff;">Cap Stateless Classic</p>
-                        <span style="font-size:11px; color:#888;">$ 49.000 COP</span>
+            <div id="cross-sell-container">
+                <!-- Iteramos sobre prendas reales si el backend las envió -->
+                <div th:each="sug : ${sugerencias}" class="cross-sell-card" th:id="'cross-' + ${sug.id}">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <div style="width:44px; height:44px; background:#181818; border-radius:8px; display:flex; align-items:center; justify-content:center; border:1px solid #282828; overflow:hidden;">
+                            <img th:if="${sug.imagen != null and !#strings.isEmpty(sug.imagen)}"
+                                 th:src="${#strings.startsWith(sug.imagen, 'http') ? sug.imagen : ('/uploads/' + sug.imagen)}"
+                                 style="width:100%; height:100%; object-fit:cover;"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                            <span style="font-size:18px; display:none;">👕</span>
+                        </div>
+                        <div>
+                            <p style="font-weight:700; font-size:12px; margin:0; color:#fff; text-transform:uppercase;" th:text="${sug.nombre}">Prenda</p>
+                            <span style="font-size:11px; color:#888;" th:text="${'$ ' + #numbers.formatDecimal(sug.precio, 0, 'COMMA', 0, 'POINT') + ' COP'}">$ 0 COP</span>
+                        </div>
                     </div>
+                    <button type="button" class="btn-add-cross" 
+                            th:data-nombre="${sug.nombre}"
+                            th:data-precio="${sug.precio}"
+                            th:data-id="${sug.id}"
+                            onclick="agregarPrendaReal(this)">ADD</button>
                 </div>
-                <button type="button" class="btn-add-cross" onclick="agregarSugerido('Cap Stateless Classic', 49000, 'cross-cap')">Add</button>
-            </div>
 
-            <div class="cross-sell-card" id="cross-socks">
-                <div style="display:flex; align-items:center; gap:12px;">
-                    <div style="width:42px; height:42px; background:#1a1a1a; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:20px;">🧦</div>
-                    <div>
-                        <p style="font-weight:700; font-size:12px; margin:0; color:#fff;">Socks Pack Black</p>
-                        <span style="font-size:11px; color:#888;">$ 25.000 COP</span>
+                <!-- Fallback por si la base de datos no tiene productos adicionales cargados -->
+                <div th:if="${#lists.isEmpty(sugerencias)}" class="cross-sell-card">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <div style="width:44px; height:44px; background:#181818; border-radius:8px; display:flex; align-items:center; justify-content:center; border:1px solid #282828;">
+                            <span style="font-size:20px;">🧢</span>
+                        </div>
+                        <div>
+                            <p style="font-weight:700; font-size:12px; margin:0; color:#fff;">Gorra Stateless Classic</p>
+                            <span style="font-size:11px; color:#888;">$ 45.000 COP</span>
+                        </div>
                     </div>
+                    <button type="button" class="btn-add-cross" 
+                            data-nombre="Gorra Stateless Classic" data-precio="45000" data-id="999"
+                            onclick="agregarPrendaReal(this)">ADD</button>
                 </div>
-                <button type="button" class="btn-add-cross" onclick="agregarSugerido('Socks Pack Black', 25000, 'cross-socks')">Add</button>
             </div>
 
         </div>
@@ -487,9 +511,11 @@
 
 </div>
 
-<!-- SCRIPT DE VALIDACIÓN ESTRICTA Y CÁLCULO DE IVA -->
+<!-- SCRIPT CON CSRF Y PAGO EXPRÉS BLINDADO -->
 <script>
 let totalActual = parseFloat(document.getElementById('total-val').textContent.replace(/[^0-9]/g, '')) || 0;
+let itemsAgregados = [];
+let metodoExpressActivo = null;
 
 function actualizarDesgloseIva() {
     const base = Math.round(totalActual / 1.19);
@@ -499,9 +525,97 @@ function actualizarDesgloseIva() {
     document.getElementById('iva-val').textContent = '$ ' + iva.toLocaleString('es-CO');
     document.getElementById('total-val').textContent = '$ ' + totalActual.toLocaleString('es-CO');
 }
-actualizarDesgloseIva();
 
-// Autoformato de tarjeta (espacio cada 4 números)
+// 1. SELECCIÓN DE PAGO EXPRÉS
+function seleccionarExpress(provider) {
+    metodoExpressActivo = provider;
+
+    document.querySelectorAll('.btn-express').forEach(b => b.classList.remove('active'));
+    if (provider === 'Shop Pay') document.getElementById('btn-shop').classList.add('active');
+    if (provider === 'PayPal') document.getElementById('btn-paypal').classList.add('active');
+    if (provider === 'Google Pay') document.getElementById('btn-gpay').classList.add('active');
+
+    const btn = document.getElementById('btnProcesar');
+    btn.textContent = 'PAGAR CON ' + provider.toUpperCase() + ' (' + document.getElementById('total-val').textContent + ')';
+
+    const notice = document.getElementById('expressNotice');
+    document.getElementById('expressNoticeText').textContent = '✓ ' + provider + ' activado. Haz clic en el botón inferior para confirmar.';
+    notice.style.display = 'flex';
+
+    // Ocultar formulario manual de tarjeta para que no pida CVV
+    const fields = document.getElementById('tarjetaFields');
+    if (fields) fields.style.display = 'none';
+
+    if (provider === 'PayPal') {
+        document.getElementById('rb_paypal').checked = true;
+    }
+}
+
+function cancelarExpress() {
+    metodoExpressActivo = null;
+    document.querySelectorAll('.btn-express').forEach(b => b.classList.remove('active'));
+    document.getElementById('expressNotice').style.display = 'none';
+    document.getElementById('rb_tarjeta').checked = true;
+    togglePayment('tarjeta');
+    document.getElementById('btnProcesar').textContent = 'Pagar ahora';
+}
+
+function togglePayment(metodo) {
+    const fields = document.getElementById('tarjetaFields');
+    if (fields) {
+        fields.style.display = (metodo === 'tarjeta') ? 'block' : 'none';
+    }
+    if (metodoExpressActivo && metodo === 'tarjeta') {
+        cancelarExpress();
+    }
+}
+
+// 2. AGREGAR PRENDAS REALES DE LA TIENDA
+function agregarPrendaReal(btnElement) {
+    if (btnElement.classList.contains('added')) return;
+
+    const nombre = btnElement.getAttribute('data-nombre');
+    const precio = parseFloat(btnElement.getAttribute('data-precio')) || 0;
+    const prodId = btnElement.getAttribute('data-id');
+
+    btnElement.textContent = '✓ ADDED';
+    btnElement.classList.add('added');
+
+    // Añadir visualmente al carrito de la derecha
+    const container = document.getElementById('cart-items-container');
+    const newRow = document.createElement('div');
+    newRow.className = 'cart-item-row';
+    newRow.innerHTML = `
+        <div style="display:flex; align-items:center;">
+            <div class="item-thumb-wrapper">
+                <span class="item-badge">1</span>
+                <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:22px; background:#181818; border-radius:7px;">
+                    👕
+                </div>
+            </div>
+            <div>
+                <p style="font-weight:700; font-size:13px; margin-bottom:2px; text-transform:uppercase; color:#fff;">${nombre}</p>
+                <p style="font-size:11px; color:#888;">Colección Stateless Oficial</p>
+            </div>
+        </div>
+        <div style="font-weight:700; font-size:13px; color:#00ff88;">
+            $ ${precio.toLocaleString('es-CO')}
+        </div>
+    `;
+    container.appendChild(newRow);
+
+    // Sumar y recalcular
+    totalActual += precio;
+    actualizarDesgloseIva();
+
+    itemsAgregados.push({ productoId: prodId, nombre: nombre, precio: precio, cantidad: 1 });
+
+    if (metodoExpressActivo) {
+        document.getElementById('btnProcesar').textContent = 'PAGAR CON ' + metodoExpressActivo.toUpperCase() + ' (' + document.getElementById('total-val').textContent + ')';
+    }
+}
+
+// Formato de tarjeta
 const ccNum = document.getElementById('cc_numero');
 if (ccNum) {
     ccNum.addEventListener('input', (e) => {
@@ -513,74 +627,16 @@ if (ccNum) {
         e.target.value = parts.join(' ');
     });
 }
-
-// Autoformato de expiración (MM/AA)
 const ccExp = document.getElementById('cc_exp');
 if (ccExp) {
     ccExp.addEventListener('input', (e) => {
         let val = e.target.value.replace(/\D/g, '').substring(0, 4);
-        if (val.length >= 2) {
-            e.target.value = val.substring(0, 2) + '/' + val.substring(2);
-        } else {
-            e.target.value = val;
-        }
+        if (val.length >= 2) e.target.value = val.substring(0, 2) + '/' + val.substring(2);
+        else e.target.value = val;
     });
 }
 
-function togglePayment(metodo) {
-    const fields = document.getElementById('tarjetaFields');
-    if (fields) {
-        fields.style.display = (metodo === 'tarjeta') ? 'block' : 'none';
-    }
-}
-
-function agregarSugerido(nombre, precio, cardId) {
-    const card = document.getElementById(cardId);
-    if (card) {
-        card.style.opacity = '0.4';
-        card.querySelector('button').textContent = '✓ Added';
-        card.querySelector('button').disabled = true;
-    }
-
-    const container = document.getElementById('cart-items-container');
-    const newRow = document.createElement('div');
-    newRow.className = 'cart-item-row';
-    newRow.innerHTML = `
-        <div style="display:flex; align-items:center;">
-            <div class="item-thumb-wrapper">
-                <span class="item-badge">1</span>
-                <span style="font-size:24px;">✨</span>
-            </div>
-            <div>
-                <p style="font-weight:700; font-size:13px; margin-bottom:2px; text-transform:uppercase; color:#fff;">${nombre}</p>
-                <p style="font-size:11px; color:#888;">Accesorio Añadido</p>
-            </div>
-        </div>
-        <div style="font-weight:700; font-size:13px; color:#fff;">
-            $ ${precio.toLocaleString('es-CO')}
-        </div>
-    `;
-    container.appendChild(newRow);
-
-    totalActual += precio;
-    actualizarDesgloseIva();
-}
-
-function aplicarDescuento() {
-    const cupon = document.getElementById('codigoCupon').value.trim().toUpperCase();
-    if (cupon === 'STATELESS10') {
-        totalActual = Math.round(totalActual * 0.9);
-        actualizarDesgloseIva();
-        alert('¡Cupón STATELESS10 aplicado! 10% de descuento concedido.');
-    } else {
-        alert('Cupón no válido o expirado.');
-    }
-}
-
-function quickFill(provider) {
-    alert('Has seleccionado ' + provider + '. Los datos de pago han sido pre-autorizados.');
-}
-
+// 3. ENVÍO DEL FORMULARIO CON CSRF PROTECTED
 const form = document.getElementById('checkoutForm');
 const btn = document.getElementById('btnProcesar');
 const errorDiv = document.getElementById('error-msg');
@@ -589,10 +645,13 @@ form.addEventListener('submit', async (e) => {
     e.preventDefault();
     errorDiv.style.display = 'none';
 
-    const metodo = document.querySelector('input[name="metodo_pago"]:checked').value;
+    let metodo = document.querySelector('input[name="metodo_pago"]:checked').value;
+    if (metodoExpressActivo) {
+        metodo = metodoExpressActivo.toLowerCase().replace(/\s+/g, '_');
+    }
 
-    // VALIDACIÓN ESTRICTA DEL MÉTODO DE PAGO
-    if (metodo === 'tarjeta_credito') {
+    // Validación de tarjeta si no es express ni paypal
+    if (metodo === 'tarjeta_credito' && !metodoExpressActivo) {
         const num = ccNum.value.replace(/\s/g, '');
         const exp = ccExp.value.trim();
         const cvv = document.getElementById('cc_cvv').value.trim();
@@ -604,32 +663,26 @@ form.addEventListener('submit', async (e) => {
             ccNum.focus();
             return;
         }
-
-        const expParts = exp.split('/');
-        if (expParts.length !== 2 || expParts[0] < 1 || expParts[0] > 12 || expParts[1].length !== 2) {
-            errorDiv.textContent = '❌ Fecha de vencimiento inválida. Usa el formato MM/AA (ej. 12/28).';
+        if (exp.length !== 5) {
+            errorDiv.textContent = '❌ Fecha de expiración inválida (MM/AA).';
             errorDiv.style.display = 'block';
             ccExp.focus();
             return;
         }
-
-        if (cvv.length < 3 || cvv.length > 4) {
-            errorDiv.textContent = '❌ El código de seguridad CVV debe tener 3 o 4 dígitos.';
+        if (cvv.length < 3) {
+            errorDiv.textContent = '❌ Ingresa un CVV válido.';
             errorDiv.style.display = 'block';
-            document.getElementById('cc_cvv').focus();
             return;
         }
-
         if (titular.length < 3) {
-            errorDiv.textContent = '❌ Debes ingresar el nombre del titular como figura en la tarjeta.';
+            errorDiv.textContent = '❌ Ingresa el titular de la tarjeta.';
             errorDiv.style.display = 'block';
-            document.getElementById('cc_titular').focus();
             return;
         }
     }
 
     btn.disabled = true;
-    btn.textContent = 'PROCESANDO PAGO SEGURO...';
+    btn.textContent = 'PROCESANDO TRANSACCIÓN...';
 
     const dirTexto = document.getElementById('direccion').value + 
                      (document.getElementById('apartamento').value ? ' - ' + document.getElementById('apartamento').value : '');
@@ -638,13 +691,23 @@ form.addEventListener('submit', async (e) => {
         direccion: dirTexto,
         ciudad: document.getElementById('ciudad').value + ' (' + document.getElementById('departamento').value + ')',
         telefono: document.getElementById('telefono').value,
-        metodo_pago: metodo
+        metodo_pago: metodo,
+        itemsAdicionales: itemsAgregados
     };
+
+    // Obtenemos el token CSRF que Spring Security necesita
+    const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content') || 'X-CSRF-TOKEN';
+
+    const headers = { 'Content-Type': 'application/json' };
+    if (csrfToken && csrfToken.length > 0) {
+        headers[csrfHeader] = csrfToken;
+    }
 
     try {
         const response = await fetch('/checkout/procesar', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: headers,
             body: JSON.stringify(payload)
         });
 
@@ -659,7 +722,9 @@ form.addEventListener('submit', async (e) => {
             btn.textContent = 'Pagar ahora';
         }
     } catch (err) {
-        errorDiv.textContent = 'Error de conexión con el servidor.';
+        // Fallback: si el backend recibe por form submit estándar o hubo error de red
+        console.error('Fetch error:', err);
+        errorDiv.textContent = 'Error de comunicación con el servidor. Revisa que tu sesión esté activa.';
         errorDiv.style.display = 'block';
         btn.disabled = false;
         btn.textContent = 'Pagar ahora';
