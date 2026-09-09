@@ -2,14 +2,56 @@
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/app-layout :: layout(content=~{::section})}">
 <body>
 <section style="padding: 80px 60px; max-width:1200px; margin:0 auto; color: #fff; background: #000;">
+    <style>
+        .talla-btn {
+            min-width: 44px;
+            height: 44px;
+            padding: 0 14px;
+            border: 1px solid #333;
+            background: #0d0d0d;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .talla-btn:hover {
+            border-color: #777;
+            background: #1a1a1a;
+        }
+        .talla-btn.selected {
+            background: #fff;
+            color: #000;
+            border-color: #fff;
+            box-shadow: 0 0 10px rgba(255,255,255,0.2);
+        }
+        .guia-tallas-link {
+            font-size: 11px;
+            color: #888;
+            text-decoration: underline;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .guia-tallas-link:hover { color: #fff; }
+    </style>
+
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:start;">
 
         <!-- CARRUSEL DE IMÁGENES -->
         <div style="position:relative; overflow:hidden;">
             <div id="producto-carousel" style="display:flex; transition:transform 0.4s ease;">
                 <div style="min-width:100%; flex-shrink:0;">
-                    <img th:src="${producto.imagen != null ? (producto.imagen.startsWith('http') ? producto.imagen : '/images/' + producto.imagen) : '/images/placeholder.jpg'}"
-                         style="width:100%; height:600px; object-fit:cover; display:block;">
+                    <img id="main-product-img"
+                         th:src="${producto.imagen != null ? (producto.imagen.startsWith('http') ? producto.imagen : (#strings.startsWith(producto.imagen, '/images/') ? producto.imagen : '/images/' + producto.imagen)) : '/images/placeholder.jpg'}"
+                         th:data-original="${producto.imagen != null ? (producto.imagen.startsWith('http') ? producto.imagen : (#strings.startsWith(producto.imagen, '/images/') ? producto.imagen : '/images/' + producto.imagen)) : '/images/placeholder.jpg'}"
+                         style="width:100%; height:600px; object-fit:cover; display:block;"
+                         onerror="this.src='https://placehold.co/600x800/111/fff?text=STATELESS';">
                 </div>
             </div>
         </div>
@@ -19,68 +61,154 @@
             <p th:if="${producto.categoria != null}" th:text="${producto.categoria.nombre}" 
                style="font-size:11px; letter-spacing:3px; text-transform:uppercase; opacity:0.4; margin-bottom:12px;"></p>
             
-            <h1 th:text="${producto.nombre}" style="font-family:'Bebas Neue', sans-serif; font-size:56px; letter-spacing:4px; margin-bottom:16px;"></h1>
+            <h1 id="product-name" th:text="${producto.nombre != null ? producto.nombre : 'Prenda Stateless'}" 
+                style="font-family:'Bebas Neue', sans-serif; font-size:56px; letter-spacing:4px; margin-bottom:16px;"></h1>
             
             <p th:if="${producto.precio != null}" 
                th:text="${'$' + #numbers.formatDecimal(producto.precio, 0, 'COMMA', 0, 'POINT')}" 
                style="font-family:'Bebas Neue', sans-serif; font-size:36px; letter-spacing:2px; margin-bottom:24px;"></p>
             
-            <p th:text="${producto.descripcion}" style="font-size:14px; line-height:1.8; opacity:0.7; margin-bottom:32px;"></p>
+            <p th:text="${producto.descripcion != null && !#strings.isEmpty(producto.descripcion) ? producto.descripcion : 'Diseño exclusivo de la colección oficial STATELESS.'}" 
+               style="font-size:14px; line-height:1.8; opacity:0.7; margin-bottom:32px;"></p>
 
-            <!-- SELECTOR DE VARIANTES (COLORES) -->
-            <div th:if="${not #lists.isEmpty(producto.variantes)}" style="margin-bottom:32px; padding-top:20px; border-top:1px solid #333;">
+            <!-- 1. SELECTOR DE VARIANTES DE COLOR -->
+            <div th:if="${producto.variantes != null and !#lists.isEmpty(producto.variantes)}" style="margin-bottom:28px; padding-top:20px; border-top:1px solid #222;">
                 <p style="font-size:11px; letter-spacing:3px; text-transform:uppercase; opacity:0.4; margin-bottom:12px;">
                     COLOR: <span id="color-nombre" style="color:#fff; font-weight:600;">Original</span>
                 </p>
                 <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                    <!-- Círculo Original -->
-                    <button type="button" onclick="seleccionarVariante('Original', null, null, null)"
+                    <!-- Original -->
+                    <button type="button" onclick="restablecerOriginal()"
+                            title="Color Original"
                             style="width:36px; height:36px; border-radius:50%; border:3px solid #fff; cursor:pointer; background: #333;"></button>
                     
-                    <!-- Círculos de Variantes -->
+                    <!-- Variantes -->
                     <button type="button" th:each="v : ${producto.variantes}"
-                            th:onclick=" 'seleccionarVariante(\'' + ${v.color} + '\', \'' + ${v.imagen} + '\', ' + ${v.stockActual} + ', ' + ${v.id} + ')' "
-                            th:style="'width:36px; height:36px; border-radius:50%; border:2px solid #555; cursor:pointer; background:' + ${v.hex}"></button>
+                            class="btn-variante-color"
+                            th:data-nombre="${v.color != null ? v.color : 'Variante'}"
+                            th:data-imagen="${v.imagen != null ? (v.imagen.startsWith('http') ? v.imagen : '/images/' + v.imagen) : ''}"
+                            th:data-stock="${v.stockActual != null ? v.stockActual : (v.stock != null ? v.stock : 10)}"
+                            th:data-id="${v.id}"
+                            th:title="${v.color != null ? v.color : 'Color'}"
+                            onclick="cambiarColorVariante(this)"
+                            th:style="'width:36px; height:36px; border-radius:50%; border:2px solid #555; cursor:pointer; background:' + (${v.hex != null && !#strings.isEmpty(v.hex)} ? v.hex : '#444444') + ';'"></button>
                 </div>
-                <p id="variante-stock" style="font-size:12px; opacity:0.5; margin-top:10px;" 
-                   th:text="'Stock: ' + ${producto.stockActual} + ' unidades'"></p>
+            </div>
+
+            <!-- 2. SELECTOR DINÁMICO DE TALLAS (PANTALÓN VS CAMISA/BUSO) -->
+            <div style="margin-bottom:32px; padding-top:20px; border-top:1px solid #222;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <p style="font-size:11px; letter-spacing:3px; text-transform:uppercase; opacity:0.4; margin:0;">
+                        TALLA: <span id="talla-seleccionada-label" style="color:#fff; font-weight:700;">SELECCIONA</span>
+                    </p>
+                    <span class="guia-tallas-link" onclick="mostrarGuiaTallas()">Guía de tallas</span>
+                </div>
+
+                <!-- Tallas para PANTALÓN (28, 30, 32, 34, 36) -->
+                <div id="tallas-pantalon" style="display:none; gap:10px; flex-wrap:wrap;">
+                    <button type="button" class="talla-btn" onclick="seleccionarTalla('28', this)">28</button>
+                    <button type="button" class="talla-btn" onclick="seleccionarTalla('30', this)">30</button>
+                    <button type="button" class="talla-btn" onclick="seleccionarTalla('32', this)">32</button>
+                    <button type="button" class="talla-btn" onclick="seleccionarTalla('34', this)">34</button>
+                    <button type="button" class="talla-btn" onclick="seleccionarTalla('36', this)">36</button>
+                </div>
+
+                <!-- Tallas para CAMISA / BUSO / HOODIE (S, M, L, XL) -->
+                <div id="tallas-superior" style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <button type="button" class="talla-btn" onclick="seleccionarTalla('S', this)">S</button>
+                    <button type="button" class="talla-btn" onclick="seleccionarTalla('M', this)">M</button>
+                    <button type="button" class="talla-btn" onclick="seleccionarTalla('L', this)">L</button>
+                    <button type="button" class="talla-btn" onclick="seleccionarTalla('XL', this)">XL</button>
+                </div>
             </div>
 
             <!-- FORMULARIO AÑADIR AL CARRITO -->
-            <form th:action="@{'/carrito/agregar/' + ${producto.id}}" method="POST">
-                <!-- ID de variante que se llena con JS -->
+            <form th:action="@{'/carrito/agregar/' + ${producto.id}}" method="POST" id="form-add-cart">
                 <input type="hidden" name="varianteId" id="selected-variante-id">
+                <input type="hidden" name="talla" id="selected-talla" value="">
                 
                 <button type="submit" id="btn-carrito"
-                        style="width:100%; padding:16px; background:#fff; color:#000; border:none; font-weight:bold; letter-spacing:2px; cursor:pointer;">
+                        style="width:100%; padding:16px; background:#fff; color:#000; border:none; font-weight:bold; letter-spacing:2px; cursor:pointer; text-transform:uppercase;">
                     AÑADIR AL CARRITO
                 </button>
             </form>
+            
+            <p id="talla-alert" style="display:none; color:#ff4444; font-size:12px; margin-top:10px; font-weight:600;">
+                ⚠️ Por favor selecciona una talla antes de añadir al carrito.
+            </p>
         </div>
     </div>
 
+    <!-- SCRIPT DE TALLAS Y VARIANTES -->
     <script th:inline="javascript">
-        function seleccionarVariante(nombre, imagenUrl, stock, id) {
+        // 1. Detectar automáticamente si la prenda es Pantalón o Camisa/Buso
+        document.addEventListener('DOMContentLoaded', () => {
+            const nombreProducto = document.getElementById('product-name').innerText.toLowerCase();
+            const categoria = /*[[${producto.categoria != null ? producto.categoria.nombre.toLowerCase() : ''}]]*/ '';
+
+            const esPantalon = nombreProducto.includes('pantalon') || 
+                               nombreProducto.includes('pantalo') || 
+                               nombreProducto.includes('jean') || 
+                               nombreProducto.includes('short') || 
+                               categoria.includes('pantalon') || 
+                               categoria.includes('bottom');
+
+            if (esPantalon) {
+                document.getElementById('tallas-pantalon').style.display = 'flex';
+                document.getElementById('tallas-superior').style.display = 'none';
+            } else {
+                document.getElementById('tallas-pantalon').style.display = 'none';
+                document.getElementById('tallas-superior').style.display = 'flex';
+            }
+        });
+
+        // 2. Selección de Talla
+        function seleccionarTalla(talla, btnElement) {
+            document.querySelectorAll('.talla-btn').forEach(b => b.classList.remove('selected'));
+            btnElement.classList.add('selected');
+
+            document.getElementById('selected-talla').value = talla;
+            document.getElementById('talla-seleccionada-label').innerText = talla;
+            document.getElementById('talla-alert').style.display = 'none';
+        }
+
+        // 3. Validación al enviar al carrito (Exigir selección de talla)
+        document.getElementById('form-add-cart').addEventListener('submit', function(e) {
+            const talla = document.getElementById('selected-talla').value;
+            if (!talla || talla.trim() === '') {
+                e.preventDefault();
+                document.getElementById('talla-alert').style.display = 'block';
+            }
+        });
+
+        function mostrarGuiaTallas() {
+            const esPantalon = document.getElementById('tallas-pantalon').style.display === 'flex';
+            if (esPantalon) {
+                alert("📏 GUÍA DE TALLAS STATELESS (Pantalones):\n• 28: Cintura 71-76 cm\n• 30: Cintura 76-81 cm\n• 32: Cintura 81-86 cm\n• 34: Cintura 86-91 cm\n• 36: Cintura 91-96 cm\n\nCorte: Straight / Relaxed Fit.");
+            } else {
+                alert("📏 GUÍA DE TALLAS STATELESS (Camisas y Busos):\n• S: Pecho 90-96 cm | Largo 72 cm\n• M: Pecho 96-102 cm | Largo 74 cm\n• L: Pecho 102-108 cm | Largo 76 cm\n• XL: Pecho 108-114 cm | Largo 78 cm\n\nCorte: Boxy Oversized Fit.");
+            }
+        }
+
+        // Variantes de color
+        function cambiarColorVariante(btn) {
+            const nombre = btn.getAttribute('data-nombre');
+            const imagen = btn.getAttribute('data-imagen');
+            const id = btn.getAttribute('data-id');
+
             document.getElementById('color-nombre').innerText = nombre;
             document.getElementById('selected-variante-id').value = id;
-            
-            if(stock !== null) {
-                document.getElementById('variante-stock').innerText = 'Stock: ' + stock + ' unidades';
-                const btn = document.getElementById('btn-carrito');
-                if(stock <= 0) {
-                    btn.disabled = true;
-                    btn.innerText = 'AGOTADO';
-                    btn.style.opacity = '0.5';
-                } else {
-                    btn.disabled = false;
-                    btn.innerText = 'AÑADIR AL CARRITO';
-                    btn.style.opacity = '1';
-                }
-            }
 
-            if(imagenUrl && imagenUrl !== 'null') {
-                document.querySelector('#producto-carousel img').src = imagenUrl;
+            if (imagen && imagen.trim() !== '') {
+                document.getElementById('main-product-img').src = imagen;
             }
+        }
+
+        function restablecerOriginal() {
+            document.getElementById('color-nombre').innerText = 'Original';
+            document.getElementById('selected-variante-id').value = '';
+            const img = document.getElementById('main-product-img');
+            img.src = img.getAttribute('data-original');
         }
     </script>
 </section>

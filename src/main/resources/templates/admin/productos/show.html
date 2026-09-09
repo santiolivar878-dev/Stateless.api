@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${producto.nombre != null ? producto.nombre + ' - STATELESS' : 'Producto - STATELESS'}">Producto - STATELESS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Space Grotesk', sans-serif; }
+        body { background: #000000; color: #ffffff; min-height: 100vh; }
+        
+        .nav-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 24px 48px;
+            border-bottom: 1px solid #1a1a1a;
+        }
+        .brand-logo {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 32px;
+            letter-spacing: 4px;
+            color: #ffffff;
+            text-decoration: none;
+        }
+        .nav-links a {
+            color: #aaaaaa;
+            text-decoration: none;
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-left: 24px;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover { color: #ffffff; }
+
+        .product-container {
+            max-width: 1100px;
+            margin: 48px auto;
+            padding: 0 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px;
+        }
+
+        .img-box {
+            background: #0d0d0d;
+            border: 1px solid #222222;
+            border-radius: 8px;
+            aspect-ratio: 3/4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .details-box {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .category-tag {
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #888888;
+            margin-bottom: 8px;
+        }
+        .product-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 48px;
+            letter-spacing: 2px;
+            margin-bottom: 16px;
+            line-height: 1.1;
+        }
+        .product-price {
+            font-size: 26px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 24px;
+        }
+        .product-desc {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #aaaaaa;
+            margin-bottom: 32px;
+        }
+
+        .btn-add-cart {
+            width: 100%;
+            height: 52px;
+            background: #ffffff;
+            color: #000000;
+            border: none;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-add-cart:hover {
+            background: #cccccc;
+        }
+
+        @media (max-width: 768px) {
+            .product-container { grid-template-columns: 1fr; gap: 32px; }
+            .nav-header { padding: 18px 24px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="nav-header">
+        <a th:href="@{/}" class="brand-logo">STATELESS</a>
+        <nav class="nav-links">
+            <a th:href="@{/}">Colección</a>
+            <a th:href="@{/carrito}">Carrito 🛒</a>
+        </nav>
+    </header>
+
+    <main class="product-container">
+        <!-- FOTO -->
+        <div class="img-box">
+            <img th:if="${producto.imagen != null and !#strings.isEmpty(producto.imagen)}"
+                 th:src="${#strings.startsWith(producto.imagen, 'http') ? producto.imagen : ('/uploads/' + producto.imagen)}"
+                 alt="Prenda"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div th:style="${producto.imagen != null and !#strings.isEmpty(producto.imagen)} ? 'display:none; font-size:48px;' : 'display:flex; font-size:48px;'">
+                👕
+            </div>
+        </div>
+
+        <!-- INFO Y COMPRA -->
+        <div class="details-box">
+            <span class="category-tag" th:text="${producto.categoria != null ? producto.categoria.nombre : 'STATELESS EDICIÓN'}">EDICIÓN LIMITADA</span>
+            <h1 class="product-title" th:text="${producto.nombre != null ? producto.nombre : 'Prenda Stateless'}">NOMBRE DE PRENDA</h1>
+            
+            <div class="product-price" 
+                 th:text="${'$ ' + #numbers.formatDecimal(producto.precio != null ? producto.precio : 0, 0, 'COMMA', 0, 'POINT') + ' COP'}">
+                 $ 0 COP
+            </div>
+
+            <p class="product-desc" th:text="${producto.descripcion != null && !#strings.isEmpty(producto.descripcion) ? producto.descripcion : 'Diseño vanguardista de la colección oficial STATELESS. Confeccionado en algodón pesado de alta densidad con acabado premium.'}">
+                Descripción de la prenda.
+            </p>
+
+            <form th:action="@{'/carrito/agregar/' + ${producto.id}}" method="post">
+                <button type="submit" class="btn-add-cart">AGREGAR AL CARRITO</button>
+            </form>
+        </div>
+    </main>
+
+</body>
+</html>
