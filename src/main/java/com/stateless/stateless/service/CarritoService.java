@@ -37,26 +37,24 @@ public class CarritoService {
     public void migrarCarritoSesionAUsuario(HttpSession session, User user) {
         if (session == null || user == null) return;
         
-        // Leemos con la clave correcta "guest_cart"
         Carrito carritoSesion = (Carrito) session.getAttribute("guest_cart");
         
         if (carritoSesion != null && carritoSesion.getItems() != null && !carritoSesion.getItems().isEmpty()) {
             for (CarritoItem item : carritoSesion.getItems()) {
                 Long varianteId = (item.getVariante() != null) ? item.getVariante().getId() : null;
-                
-                // Pasamos los ítems a la base de datos del usuario
                 for (int i = 0; i < item.getCantidad(); i++) {
-                    this.agregarProducto(item.getProducto().getId(), varianteId, user, null);
+                    this.agregarProducto(item.getProducto().getId(), varianteId, 1, user, null);
                 }
             }
-            // Limpiamos el carrito temporal de la sesión
             session.removeAttribute("guest_cart");
         }
     }
 
-    // 3. Agregar producto
+    // 3. Agregar producto con cantidad opcional
     @Transactional
-    public void agregarProducto(Long productoId, Long varianteId, User user, HttpSession session) {
+    public void agregarProducto(Long productoId, Long varianteId, Integer cantidad, User user, HttpSession session) {
+        if (cantidad == null || cantidad < 1) cantidad = 1;
+
         Producto producto = productoRepository.findById(productoId).orElseThrow();
         ProductoVariante variante = (varianteId != null) ? varianteRepository.findById(varianteId).orElse(null) : null;
         
@@ -69,17 +67,53 @@ public class CarritoService {
                 .findFirst().orElse(null);
 
         if (item != null) {
-            item.setCantidad(item.getCantidad() + 1);
+            item.setCantidad(item.getCantidad() + cantidad);
         } else {
             item = new CarritoItem();
             item.setCarrito(carrito);
             item.setProducto(producto);
             item.setVariante(variante);
-            item.setCantidad(1);
+            item.setCantidad(cantidad);
             item.setPrecioUnitario(producto.getPrecio());
             carrito.getItems().add(item);
         }
 
+        guardarCarrito(carrito, user, session);
+    }
+
+    // 4. Actualizar cantidad directamente (+, -, o número escrito)
+    @Transactional
+    public void actualizarCantidad(Long productoId, Long varianteId, int nuevaCantidad, User user, HttpSession session) {
+        Carrito carrito = obtenerCarritoDeCualquierFuente(user, session);
+
+        if (nuevaCantidad <= 0) {
+            eliminarProducto(productoId, varianteId, user, session);
+            return;
+        }
+
+        carrito.getItems().stream()
+                .filter(i -> i.getProducto().getId().equals(productoId) &&
+                            ((varianteId == null && i.getVariante() == null) ||
+                             (i.getVariante() != null && i.getVariante().getId().equals(varianteId))))
+                .findFirst()
+                .ifPresent(item -> item.setCantidad(nuevaCantidad));
+
+        guardarCarrito(carrito, user, session);
+    }
+
+    // 5. Eliminar producto de la bolsa
+    @Transactional
+    public void eliminarProducto(Long productoId, Long varianteId, User user, HttpSession session) {
+        Carrito carrito = obtenerCarritoDeCualquierFuente(user, session);
+
+        carrito.getItems().removeIf(i -> i.getProducto().getId().equals(productoId) &&
+                ((varianteId == null && i.getVariante() == null) ||
+                 (i.getVariante() != null && i.getVariante().getId().equals(varianteId))));
+
+        guardarCarrito(carrito, user, session);
+    }
+
+    private void guardarCarrito(Carrito carrito, User user, HttpSession session) {
         if (user != null) {
             carritoRepository.save(carrito);
         } else if (session != null) {

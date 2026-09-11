@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/app-layout :: layout(content=~{::section})}">
+    <body>
+<section class="life-collection" style="background:#EDE7D8; color:#332E27; min-height:100vh; position:relative;">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap">
+
+<style>
+  .life-collection{
+    --paper:#EDE7D8;
+    --paper-light:#F6F1E4;
+    --ink:#332E27;
+    --graphite:#726A57;
+    --rust:#A9502C;
+    --polaroid:#FBF8EF;
+    font-family:'Inter',sans-serif;
+  }
+  .life-collection::before{
+    content:"";
+    position:absolute; inset:0; pointer-events:none; z-index:0;
+    background-image:radial-gradient(rgba(51,46,39,0.05) 1px, transparent 1px);
+    background-size:3px 3px;
+    mix-blend-mode:multiply;
+  }
+  .life-hand{ font-family:'Caveat',cursive; }
+
+  /* ---- hero ---- */
+  .life-hero-wrap{ background:var(--paper); width:100%; position:relative; overflow:hidden; padding:96px 40px 70px; z-index:1; }
+  .life-hero-grid{ max-width:1160px; margin:0 auto; display:grid; grid-template-columns:1.05fr 1fr; gap:40px; align-items:center; }
+  .life-eyebrow{ font-size:12.5px; letter-spacing:4px; text-transform:uppercase; color:var(--graphite); margin:0 0 18px; font-weight:600; }
+  .life-title-wrap{ position:relative; display:inline-block; margin-bottom:22px; }
+  .life-title{ font-family:'Caveat',cursive; font-weight:700; font-size:112px; line-height:0.9; margin:0; color:var(--ink); transform:rotate(-2deg); display:inline-block;
+    opacity:0; animation:life-fade .7s ease forwards; animation-delay:.15s; }
+  .life-underline{ position:absolute; left:2px; bottom:-6px; width:78%; height:20px; overflow:visible; }
+  .life-copy{ font-size:15.5px; line-height:1.6; color:var(--ink); max-width:38ch; margin:0 0 30px;
+    opacity:0; animation:life-fade .7s ease forwards; animation-delay:.35s; }
+  .life-cta{
+    display:inline-block; padding:13px 34px; border:1.5px solid var(--ink); color:var(--ink);
+    text-decoration:none; text-transform:uppercase; letter-spacing:3px; font-size:12px; font-weight:600;
+    background:rgba(251,248,239,0.7);
+    transform:rotate(-1deg); transition:transform .25s ease, background .25s ease;
+    opacity:0; animation:life-fade .7s ease forwards; animation-delay:.5s;
+  }
+  .life-cta:hover{ transform:rotate(0deg); background:var(--paper-light); }
+  .life-cta:focus-visible{ outline:2px solid var(--rust); outline-offset:3px; }
+
+  .life-illustration{ width:100%; height:auto; overflow:visible; }
+  .life-illustration .draw{ fill:none; stroke:var(--ink); stroke-width:2.1; stroke-linecap:round; stroke-linejoin:round; animation:life-draw 1.1s ease forwards; }
+  .life-illustration .draw-rust{ stroke:var(--rust); }
+  .life-illustration .fill-rust{ fill:var(--rust); opacity:0; animation:life-fade .5s ease forwards; }
+  .life-tag{ font-family:'Caveat',cursive; font-size:22px; fill:var(--graphite);
+    opacity:0; animation:life-fade .5s ease forwards; animation-delay:1.5s; }
+  .life-speck{ fill:var(--ink); opacity:0; animation:life-fade .4s ease forwards; animation-delay:1.3s; }
+
+  @keyframes life-draw{ to{ stroke-dashoffset:0; } }
+  @keyframes life-fade{ from{ opacity:0; transform:translateY(6px);} to{ opacity:1; transform:none; } }
+
+  @media (prefers-reduced-motion: reduce){
+    .life-illustration .draw{ animation:none !important; stroke-dashoffset:0 !important; }
+    .life-title, .life-copy, .life-cta, .life-fade, .life-tag, .life-speck, .fill-rust{ animation:none !important; opacity:1 !important; transform:none !important; }
+  }
+
+  /* ---- catalog header ---- */
+  .life-catalog-head{ display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:40px; border-bottom:1.5px solid var(--ink); padding-bottom:18px; flex-wrap:wrap; gap:12px; }
+  .life-catalog-eyebrow{ font-size:11px; letter-spacing:4px; text-transform:uppercase; color:var(--graphite); margin:0 0 6px; font-weight:600; }
+  .life-catalog-title{ font-family:'Caveat',cursive; font-weight:700; font-size:56px; line-height:1; margin:0; color:var(--ink); position:relative; display:inline-block; }
+  .life-catalog-sub{ font-size:11px; letter-spacing:3px; text-transform:uppercase; color:var(--graphite); }
+
+  /* ---- product grid ---- */
+  .life-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(270px, 1fr)); gap:34px; }
+  .life-card{
+    position:relative; background:var(--polaroid); border:1px solid rgba(51,46,39,0.14);
+    padding:14px 14px 18px; transition:transform .3s ease, box-shadow .3s ease;
+    display:flex; flex-direction:column; justify-content:space-between;
+  }
+  .life-card:nth-child(3n+1){ transform:rotate(-1.4deg); }
+  .life-card:nth-child(3n+2){ transform:rotate(1deg); }
+  .life-card:nth-child(3n){ transform:rotate(-0.6deg); }
+  .life-card:hover{ transform:rotate(0deg); box-shadow:0 10px 22px rgba(51,46,39,0.12); z-index:5; }
+  .life-card:hover .life-tape{ opacity:1; }
+  .life-tape{
+    position:absolute; top:-10px; left:50%; transform:translateX(-50%) rotate(-3deg);
+    width:74px; height:22px; background:rgba(255,244,196,0.6);
+    border:1px solid rgba(255,244,196,0.9); opacity:0.85; z-index:2;
+  }
+  .life-photo-wrap{ position:relative; overflow:hidden; margin-bottom:16px; background:#e2dbc9; aspect-ratio:3/4; border:1px solid rgba(51,46,39,0.08); }
+  .life-photo{
+    width:100%; height:100%; object-fit:cover; display:block;
+    filter:sepia(10%) saturate(85%) contrast(105%) brightness(97%);
+    transition:transform 0.3s ease;
+  }
+  .life-card:hover .life-photo{ transform:scale(1.02); }
+  .life-photo-wrap::after{
+    content:""; position:absolute; inset:0; pointer-events:none;
+    background:linear-gradient(160deg, rgba(169,80,44,0.1), rgba(51,46,39,0.06));
+    mix-blend-mode:multiply;
+  }
+  .life-name{ font-size:13px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--ink); margin:0 0 6px; line-height:1.2; }
+  .life-category{ font-family:'Caveat',cursive; font-size:17px; color:var(--rust); margin-bottom:4px; display:block; }
+  .life-price-row{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+  .life-price{ font-size:13px; font-weight:600; color:var(--graphite); margin:0; }
+  
+  .life-add{
+    width:100%; background:var(--ink); color:var(--paper-light); border:1px solid var(--ink);
+    padding:11px; font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase;
+    cursor:pointer; box-shadow:2px 2px 0 rgba(169,80,44,0.45); transition:transform .15s ease, box-shadow .15s ease, background .2s ease;
+  }
+  .life-add:hover{ transform:translate(-1px,-1px); box-shadow:3px 3px 0 rgba(169,80,44,0.55); background:#201c18; }
+  .life-add:focus-visible{ outline:2px solid var(--rust); outline-offset:2px; }
+  .life-add:active{ transform:translate(0,0); box-shadow:1px 1px 0 rgba(169,80,44,0.45); }
+
+  /* Estado sin productos */
+  .life-empty-state{
+    grid-column: 1 / -1; text-align:center; padding:70px 20px;
+    border:2px dashed var(--graphite); background:rgba(251,248,239,0.5);
+    border-radius:6px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .life-card, .life-cta, .life-add, .life-tape{ transition:none !important; }
+  }
+  @media (max-width:860px){
+    .life-hero-grid{ grid-template-columns:1fr; }
+    .life-title{ font-size:84px; }
+  }
+  @media (max-width:640px){
+    .life-catalog-title{ font-size:40px; }
+    .life-hero-wrap{ padding:64px 22px 50px; }
+    .life-title{ font-size:64px; }
+  }
+</style>
+
+<!-- ============== HERO ============== -->
+<div class="life-hero-wrap">
+  <div class="life-hero-grid">
+
+    <!-- texto -->
+    <div>
+      <p class="life-eyebrow">pequeñas cosas, dibujadas rápido</p>
+      <div class="life-title-wrap">
+        <h1 class="life-title">life.</h1>
+        <svg class="life-underline" viewBox="0 0 300 20" preserveAspectRatio="none">
+          <path class="draw" d="M4 10 C 60 17, 160 3, 296 12" style="stroke-dasharray:330; stroke-dashoffset:330; animation-delay:.85s;"/>
+        </svg>
+      </div>
+      <p class="life-copy">una colección sobre lo de siempre: el café antes de salir, la ventana con lluvia, la nota que se guarda en el bolsillo. bocetos rápidos, antes de que se escape el momento.</p>
+      <a href="#catalogo-life" class="life-cta">ver colección</a>
+    </div>
+
+    <!-- ilustración: cuaderno + lápiz, estilo boceto -->
+    <svg class="life-illustration" viewBox="0 0 460 340" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Boceto de un cuaderno abierto con un lápiz encima">
+      <!-- página izquierda -->
+      <path class="draw" d="M40 58 C 38 130, 42 210, 46 268 C 100 282, 160 280, 218 270 L 214 66 C 158 52, 96 50, 40 58 Z"
+            style="stroke-dasharray:760; stroke-dashoffset:760; animation-delay:.1s;"/>
+      <!-- página derecha -->
+      <path class="draw" d="M226 66 L 230 270 C 288 280, 350 282, 404 266 C 408 208, 410 128, 406 56 C 348 50, 284 52, 226 66 Z"
+            style="stroke-dasharray:760; stroke-dashoffset:760; animation-delay:.25s;"/>
+      <!-- lomo -->
+      <path class="draw" d="M220 54 C 222 130, 224 200, 222 272" style="stroke-dasharray:260; stroke-dashoffset:260; animation-delay:.4s;"/>
+      <!-- anillas -->
+      <ellipse class="draw" cx="222" cy="80" rx="7" ry="5" style="stroke-dasharray:45; stroke-dashoffset:45; animation-delay:.5s;"/>
+      <ellipse class="draw" cx="222" cy="140" rx="7" ry="5" style="stroke-dasharray:45; stroke-dashoffset:45; animation-delay:.55s;"/>
+      <ellipse class="draw" cx="222" cy="200" rx="7" ry="5" style="stroke-dasharray:45; stroke-dashoffset:45; animation-delay:.6s;"/>
+      <ellipse class="draw" cx="222" cy="250" rx="7" ry="5" style="stroke-dasharray:45; stroke-dashoffset:45; animation-delay:.65s;"/>
+      <!-- renglones página derecha -->
+      <path class="draw" d="M250 110 L 380 104" style="stroke-dasharray:140; stroke-dashoffset:140; animation-delay:.7s; stroke-width:1.3; opacity:.55;"/>
+      <path class="draw" d="M250 132 L 384 126" style="stroke-dasharray:140; stroke-dashoffset:140; animation-delay:.75s; stroke-width:1.3; opacity:.55;"/>
+      <path class="draw" d="M250 154 L 344 149" style="stroke-dasharray:140; stroke-dashoffset:140; animation-delay:.8s; stroke-width:1.3; opacity:.55;"/>
+      <!-- doodle: estrella -->
+      <path class="draw draw-rust" d="M356 178 L 360 190 L 372 191 L 362 199 L 366 211 L 356 204 L 346 211 L 350 199 L 340 191 L 352 190 Z"
+            style="stroke-dasharray:150; stroke-dashoffset:150; animation-delay:1s;"/>
+      <!-- palabra "hoy" garabateada, circulada -->
+      <text x="258" y="228" class="life-hand" font-size="24" fill="#332E27" style="opacity:0; animation:life-fade .5s ease forwards; animation-delay:1.15s;">hoy</text>
+      <ellipse class="draw draw-rust" cx="278" cy="221" rx="34" ry="16" style="stroke-dasharray:180; stroke-dashoffset:180; animation-delay:1.25s; transform:rotate(-4deg); transform-origin:278px 221px;"/>
+      <!-- lápiz -->
+      <path class="draw" d="M78 100 L 300 258" style="stroke-dasharray:270; stroke-dashoffset:270; animation-delay:1.4s; stroke-width:5;"/>
+      <path class="draw" d="M64 90 L 92 112" style="stroke-dasharray:40; stroke-dashoffset:40; animation-delay:1.6s; stroke-width:5;"/>
+      <path class="draw draw-rust" d="M296 252 L 314 266 L 300 274 Z" style="stroke-dasharray:60; stroke-dashoffset:60; animation-delay:1.7s;"/>
+      <!-- destellos -->
+      <circle class="life-speck" cx="52" cy="70" r="1.6"/>
+      <circle class="life-speck" cx="416" cy="94" r="1.6"/>
+      <circle class="life-speck" cx="392" cy="220" r="1.6"/>
+      <circle class="life-speck" cx="60" cy="240" r="1.6"/>
+      <!-- etiqueta esquina -->
+      <text x="40" y="322" class="life-tag">cuaderno, no. 04</text>
+    </svg>
+
+  </div>
+</div>
+
+<!-- ============== CATÁLOGO ============== -->
+<div id="catalogo-life" style="padding:60px 40px; max-width:1200px; margin:0 auto; position:relative; z-index:1;">
+  <div class="life-catalog-head">
+    <div>
+      <p class="life-catalog-eyebrow">Catálogo</p>
+      <h2 class="life-catalog-title">ropa life.</h2>
+    </div>
+    <span class="life-catalog-sub">instantáneas del día a día</span>
+  </div>
+
+  <!-- ESPACIOS DE ROPA -->
+  <div class="life-grid">
+
+    <!-- Tarjeta de Producto Iterada -->
+    <div th:each="p : ${productos}" class="life-card">
+      <div class="life-tape"></div>
+      
+      <a th:href="@{'/producto/' + ${p.id}}" style="text-decoration:none; color:inherit; display:block;">
+        <!-- Espacio para la foto con filtro sepia cálido -->
+        <div class="life-photo-wrap">
+          <img class="life-photo"
+               th:src="${p.imagen != null ? (p.imagen.startsWith('http') ? p.imagen : (#strings.startsWith(p.imagen, '/images/') ? p.imagen : '/images/' + p.imagen)) : '/images/placeholder.jpg'}"
+               th:alt="${p.nombre}"
+               onerror="this.src='https://placehold.co/600x800/EDE7D8/332E27?text=Boceto+Life';">
+        </div>
+        
+        <span class="life-category" th:text="${p.categoria != null ? p.categoria.nombre : 'Boceto original'}">edición life</span>
+        <h3 class="life-name" th:text="${p.nombre}">PRENDA LIFE</h3>
+        
+        <div class="life-price-row">
+          <p class="life-price" th:if="${p.precio != null}"
+             th:text="${'$' + #numbers.formatDecimal(p.precio, 0, 'COMMA', 0, 'POINT') + ' COP'}">$ 0 COP</p>
+          <span style="font-family:'Caveat',cursive; font-size:16px; color:var(--graphite);">en stock</span>
+        </div>
+      </a>
+
+      <!-- Formulario para agregar al carrito -->
+      <form th:action="@{'/carrito/agregar/' + ${p.id}}" method="POST" style="margin-top:auto;">
+        <button type="submit" class="life-add">Añadir al carrito</button>
+      </form>
+    </div>
+
+    <!-- Espacio si aún no hay prendas registradas bajo 'Life' -->
+    <div th:if="${#lists.isEmpty(productos)}" class="life-empty-state">
+      <p class="life-hand" style="font-size:38px; color:var(--ink); margin-bottom:8px;">dibujando las próximas prendas...</p>
+      <p style="font-size:13px; color:var(--graphite); max-width:440px; margin:0 auto 20px;">
+        Aún no hay prendas asignadas a la categoría <strong>Life</strong> en tu panel de administración.
+      </p>
+      <a th:href="@{/catalogo}" class="life-cta" style="font-size:11px;">Ver catálogo general</a>
+    </div>
+
+  </div>
+</div>
+
+</section>
+</body>
+</html>

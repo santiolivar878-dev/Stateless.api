@@ -1,7 +1,5 @@
 package com.stateless.stateless.config;
 
-import com.stateless.stateless.security.CustomLoginSuccessHandler;
-import com.stateless.stateless.security.oauth2.CustomOAuth2UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,6 +11,10 @@ import org.springframework.security.web.authentication.logout.HeaderWriterLogout
 import org.springframework.security.web.header.writers.ClearSiteDataHeaderWriter;
 import static org.springframework.security.web.header.writers.ClearSiteDataHeaderWriter.Directive.COOKIES;
 import static org.springframework.security.web.header.writers.ClearSiteDataHeaderWriter.Directive.STORAGE;
+
+import com.stateless.stateless.security.CustomLoginSuccessHandler;
+import com.stateless.stateless.security.oauth2.CustomOAuth2UserService;
+
 
 @Configuration
 @EnableWebSecurity
@@ -36,19 +38,23 @@ public class SecurityConfig {
                 .cacheControl(cache -> {})
             )
             .authorizeHttpRequests(auth -> auth
-                // 1. Recursos estáticos y rutas públicas
-                .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico", "/error").permitAll()
-                .requestMatchers("/", "/login", "/register", "/essentials", "/octane", "/waves", "/buscar/**", "/catalogo/**").permitAll()
+                // 1. Recursos estáticos y rutas públicas de la tienda y del reproductor
+                .requestMatchers("/css/**", "/js/**", "/images/**", "/videos/**", "/favicon.ico", "/favicon.svg", "/error", "/error/**").permitAll()
+                .requestMatchers("/player/skins/**", "/player/js/**", "/favicon.svg").permitAll()
+                .requestMatchers("/", "/login", "/register", "/essentials", "/octane", "/waves", "/life", "/buscar/**", "/catalogo/**").permitAll()
                 .requestMatchers("/producto/**", "/carrito", "/carrito/**", "/forgot-password", "/reset-password/**").permitAll()
-                .requestMatchers("/error", "/error/**", "/css/**", "/js/**", "/images/**").permitAll()
+                .requestMatchers("/player/login", "/oauth2/**").permitAll()
+
+                // 2. Funcionalidad del reproductor de Spotify (disponible para cualquier usuario autenticado)
+                .requestMatchers("/player", "/player/**", "/api/player/**", "/api/token").authenticated()
                 
-                // 2. RUTAS EXCLUSIVAS DE ADMIN (Usuarios y Reportes)
+                // 3. RUTAS EXCLUSIVAS DE ADMIN (Usuarios y Reportes)
                 .requestMatchers("/admin/usuarios/**", "/admin/reportes/**").hasRole("ADMIN")
                 
-                // 3. RUTAS COMPARTIDAS (Admin y Empleado pueden gestionar la tienda)
+                // 4. RUTAS COMPARTIDAS (Admin y Empleado gestionan la tienda)
                 .requestMatchers("/admin/ventas/**", "/admin/envios/**", "/admin/productos/**", "/admin/categorias/**", "/admin/proveedores/**", "/admin/dashboard").hasAnyRole("ADMIN", "EMPLEADO")
                 
-                // 4. RUTAS DE CLIENTE
+                // 5. RUTAS DE CLIENTE
                 .requestMatchers("/account/**", "/checkout/**").authenticated() 
                 
                 .anyRequest().authenticated()

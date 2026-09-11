@@ -1,17 +1,20 @@
 package com.stateless.stateless.security;
 
+import java.io.IOException;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.stereotype.Component;
+
 import com.stateless.stateless.model.User;
 import com.stateless.stateless.service.CarritoService;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.stereotype.Component;
-
-import java.io.IOException;
 
 @Component
 public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
@@ -25,6 +28,13 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
                                         Authentication authentication) throws IOException, ServletException {
         
         HttpSession session = request.getSession();
+
+        if (authentication instanceof OAuth2AuthenticationToken oauth2Authentication
+                && "spotify".equals(oauth2Authentication.getAuthorizedClientRegistrationId())) {
+            response.sendRedirect("/player");
+            return;
+        }
+
         User user = (User) authentication.getPrincipal();
 
         // 1. MIGRACIÓN: Pasa los productos agregados en sesión a la base de datos del usuario

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>STATELESS Player</title>
+    <link rel="icon" th:href="@{/favicon.svg}" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Kalam:wght@400;700&family=Patrick+Hand&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/player/skins/base.css}">
+</head>
+<body th:classappend="${skin}">
+
+    <div class="app-layout">
+        <nav class="sidebar" aria-label="Navegación principal">
+            <div class="binder-holes" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+            <div class="journal-brand"><span>life</span><small>by STATELESS <b>✳</b></small></div>
+            <div class="sidebar-nav">
+                <button id="nav-home" class="active"><span class="nav-icon">⌂</span>Home</button>
+                <button id="nav-search"><span class="nav-icon">⌕</span>Search</button>
+                <button id="nav-collection"><span class="nav-icon">▤</span>Collection <em>life</em></button>
+                <button id="nav-liked"><span class="nav-icon">♡</span>Liked Songs</button>
+            </div>
+            <div class="sidebar-note">life is a collection<br>of moments. <b>♡</b></div>
+            <div class="sidebar-now-playing">
+                <span class="sidebar-label">NOW PLAYING</span>
+                <div class="sidebar-track"><img id="sidebar-cover" src="" alt=""><div><strong id="sidebar-track-name">Waiting for a song</strong><small id="sidebar-artist-name">Spotify</small></div><span>♡</span></div>
+            </div>
+            <div class="spotify-status"><span class="status-dot"></span><span id="sidebar-status">connecting to spotify</span></div>
+        </nav>
+
+        <div class="content-panel">
+
+            <!-- HOME: dashboard -->
+            <section id="section-home" class="section active">
+                <div class="home-topbar">
+                    <label class="search-shell"><span>⌕</span><input type="text" id="home-search-input" class="home-search-input" placeholder="search music..."></label>
+                    <div class="topbar-tools"><button aria-label="Notifications">♧</button><button aria-label="Friends">♢</button><button id="account-button" class="avatar" type="button" aria-label="Abrir cuenta"><span id="account-avatar-fallback">S</span><img id="account-avatar" src="" alt=""></button></div>
+                </div>
+
+                <div class="home-date-row">
+                    <span class="journal-kicker">TODAY'S ENTRY</span>
+                    <strong id="home-date"></strong>
+                    <span id="home-time-of-day"></span>
+                </div>
+
+                <div class="now-playing-showcase">
+                    <span class="paper-label">NOW PLAYING <b>02:41 AM</b></span>
+                    <div class="np-polaroid-wrap">
+                        <img id="home-cover" src="" alt="portada">
+                        <img class="frame-overlay frame-song" th:src="@{/player/skins/imagenes/life/Marco_cancion_sonando.png}" alt="">
+                    </div>
+                    <div class="np-info">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <p class="np-title" id="home-track-name">Selecciona algo en Spotify</p>
+                            <img id="like-btn" class="like-btn" th:src="@{/player/skins/imagenes/life/Me_Gusta_previo.png}" alt="me gusta">
+                        </div>
+                        <p class="np-artist" id="home-artist-name"></p>
+                        <p class="np-album" id="home-album-name"></p>
+                        <div class="np-progress-row">
+                            <span id="home-time-current">0:00</span>
+                            <div class="np-progress-bar" id="home-progress-bar" role="slider" aria-label="Posición de reproducción" tabindex="0"><div class="np-progress-fill" id="home-progress-fill"></div></div>
+                            <span id="home-time-total">0:00</span>
+                        </div>
+                    </div>
+                    <div class="np-note">“I keep coming back to this one.” <span>✎</span></div>
+                </div>
+
+                <div class="journal-heading"><span>03</span><h2>your little listening journal</h2><i>✳</i></div>
+
+                <div class="home-row notebook-section">
+                    <div class="home-row-header">
+                        <h3>Recently Played</h3>
+                        <button class="home-row-seeall" id="recent-see-all">see all &gt;</button>
+                    </div>
+                    <div class="home-cards" id="home-recent-cards"></div>
+                </div>
+
+                <div class="home-row notebook-section">
+                    <div class="home-row-header">
+                        <h3>Your Collection</h3>
+                        <button class="home-row-seeall" id="albums-see-all">see all &gt;</button>
+                    </div>
+                    <div class="home-cards" id="home-albums-cards"></div>
+                </div>
+
+                <div class="home-row notebook-section">
+                    <div class="home-row-header">
+                        <h3>Playlists for You</h3>
+                        <button class="home-row-seeall" id="playlists-see-all">see all &gt;</button>
+                    </div>
+                    <div class="home-cards" id="home-playlists-cards"></div>
+                </div>
+            </section>
+
+            <!-- SEARCH -->
+            <section id="section-search" class="section">
+                <div class="section-heading"><span class="journal-kicker">SEARCH THE ARCHIVE</span><h1>find a feeling</h1></div>
+                <label class="search-shell search-page-shell"><span>⌕</span><input type="text" id="search-input" placeholder="songs, albums, artists..."><b>×</b></label>
+                <div class="search-filters"><button class="active">ALL</button><button>SONGS</button><button>ALBUMS</button><button>ARTISTS</button><button>PLAYLISTS</button></div>
+                <div id="search-results" class="search-results-grid"></div>
+            </section>
+
+            <!-- COLLECTION: playlists + albumes -->
+            <section id="section-collection" class="section">
+                <div class="section-heading"><span class="journal-kicker">THE ARCHIVE</span><h1>your collection</h1></div>
+                <div class="browse-tabs">
+                    <button id="tab-playlists" class="tab-btn active">Playlists</button>
+                    <button id="tab-albums" class="tab-btn">Álbumes</button>
+                </div>
+                <ul id="playlists-list" class="collection-grid"></ul>
+                <ul id="albums-list" class="albums-grid" style="display:none;"></ul>
+            </section>
+
+            <!-- LIKED SONGS -->
+            <section id="section-liked" class="section">
+                <h3>Liked Songs</h3>
+                <ul id="liked-list" class="liked-songs-grid"></ul>
+            </section>
+
+            <!-- TRACKLIST -->
+            <section id="section-tracklist" class="section playlist-detail-view">
+                <button id="back-to-collection" class="playlist-back">&larr; Volver</button>
+                <header class="playlist-detail-header">
+                    <img id="tracklist-cover" class="playlist-detail-cover" src="" alt="Portada de playlist">
+                    <div class="playlist-detail-copy">
+                        <span class="journal-kicker">PLAYLIST</span>
+                        <h1 id="tracklist-title">Playlist</h1>
+                        <p id="tracklist-owner"></p>
+                        <p id="tracklist-count"></p>
+                    </div>
+                </header>
+                <div class="playlist-detail-toolbar">
+                    <button id="playlist-play-all" class="playlist-play-button" type="button" aria-label="Reproducir playlist">▶</button>
+                    <button id="playlist-shuffle" class="playlist-tool-button" type="button" aria-label="Reproducir playlist en aleatorio">⤨</button>
+                </div>
+                <div class="playlist-track-heading"><span>#</span><span>Título</span><span>Álbum</span><span>Duración</span></div>
+                <ul id="tracklist" class="songs-grid"></ul>
+            </section>
+
+        </div>
+    </div>
+
+    <aside id="account-panel" class="account-panel" hidden aria-label="Cuenta de Spotify">
+        <div class="account-panel-head"><div><span class="journal-kicker">SPOTIFY ACCOUNT</span><h2 id="account-display-name">Cuenta</h2></div><button id="account-close" type="button" aria-label="Cerrar cuenta">×</button></div>
+        <img id="account-image" class="account-image" src="" alt="Foto de perfil">
+        <p id="account-email" class="account-detail"></p>
+        <nav class="account-menu"><button id="account-profile" type="button">Perfil</button><button id="account-recent" type="button">Recientes</button><button id="account-help" type="button">Ayuda</button><button id="account-private" type="button">Sesión privada</button><button id="account-preferences" type="button">Preferencias</button><form th:action="@{/logout}" method="post"><input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><button type="submit">Cerrar sesión</button></form></nav>
+        <div class="account-notice"><strong>Tus avisos</strong><span>✓</span><b>Ya estás al día</b><small>Tu cuenta está conectada con Spotify.</small></div>
+    </aside>
+
+    <div class="mini-player" aria-label="Controles de reproducción">
+        <div class="player-tape" aria-hidden="true"></div>
+        <div class="mini-player-left">
+            <button id="mini-cover-button" class="mini-cover-button" type="button" aria-label="Ampliar portada">
+                <img id="mini-cover" class="mini-cover" src="" alt="portada">
+            </button>
+            <div>
+                <div id="mini-track-name" style="font-size:0.85rem;">—</div>
+                <div id="mini-artist-name" style="font-size:0.72rem; opacity:0.6;"></div>
+            </div>
+            <img id="mini-like-btn" class="mini-like-btn" src="/player/skins/imagenes/life/Me_Gusta_previo.png" alt="Me gusta">
+        </div>
+        <div class="mini-player-controls">
+            <button id="shuffle" class="player-icon-button" type="button" aria-label="Aleatorio" title="Aleatorio">⤨</button>
+            <img id="prev" class="ctrl-btn" th:src="@{/player/skins/imagenes/life/boton_anterior.png}" alt="anterior" width="24" height="24">
+            <img id="play-pause" class="ctrl-btn ctrl-btn-play" th:src="@{/player/skins/imagenes/life/boton_play.png}" alt="play" width="32" height="32">
+            <img id="next" class="ctrl-btn" th:src="@{/player/skins/imagenes/life/boton_siguiente.png}" alt="siguiente" width="24" height="24">
+            <button id="repeat" class="player-icon-button" type="button" aria-label="Repetir" title="Repetir">↻</button>
+        </div>
+        <div class="mini-player-right">
+            <button id="queue" class="player-icon-button" type="button" aria-label="Cola" title="Cola">☷</button>
+            <button id="device" class="player-icon-button" type="button" aria-label="Dispositivo" title="Dispositivo">▣</button>
+            <span class="volume-icon" aria-hidden="true">🔊</span><input type="range" id="mini-volume" min="0" max="100" value="50" aria-label="Volumen">
+            <button id="mini-expand" class="player-icon-button" type="button" aria-label="Ampliar reproductor" title="Ampliar reproductor">↗</button>
+        </div>
+    </div>
+
+    <div id="expanded-player" class="expanded-player" hidden>
+        <button id="expanded-player-close" class="expanded-player-close" type="button" aria-label="Cerrar reproductor">×</button>
+        <div class="expanded-player-topline"><span class="journal-kicker">NOW PLAYING</span><span>life / STATELESS</span></div>
+        <div class="expanded-player-content">
+            <img id="expanded-cover" class="expanded-cover" src="" alt="Portada ampliada">
+            <div class="expanded-player-info">
+                <span class="journal-kicker">CURRENT ENTRY</span>
+                <h2 id="expanded-track-name">—</h2>
+                <p id="expanded-artist-name">—</p>
+                <p id="expanded-album-name"></p>
+                <div class="expanded-progress" id="expanded-progress-bar" role="slider" aria-label="Posición de reproducción" tabindex="0"><span id="expanded-time-current">0:00</span><div><i id="expanded-progress-fill"></i></div><span id="expanded-time-total">0:00</span></div>
+                <div class="expanded-controls">
+                    <button id="expanded-shuffle" class="player-icon-button" type="button" aria-label="Aleatorio">⤨</button>
+                    <button id="expanded-prev" class="player-icon-button" type="button" aria-label="Anterior">|◀</button>
+                    <button id="expanded-play" class="expanded-play" type="button" aria-label="Reproducir">▶</button>
+                    <button id="expanded-next" class="player-icon-button" type="button" aria-label="Siguiente">▶|</button>
+                    <button id="expanded-repeat" class="player-icon-button" type="button" aria-label="Repetir">↻</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <p id="status" class="status-text" style="position:fixed; bottom:70px; left:20px;">Conectando con Spotify...</p>
+
+    <script src="https://sdk.scdn.co/spotify-player.js"></script>
+    <script th:src="@{/player/js/player.js}"></script>
+</body>
+</html>

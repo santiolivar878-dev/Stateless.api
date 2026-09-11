@@ -1,0 +1,11 @@
+body.octane {
+    background: #0d0d0d;
+    color: #ff3b30;
+}
+body.octane .player-shell {
+    background: #1a1a1a;
+    border: 1px solid #ff3b30;
+}
+body.octane .controls button {
+    color: #ff3b30;
+}

@@ -1,5 +1,4 @@
 services:
-  # Servicio de Base de Datos MySQL
   db:
     image: mysql:8.0
     container_name: stateless_db
@@ -12,8 +11,12 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
       - ./sql:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
-  # Servicio del Backend Spring Boot
   app:
     build: .
     container_name: stateless_backend
@@ -21,7 +24,8 @@ services:
     ports:
       - "8081:8081"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
 volumes:
   mysql_data:

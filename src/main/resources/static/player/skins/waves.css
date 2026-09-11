@@ -1,0 +1,11 @@
+body.waves {
+    background: linear-gradient(160deg, #0b1e2d, #123a4f);
+    color: #eaf6ff;
+}
+body.waves .player-shell {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.15);
+}
+body.waves .controls button {
+    color: #eaf6ff;
+}

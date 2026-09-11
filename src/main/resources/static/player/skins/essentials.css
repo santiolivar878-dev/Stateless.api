@@ -1,0 +1,11 @@
+body.essentials {
+    background: #f4f2ee;
+    color: #111;
+}
+body.essentials .player-shell {
+    background: #ffffff;
+    border: 1px solid #e0ddd6;
+}
+body.essentials .controls button {
+    color: #111;
+}

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LIFE by STATELESS</title>
+  
+  <!-- Tipografías de los bocetos -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Courier+Prime:wght@400;700&family=Patrick+Hand&family=Special+Elite&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      width: 100vw;
+      background-color: #f4ede0;
+      background-image: 
+        radial-gradient(#d6c9b8 0.75px, transparent 0.75px),
+        radial-gradient(#d6c9b8 0.75px, #f4ede0 0.75px);
+      background-size: 26px 26px;
+      background-position: 0 0, 13px 13px;
+      color: #2c251f;
+      font-family: 'Patrick Hand', cursive, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow: hidden;
+    }
+
+    /* Tarjeta estilo cuaderno de recortes */
+    .scrapbook-card {
+      background: #fdfbf7;
+      border: 2px solid #3c342d;
+      border-radius: 14px;
+      padding: 46px 40px 36px 40px;
+      max-width: 440px;
+      width: 100%;
+      box-shadow: 0 12px 28px rgba(60, 45, 30, 0.12);
+      position: relative;
+      transform: rotate(-1deg);
+      text-align: center;
+    }
+
+    /* Cinta Washi Tape superior */
+    .washi-tape {
+      position: absolute;
+      top: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(225, 214, 186, 0.9);
+      padding: 4px 28px;
+      font-family: 'Special Elite', monospace;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      border-left: 2px dashed rgba(160, 145, 120, 0.6);
+      border-right: 2px dashed rgba(160, 145, 120, 0.6);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.06);
+      white-space: nowrap;
+    }
+
+    /* Clip de papel decorativo en la esquina */
+    .paper-clip {
+      position: absolute;
+      top: -12px;
+      right: 34px;
+      width: 14px;
+      height: 38px;
+      border: 2.5px solid #5a5044;
+      border-radius: 8px 8px 0 0;
+      background: transparent;
+    }
+
+    .brand-header {
+      margin-bottom: 24px;
+    }
+
+    .brand-title {
+      font-size: 52px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .brand-title span.sketch-mark {
+      font-size: 26px;
+      font-weight: 400;
+      opacity: 0.6;
+    }
+
+    .brand-subtitle {
+      font-size: 16px;
+      color: #6d5e4f;
+      margin-top: 2px;
+    }
+
+    /* Polaroid pequeña en la portada */
+    .mini-polaroid {
+      background: #ffffff;
+      border: 1px solid rgba(60, 52, 45, 0.25);
+      padding: 8px 8px 18px 8px;
+      width: 150px;
+      margin: 0 auto 24px auto;
+      box-shadow: 0 4px 10px rgba(60, 52, 45, 0.1);
+      transform: rotate(2deg);
+      position: relative;
+    }
+
+    .mini-polaroid img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      display: block;
+      border: 1px solid rgba(60, 52, 45, 0.15);
+    }
+
+    .polaroid-caption {
+      font-family: 'Special Elite', monospace;
+      font-size: 9px;
+      color: #726252;
+      margin-top: 8px;
+      letter-spacing: 1px;
+    }
+
+    .handwritten-quote {
+      font-family: 'Caveat', cursive;
+      font-size: 22px;
+      color: #4a3e32;
+      margin-bottom: 28px;
+      line-height: 1.2;
+    }
+
+    /* Botón de Login con Spotify */
+    .login-spotify-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background-color: #1DB954;
+      color: #ffffff;
+      text-decoration: none;
+      font-family: 'Patrick Hand', cursive;
+      font-size: 20px;
+      font-weight: bold;
+      padding: 12px 32px;
+      border-radius: 999px;
+      box-shadow: 0 4px 12px rgba(29, 185, 84, 0.35);
+      border: 2px solid #1aa34a;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+    }
+
+    .login-spotify-btn:hover {
+      transform: scale(1.04);
+      background-color: #1ed760;
+      box-shadow: 0 6px 18px rgba(29, 185, 84, 0.45);
+    }
+
+    .spotify-logo {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
+    .footer-note {
+      font-family: 'Courier Prime', monospace;
+      font-size: 11px;
+      color: #8c7c6d;
+      margin-top: 24px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="scrapbook-card">
+    
+    <!-- Cinta adhesiva con texto del boceto -->
+    <div class="washi-tape">SPOTIFY DEVELOPER • WEB SDK</div>
+
+    <!-- Clip metálico -->
+    <div class="paper-clip"></div>
+
+    <!-- Título y subtítulo -->
+    <div class="brand-header">
+      <h1 class="brand-title">
+        <span>LIFE</span>
+        <span class="sketch-mark">彡</span>
+      </h1>
+      <p class="brand-subtitle">by STATELESS ✿</p>
+    </div>
+
+    <!-- Ilustración tipo Polaroid -->
+    <div class="mini-polaroid">
+      <img src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=300" alt="Music Moments">
+      <div class="polaroid-caption">MEMORIES & SOUNDS</div>
+    </div>
+
+    <!-- Frase del diseño -->
+    <p class="handwritten-quote">
+      "life is a collection of moments." ♡
+    </p>
+
+    <!-- Enlace OAuth 2.0 que inicia el flujo de Spotify en Spring Security -->
+    <a class="login-spotify-btn" th:href="@{/oauth2/authorization/spotify}">
+      <svg class="spotify-logo" viewBox="0 0 24 24">
+        <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.498 17.306c-.217.356-.68.47-1.036.253-2.842-1.737-6.42-2.13-10.635-1.168-.407.094-.814-.158-.908-.565-.094-.407.158-.814.565-.908 4.618-1.054 8.57-.614 11.76 1.352.357.218.47.68.254 1.036zm1.467-3.26c-.273.444-.858.587-1.302.314-3.253-2-8.212-2.58-12.06-1.412-.498.15-1.027-.134-1.178-.632-.15-.498.134-1.027.632-1.178 4.407-1.338 9.878-.696 13.594 1.595.444.273.587.858.314 1.313zm.126-3.41c-3.899-2.316-10.334-2.53-14.07-1.396-.598.181-1.23-.162-1.412-.76-.182-.598.162-1.23.76-1.412 4.293-1.304 11.39-1.05 15.867 1.608.539.32.716 1.023.396 1.562-.32.539-1.023.716-1.562.396z"/>
+      </svg>
+      <span>Conectar con Spotify</span>
+    </a>
+
+    <p class="footer-note">Requiere cuenta Spotify Premium para reproducción Web SDK</p>
+
+  </div>
+
+</body>
+</html>   
