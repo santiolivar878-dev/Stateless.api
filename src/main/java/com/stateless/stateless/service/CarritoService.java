@@ -43,18 +43,16 @@ public class CarritoService {
             for (CarritoItem item : carritoSesion.getItems()) {
                 Long varianteId = (item.getVariante() != null) ? item.getVariante().getId() : null;
                 for (int i = 0; i < item.getCantidad(); i++) {
-                    this.agregarProducto(item.getProducto().getId(), varianteId, 1, user, null);
+                    this.agregarProducto(item.getProducto().getId(), varianteId, user, null);
                 }
             }
             session.removeAttribute("guest_cart");
         }
     }
 
-    // 3. Agregar producto con cantidad opcional
+    // 3. Agregar producto
     @Transactional
-    public void agregarProducto(Long productoId, Long varianteId, Integer cantidad, User user, HttpSession session) {
-        if (cantidad == null || cantidad < 1) cantidad = 1;
-
+    public void agregarProducto(Long productoId, Long varianteId, User user, HttpSession session) {
         Producto producto = productoRepository.findById(productoId).orElseThrow();
         ProductoVariante variante = (varianteId != null) ? varianteRepository.findById(varianteId).orElse(null) : null;
         
@@ -67,13 +65,13 @@ public class CarritoService {
                 .findFirst().orElse(null);
 
         if (item != null) {
-            item.setCantidad(item.getCantidad() + cantidad);
+            item.setCantidad(item.getCantidad() + 1);
         } else {
             item = new CarritoItem();
             item.setCarrito(carrito);
             item.setProducto(producto);
             item.setVariante(variante);
-            item.setCantidad(cantidad);
+            item.setCantidad(1);
             item.setPrecioUnitario(producto.getPrecio());
             carrito.getItems().add(item);
         }

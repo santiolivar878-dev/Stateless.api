@@ -223,11 +223,9 @@
           <span style="font-family:'Caveat',cursive; font-size:16px; color:var(--graphite);">en stock</span>
         </div>
       </a>
-
-      <!-- Formulario para agregar al carrito -->
-      <form th:action="@{'/carrito/agregar/' + ${p.id}}" method="POST" style="margin-top:auto;">
-        <button type="submit" class="life-add">Añadir al carrito</button>
-      </form>
+        <a th:href="@{'/producto/' + ${p.id}}" class="life-add" style="text-decoration:none; display:block; text-align:center;">
+            Elegir Talla
+        </a>
     </div>
 
     <!-- Espacio si aún no hay prendas registradas bajo 'Life' -->

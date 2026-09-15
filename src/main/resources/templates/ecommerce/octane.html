@@ -116,12 +116,9 @@
                     <div style="opacity:0.6; font-size:13px; font-family:monospace;" th:if="${p.precio != null}" th:text="${'PRICE >> $' + #numbers.formatDecimal(p.precio, 0, 'COMMA', 0, 'POINT') + ' COP'}"></div>
                 </div>
             </a>
-
-            <form th:action="@{'/carrito/agregar/' + ${p.id}}" method="POST">
-                <button type="submit" class="btn-octane-cart">
-                    [ JOIN THE GARAGE ]
-                </button>
-            </form>
+                <a th:href="@{'/producto/' + ${p.id}}" class="btn-octane-cart" style="text-decoration:none; display:block; text-align:center;">
+                    [ ELEGIR TALLA // VER ]
+                </a>
         </div>
     </div>
 </div>

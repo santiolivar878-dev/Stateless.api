@@ -47,10 +47,9 @@
                 <p th:text="${p.nombre}" style="font-family:'Bebas Neue'; font-size:20px; letter-spacing:1px; margin-bottom:8px;"></p>
                 <p th:text="${'$' + #numbers.formatDecimal(p.precio, 0, 'COMMA', 0, 'POINT')}" style="font-weight:600;"></p>
             </a>
-            
-            <form th:action="@{'/carrito/agregar/' + ${p.id}}" method="POST" style="margin-top:16px;">
-                <button type="submit" class="btn-sl-outline" style="width:100%;" th:disabled="${p.stockActual == 0}" th:text="${p.stockActual > 0 ? 'AÑADIR AL CARRITO' : 'AGOTADO'}"></button>
-            </form>
+            <a th:href="@{'/producto/' + ${p.id}}" class="btn-sl-outline" style="text-decoration:none; display:block; text-align:center; width:100%; margin-top:16px;">
+                ELEGIR TALLA
+            </a>
         </div>
     </div>
 

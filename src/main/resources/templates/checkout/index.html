@@ -485,11 +485,12 @@
                             <span style="font-size:11px; color:#888;" th:text="${'$ ' + #numbers.formatDecimal(sug.precio, 0, 'COMMA', 0, 'POINT') + ' COP'}">$ 0 COP</span>
                         </div>
                     </div>
-                    <button type="button" class="btn-add-cross" 
-                            th:data-nombre="${sug.nombre}"
-                            th:data-precio="${sug.precio}"
-                            th:data-id="${sug.id}"
-                            onclick="agregarPrendaReal(this)">ADD</button>
+                    <!-- ✅ Redirige a la prenda para escoger talla -->
+                    <a th:href="@{'/producto/' + ${sug.id}}" 
+                       class="btn-add-cross" 
+                       style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center;">
+                        ELEGIR TALLA →
+                    </a>
                 </div>
             </div>
 
