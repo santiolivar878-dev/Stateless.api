@@ -306,11 +306,9 @@
                     </a>
                     <p class="essentials-item-price" th:if="${p.precio != null}" th:text="${'$' + #numbers.formatDecimal(p.precio, 0, 'COMMA', 0, 'POINT') + ' COP'}"></p>
 
-                    <form th:action="@{'/carrito/agregar/' + ${p.id}}" method="POST">
-                        <button type="submit" class="btn-stateless-card">
-                            Añadir al carrito
-                        </button>
-                    </form>
+                    <a th:href="@{'/producto/' + ${p.id}}" class="btn-stateless-card" style="text-decoration:none;">
+                        Elegir Talla & Comprar
+                    </a>
                 </div>
             </div>
         </div>

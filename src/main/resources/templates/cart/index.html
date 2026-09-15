@@ -3,6 +3,66 @@
 <body>
 <section style="background:#fff; color:#000; min-height:85vh; padding:60px 40px;">
 
+    <style>
+        .qty-box {
+            display: inline-flex;
+            align-items: center;
+            border: 1px solid #000;
+            background: #fff;
+        }
+        .qty-btn {
+            background: #fff;
+            border: none;
+            color: #000;
+            width: 32px;
+            height: 32px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+        }
+        .qty-btn:hover {
+            background: #000;
+            color: #fff;
+        }
+        .qty-input {
+            width: 44px;
+            height: 32px;
+            border: none;
+            border-left: 1px solid #000;
+            border-right: 1px solid #000;
+            text-align: center;
+            font-weight: 700;
+            font-size: 13px;
+            outline: none;
+            -moz-appearance: textfield;
+        }
+        .qty-input::-webkit-outer-spin-button,
+        .qty-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .btn-remove-item {
+            background: transparent;
+            border: none;
+            color: #888;
+            font-size: 11px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            text-decoration: underline;
+            padding: 0;
+            margin-top: 6px;
+            display: inline-block;
+        }
+        .btn-remove-item:hover {
+            color: #c00;
+        }
+    </style>
+
     <div style="max-width:1100px; margin:0 auto;">
         <div style="display:flex; justify-content:space-between; align-items:flex-end; border-bottom:2px solid #000; padding-bottom:16px; margin-bottom:40px;">
             <div>
@@ -28,23 +88,41 @@
             <!-- Lista de Ítems -->
             <div>
                 <div th:each="item : ${carrito.items}" style="display:flex; gap:20px; padding:20px 0; border-bottom:1px solid #eee; align-items:center;">
-                    <img th:src="${item.producto.imagen != null ? (item.producto.imagen.startsWith('http') ? item.producto.imagen : '/images/' + item.producto.imagen) : '/images/placeholder.jpg'}" 
-                         style="width:90px; aspect-ratio:3/4; object-fit:cover; border:1px solid #eee;">
+                    <img th:src="${item.producto.imagen != null ? (item.producto.imagen.startsWith('http') ? item.producto.imagen : (#strings.startsWith(item.producto.imagen, '/images/') ? item.producto.imagen : '/images/' + item.producto.imagen)) : '/images/placeholder.jpg'}" 
+                         style="width:90px; aspect-ratio:3/4; object-fit:cover; border:1px solid #eee;"
+                         onerror="this.src='https://placehold.co/300x400/000/fff?text=STATELESS';">
                     
                     <div style="flex:1;">
                         <h3 th:text="${item.producto.nombre}" style="font-family:'Bebas Neue'; font-size:22px; letter-spacing:2px; margin:0 0 4px;"></h3>
                         <p th:if="${item.variante != null}" th:text="'Color: ' + ${item.variante.color}" style="font-size:11px; letter-spacing:1px; text-transform:uppercase; opacity:0.5; margin-bottom:6px;"></p>
+                        <span th:if="${item.talla != null}" th:text="' | Talla: ' + ${item.talla}" style="font-weight:700;"></span>
                         <p th:text="${'$' + #numbers.formatDecimal(item.precioUnitario, 0, 'COMMA', 0, 'POINT') + ' COP'}" style="font-size:13px; font-weight:600; margin:0;"></p>
+
+                        <!-- Botón Eliminar Prenda -->
+                        <form th:action="@{/carrito/eliminar}" method="POST" style="margin:0;">
+                            <input type="hidden" name="productoId" th:value="${item.producto.id}">
+                            <input type="hidden" name="varianteId" th:value="${item.variante != null ? item.variante.id : ''}">
+                            <button type="submit" class="btn-remove-item">Eliminar</button>
+                        </form>
                     </div>
 
-                    <!-- Cantidad -->
-                    <div style="display:flex; align-items:center; border:1px solid #000; padding:4px 10px;">
-                        <span th:text="'Cant: ' + ${item.cantidad}" style="font-size:12px; font-weight:700;">1</span>
+                    <!-- CONTROL DE CANTIDAD CON BOTONES + / - Y CAMPO MANUAL -->
+                    <div>
+                        <form th:action="@{/carrito/actualizar}" method="POST" style="margin:0;">
+                            <input type="hidden" name="productoId" th:value="${item.producto.id}">
+                            <input type="hidden" name="varianteId" th:value="${item.variante != null ? item.variante.id : ''}">
+                            
+                            <div class="qty-box">
+                                <button type="submit" name="cantidad" th:value="${item.cantidad - 1}" class="qty-btn" title="Disminuir">−</button>
+                                <input type="number" name="cantidad" th:value="${item.cantidad}" min="1" class="qty-input" onchange="this.form.submit()">
+                                <button type="submit" name="cantidad" th:value="${item.cantidad + 1}" class="qty-btn" title="Aumentar">+</button>
+                            </div>
+                        </form>
                     </div>
 
                     <!-- Subtotal Ítem -->
                     <div style="min-width:110px; text-align:right;">
-                        <p th:text="${'$' + #numbers.formatDecimal(item.precioUnitario * item.cantidad, 0, 'COMMA', 0, 'POINT')}" style="font-size:14px; font-weight:700; margin:0;"></p>
+                        <p th:text="${'$' + #numbers.formatDecimal(item.precioUnitario * item.cantidad, 0, 'COMMA', 0, 'POINT') + ' COP'}" style="font-size:14px; font-weight:700; margin:0;"></p>
                     </div>
                 </div>
             </div>

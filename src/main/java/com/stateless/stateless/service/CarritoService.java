@@ -1,11 +1,19 @@
 package com.stateless.stateless.service;
 
-import com.stateless.stateless.model.*;
-import com.stateless.stateless.repository.*;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.stateless.stateless.model.Carrito;
+import com.stateless.stateless.model.CarritoItem;
+import com.stateless.stateless.model.Producto;
+import com.stateless.stateless.model.ProductoVariante;
+import com.stateless.stateless.model.User;
+import com.stateless.stateless.repository.CarritoRepository;
+import com.stateless.stateless.repository.ProductoRepository;
+import com.stateless.stateless.repository.ProductoVarianteRepository;
+
+import jakarta.servlet.http.HttpSession;
 
 @Service
 public class CarritoService {
@@ -31,7 +39,6 @@ public class CarritoService {
         }
         return carritoSesion;
     }
-
     // 2. Migrar carrito de invitado a base de datos al iniciar sesión
     @Transactional
     public void migrarCarritoSesionAUsuario(HttpSession session, User user) {
@@ -42,17 +49,15 @@ public class CarritoService {
         if (carritoSesion != null && carritoSesion.getItems() != null && !carritoSesion.getItems().isEmpty()) {
             for (CarritoItem item : carritoSesion.getItems()) {
                 Long varianteId = (item.getVariante() != null) ? item.getVariante().getId() : null;
-                for (int i = 0; i < item.getCantidad(); i++) {
-                    this.agregarProducto(item.getProducto().getId(), varianteId, 1, user, null);
-                }
+                this.agregarProducto(item.getProducto().getId(), varianteId, item.getTalla(), item.getCantidad(), user, null);
             }
             session.removeAttribute("guest_cart");
         }
     }
 
-    // 3. Agregar producto con cantidad opcional
+    // 3. Agregar producto
     @Transactional
-    public void agregarProducto(Long productoId, Long varianteId, Integer cantidad, User user, HttpSession session) {
+    public void agregarProducto(Long productoId, Long varianteId, String talla, Integer cantidad, User user, HttpSession session) {
         if (cantidad == null || cantidad < 1) cantidad = 1;
 
         Producto producto = productoRepository.findById(productoId).orElseThrow();
@@ -60,10 +65,13 @@ public class CarritoService {
         
         Carrito carrito = obtenerCarritoDeCualquierFuente(user, session);
         
+        // Comparamos producto, variante y también TALLA
         CarritoItem item = carrito.getItems().stream()
                 .filter(i -> i.getProducto().getId().equals(productoId) && 
                             ((variante == null && i.getVariante() == null) || 
-                             (i.getVariante() != null && i.getVariante().getId().equals(varianteId))))
+                             (i.getVariante() != null && i.getVariante().getId().equals(varianteId))) &&
+                            ((talla == null && i.getTalla() == null) ||
+                             (talla != null && talla.equalsIgnoreCase(i.getTalla()))))
                 .findFirst().orElse(null);
 
         if (item != null) {
@@ -73,6 +81,7 @@ public class CarritoService {
             item.setCarrito(carrito);
             item.setProducto(producto);
             item.setVariante(variante);
+            item.setTalla(talla); // 👉 Se guarda la talla escogida
             item.setCantidad(cantidad);
             item.setPrecioUnitario(producto.getPrecio());
             carrito.getItems().add(item);

@@ -134,7 +134,7 @@
             <p class="label">Comprobante de Venta</p>
             <h2 style="font-family:'Bebas Neue'; font-size:28px; letter-spacing:3px;" 
                 th:text="'FACTURA #' + ${venta.id}">FACTURA #1</h2>
-            <p style="font-size:12px; color:#00ff88; font-weight:700;">PAGO APROBADO</p>
+            <p style="font-size:12px; color:#00ff88; font-weight:700;">PAGO REALIZADO</p>
         </div>
     </div>
 
@@ -146,8 +146,8 @@
         </div>
         <div>
             <p class="label">Lugar de Entrega & Método</p>
-            <p class="val" th:text="${venta.envio != null ? venta.envio.direccion : 'Dirección Registrada'}"></p>
-            <p style="font-size:12px; color:#888;" th:text="${venta.envio != null ? venta.envio.ciudad : 'Colombia'}"></p>
+            <p class="val" th:text="${venta.envio != null ? venta.envio.direccion : (venta.direccion != null ? venta.direccion : 'Dirección Registrada')}"></p>
+            <p style="font-size:12px; color:#888;" th:text="${venta.envio != null ? venta.envio.ciudad : (venta.ciudad != null ? venta.ciudad : 'Colombia')}"></p>
             <p style="font-size:11px; color:#777; text-transform:uppercase; margin-top:4px;" th:text="'Pago: ' + ${venta.metodoPago}"></p>
         </div>
     </div>
@@ -166,6 +166,8 @@
             <tr th:each="item : ${venta.items}">
                 <td>
                     <strong style="color:#fff;" th:text="${item.producto != null ? item.producto.nombre : 'Prenda'}"></strong>
+                    <!-- Aquí SÍ existe 'item' y se ve genial -->
+                    <span th:if="${item.talla != null}" th:text="' - Talla ' + ${item.talla}" style="color:#00ff88; font-size:12px; font-weight:600;"></span>
                     <span th:if="${item.variante != null}" th:text="' (' + ${item.variante.color} + ')'" style="color:#888; font-size:12px;"></span>
                 </td>
                 <td style="text-align:center;" th:text="${item.cantidad}">1</td>

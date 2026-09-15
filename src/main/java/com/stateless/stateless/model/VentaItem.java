@@ -1,7 +1,16 @@
 package com.stateless.stateless.model;
 
-import jakarta.persistence.*;
 import java.math.BigDecimal;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "venta_items")
@@ -22,7 +31,14 @@ public class VentaItem {
     @JoinColumn(name = "variante_id", referencedColumnName = "id")
     private ProductoVariante variante;
 
+    // 👉 NUEVO CAMPO TALLA:
+    private String talla;
+
     private Integer cantidad;
+
+    // Getters y Setters de talla:
+    public String getTalla() { return talla; }
+    public void setTalla(String talla) { this.talla = talla; }
 
     @Column(name = "precio_unitario")
     private BigDecimal precioUnitario;

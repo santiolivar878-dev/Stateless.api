@@ -117,11 +117,10 @@
                 </div>
             </a>
 
-            <form th:action="@{'/carrito/agregar/' + ${p.id}}" method="POST">
-                <button type="submit" class="btn-octane-cart">
-                    [ JOIN THE GARAGE ]
-                </button>
-            </form>
+    
+<a th:href="@{'/producto/' + ${p.id}}" class="btn-octane-cart" style="text-decoration:none; display:block; text-align:center;">
+    [ ELEGIR TALLA // VER ]
+</a>
         </div>
     </div>
 </div>
