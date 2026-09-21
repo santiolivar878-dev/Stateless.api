@@ -47,9 +47,12 @@
                 <p th:text="${p.nombre}" style="font-family:'Bebas Neue'; font-size:20px; letter-spacing:1px; margin-bottom:8px;"></p>
                 <p th:text="${'$' + #numbers.formatDecimal(p.precio, 0, 'COMMA', 0, 'POINT')}" style="font-weight:600;"></p>
             </a>
-            <a th:href="@{'/producto/' + ${p.id}}" class="btn-sl-outline" style="text-decoration:none; display:block; text-align:center; width:100%; margin-top:16px;">
-                ELEGIR TALLA
-            </a>
+
+            
+<a th:href="@{'/producto/' + ${p.id}}" class="btn-sl-outline" style="text-decoration:none; display:block; text-align:center; width:100%; margin-top:16px;">
+    ELEGIR TALLA
+</a>
+>>>>>>> 2e47a3aa3c6bbc34415d59ee05877a9c01093587
         </div>
     </div>
 

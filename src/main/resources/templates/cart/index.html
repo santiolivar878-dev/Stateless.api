@@ -95,6 +95,7 @@
                     <div style="flex:1;">
                         <h3 th:text="${item.producto.nombre}" style="font-family:'Bebas Neue'; font-size:22px; letter-spacing:2px; margin:0 0 4px;"></h3>
                         <p th:if="${item.variante != null}" th:text="'Color: ' + ${item.variante.color}" style="font-size:11px; letter-spacing:1px; text-transform:uppercase; opacity:0.5; margin-bottom:6px;"></p>
+                        <span th:if="${item.talla != null}" th:text="' | Talla: ' + ${item.talla}" style="font-weight:700;"></span>
                         <p th:text="${'$' + #numbers.formatDecimal(item.precioUnitario, 0, 'COMMA', 0, 'POINT') + ' COP'}" style="font-size:13px; font-weight:600; margin:0;"></p>
 
                         <!-- Botón Eliminar Prenda -->

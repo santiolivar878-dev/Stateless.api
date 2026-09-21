@@ -6,9 +6,11 @@
         <p class="subtitle">Accede a tu cuenta Stateless</p>
 
         <!-- Mensajes de feedback -->
-        <div th:if="${param.error}" class="alert alert-danger" style="background:#2b0000; border:1px solid #c00; color:#ff8a8a;">
-            Credenciales incorrectas o cuenta inhabilitada.
+
+        <div th:if="${param.error}" class="alert alert-danger" style="background:#2b0000; border:1px solid #c00; color:#ff8a8a; font-size:12px; line-height:1.5;">
+            Credenciales incorrectas o tu cuenta aún no ha sido verificada. Revisa tu bandeja de entrada o spam para confirmar tu correo.
         </div>
+        <div th:if="${success}" class="alert alert-success" th:text="${success}" style="background:#002b0c; border:1px solid #00c030; color:#8affaa;"></div>
         <div th:if="${success}" class="alert alert-success" th:text="${success}" style="background:#002b0c; border:1px solid #00c030; color:#8affaa;"></div>
 
         <form th:action="@{/login}" method="POST">

@@ -14,11 +14,12 @@
         <div style="background:#fff; border:1px solid #eee; padding:28px;">
             <p style="font-size:11px; letter-spacing:2px; text-transform:uppercase; opacity:0.5; margin-bottom:20px; font-weight:700;">Productos en esta orden</p>
             
-            <table class="stateless-table" style="border:none;">
+           <table class="stateless-table" style="border:none;">
                 <thead>
                     <tr>
                         <th>Producto</th>
-                        <th>Variante</th>
+                        <th>Color / Variante</th>
+                        <th>Talla</th> <!-- 👉 Columna nueva -->
                         <th>Precio Unit.</th>
                         <th>Cant.</th>
                         <th>Subtotal</th>
@@ -31,8 +32,16 @@
                             <span th:if="${item.variante != null}" th:text="${item.variante.color}" style="background:#000; color:#fff; font-size:10px; padding:2px 8px;"></span>
                             <span th:unless="${item.variante != null}" style="opacity:0.4;">Original</span>
                         </td>
+                        <!-- 👉 Aquí se muestra la talla clara para el empleado: -->
+                        <td>
+                            <span th:if="${item.talla != null && !#strings.isEmpty(item.talla)}" 
+                                  th:text="${item.talla}" 
+                                  style="font-family:'Bebas Neue'; font-size:16px; border:1px solid #000; padding:2px 10px; background:#f4f4f4; font-weight:bold;">
+                            </span>
+                            <span th:unless="${item.talla != null && !#strings.isEmpty(item.talla)}" style="opacity:0.4;">Única</span>
+                        </td>
                         <td th:text="${'$' + item.precioUnitario}"></td>
-                        <td th:text="${item.cantidad}"></td>
+                        <td th:text="${item.cantidad}" style="font-weight:700;"></td>
                         <td style="font-weight:700;" th:text="${'$' + (item.precioUnitario * item.cantidad)}"></td>
                     </tr>
                 </tbody>

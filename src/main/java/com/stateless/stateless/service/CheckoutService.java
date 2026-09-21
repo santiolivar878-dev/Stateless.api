@@ -1,14 +1,24 @@
 package com.stateless.stateless.service;
 
-import com.stateless.stateless.model.*;
-import com.stateless.stateless.repository.*;
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+
+import com.stateless.stateless.model.Carrito;
+import com.stateless.stateless.model.CarritoItem;
+import com.stateless.stateless.model.Envio;
+import com.stateless.stateless.model.Producto;
+import com.stateless.stateless.model.User;
+import com.stateless.stateless.model.Venta;
+import com.stateless.stateless.model.VentaItem;
+import com.stateless.stateless.repository.CarritoRepository;
+import com.stateless.stateless.repository.ProductoRepository;
+import com.stateless.stateless.repository.ProductoVarianteRepository;
+import com.stateless.stateless.repository.VentaItemRepository;
+import com.stateless.stateless.repository.VentaRepository;
 
 @Service
 public class CheckoutService {
@@ -41,6 +51,7 @@ public class CheckoutService {
             vItem.setVenta(ventaGuardada);
             vItem.setProducto(cartItem.getProducto());
             vItem.setVariante(cartItem.getVariante());
+            vItem.setTalla(cartItem.getTalla()); // 👉 Se traslada la talla a la venta final
             vItem.setCantidad(cartItem.getCantidad());
             vItem.setPrecioUnitario(cartItem.getPrecioUnitario());
             ventaItemRepository.save(vItem);

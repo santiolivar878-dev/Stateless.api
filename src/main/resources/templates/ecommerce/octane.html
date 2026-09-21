@@ -116,9 +116,13 @@
                     <div style="opacity:0.6; font-size:13px; font-family:monospace;" th:if="${p.precio != null}" th:text="${'PRICE >> $' + #numbers.formatDecimal(p.precio, 0, 'COMMA', 0, 'POINT') + ' COP'}"></div>
                 </div>
             </a>
-                <a th:href="@{'/producto/' + ${p.id}}" class="btn-octane-cart" style="text-decoration:none; display:block; text-align:center;">
-                    [ ELEGIR TALLA // VER ]
-                </a>
+
+
+    
+<a th:href="@{'/producto/' + ${p.id}}" class="btn-octane-cart" style="text-decoration:none; display:block; text-align:center;">
+    [ ELEGIR TALLA // VER ]
+</a>
+
         </div>
     </div>
 </div>
