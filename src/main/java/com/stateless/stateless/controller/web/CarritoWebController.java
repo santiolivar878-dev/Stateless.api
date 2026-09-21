@@ -26,27 +26,12 @@ public class CarritoWebController {
     @PostMapping("/agregar/{id}")
     public String agregar(@PathVariable("id") Long id, 
                           @RequestParam(required = false) Long varianteId, 
-<<<<<<< HEAD
-                          @AuthenticationPrincipal User user,
-                          HttpSession session) {
-        carritoService.agregarProducto(id, varianteId, user, session);
-        return "redirect:/carrito";
-    }
 
-    @PostMapping("/actualizar")
-    public String actualizar(@RequestParam Long productoId,
-                             @RequestParam(required = false) Long varianteId,
-                             @RequestParam Integer cantidad,
-                             @AuthenticationPrincipal User user,
-                             HttpSession session) {
-        carritoService.actualizarCantidad(productoId, varianteId, cantidad, user, session);
-=======
                           @RequestParam(required = false) String talla, // 👉 Recibe la talla del formulario
                           @RequestParam(defaultValue = "1") Integer cantidad,
                           @AuthenticationPrincipal User user,
                           HttpSession session) {
         carritoService.agregarProducto(id, varianteId, talla, cantidad, user, session);
->>>>>>> 2e47a3aa3c6bbc34415d59ee05877a9c01093587
         return "redirect:/carrito";
     }
 

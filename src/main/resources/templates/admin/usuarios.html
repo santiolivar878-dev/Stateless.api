@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión Dinámica de Usuarios y Roles - STATELESS ADMIN</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Space Grotesk', sans-serif; }
+        body { background: #080808; color: #fff; min-height: 100vh; padding: 32px 24px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        
+        /* Topbar */
+        .topbar { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; padding-bottom: 20px; margin-bottom: 28px; }
+        .title { font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 3px; color: #fff; }
+        .back-link { color: #888; text-decoration: none; font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+        .back-link:hover { color: #fff; }
+
+        /* Mensajes de feedback */
+        .alert { padding: 12px 16px; border-radius: 4px; font-size: 13px; font-weight: 600; margin-bottom: 20px; }
+        .alert-success { background: #062b16; color: #00ff88; border: 1px solid #0b5e31; }
+        .alert-error { background: #330b0b; color: #ff5555; border: 1px solid #771111; }
+
+        /* Paneles */
+        .grid-layout { display: grid; grid-template-columns: 1fr 340px; gap: 24px; }
+        @media (max-width: 900px) { .grid-layout { grid-template-columns: 1fr; } }
+        .panel { background: #0f0f0f; border: 1px solid #222; border-radius: 6px; padding: 24px; }
+        .panel-title { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #888; font-weight: 700; margin-bottom: 16px; }
+
+        /* Filtros Multicriterio */
+        .filter-form { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; background: #141414; padding: 14px; border-radius: 6px; border: 1px solid #222; }
+        .filter-input, .filter-select { background: #000; border: 1px solid #333; color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 12px; outline: none; }
+        .filter-input:focus, .filter-select:focus { border-color: #fff; }
+        .btn-filter { background: #fff; color: #000; border: none; padding: 8px 16px; font-size: 11px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; border-radius: 4px; cursor: pointer; }
+        .btn-clear { background: transparent; color: #888; border: 1px solid #333; padding: 8px 14px; font-size: 11px; font-weight: 700; text-transform: uppercase; border-radius: 4px; text-decoration: none; }
+        .btn-clear:hover { color: #fff; border-color: #666; }
+
+        /* Tabla */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { background: #141414; text-align: left; padding: 12px 14px; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #777; border-bottom: 1px solid #222; }
+        td { padding: 14px; font-size: 12px; border-bottom: 1px solid #1a1a1a; vertical-align: middle; }
+        tr:hover td { background: #121212; }
+
+        /* Badges */
+        .badge { display: inline-block; padding: 4px 8px; font-size: 10px; font-weight: 800; letter-spacing: 1px; border-radius: 3px; text-transform: uppercase; }
+        .badge-admin { background: #2b1700; color: #ffaa00; border: 1px solid #663800; }
+        .badge-cliente { background: #0f1d2b; color: #55aaff; border: 1px solid #143b66; }
+        .badge-custom { background: #261133; color: #cc66ff; border: 1px solid #521c73; }
+        .badge-activo { background: #072614; color: #00ff88; border: 1px solid #0f522b; }
+        .badge-inactivo { background: #330b0b; color: #ff5555; border: 1px solid #771111; }
+
+        /* Formularios en tabla */
+        .action-select { background: #000; border: 1px solid #333; color: #fff; padding: 4px 8px; font-size: 11px; border-radius: 3px; }
+        .btn-sm { padding: 5px 10px; font-size: 10px; font-weight: 800; text-transform: uppercase; border-radius: 3px; cursor: pointer; border: none; }
+        .btn-save { background: #fff; color: #000; }
+        .btn-toggle { background: transparent; border: 1px solid #444; color: #ccc; }
+        .btn-toggle:hover { border-color: #fff; color: #fff; }
+
+        /* Mini form lateral */
+        .form-group { margin-bottom: 14px; }
+        .form-group label { display: block; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #777; margin-bottom: 6px; }
+        .input-block { width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 4px; font-size: 12px; }
+        .btn-block { width: 100%; background: #fff; color: #000; border: none; padding: 12px; font-size: 11px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; border-radius: 4px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="topbar">
+        <div>
+            <h1 class="title">GESTIÓN DINÁMICA DE USUARIOS & ROLES</h1>
+            <p style="font-size: 12px; color: #777; letter-spacing: 1px;">Control de acceso dinámico, asignación de permisos y estado de cuentas</p>
+        </div>
+        <a th:href="@{/admin}" class="back-link">← Volver al Dashboard</a>
+    </div>
+
+    <!-- Mensajes Flash -->
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+    <div class="grid-layout">
+        
+        <!-- Columna Principal: Lista de Usuarios con roles dinámicos -->
+        <div>
+            <!-- Barra de Filtros Multicriterio -->
+            <form th:action="@{/admin/usuarios}" method="GET" class="filter-form">
+                <input type="text" name="buscar" th:value="${buscar}" placeholder="Buscar nombre o correo..." class="filter-input" style="flex: 1; min-width: 180px;">
+                
+                <select name="roleId" class="filter-select">
+                    <option value="">-- Todos los Roles --</option>
+                    <option th:each="r : ${roles}" th:value="${r.id}" th:text="${r.name.toUpperCase()}" th:selected="${selectedRoleId == r.id}"></option>
+                </select>
+
+                <select name="estado" class="filter-select">
+                    <option value="">-- Todos los Estados --</option>
+                    <option value="activo" th:selected="${selectedEstado == 'activo'}">Activos</option>
+                    <option value="inactivo" th:selected="${selectedEstado == 'inactivo'}">Inactivos</option>
+                </select>
+
+                <button type="submit" class="btn-filter">Filtrar</button>
+                <a th:href="@{/admin/usuarios}" class="btn-clear">Limpiar</a>
+            </form>
+
+            <div class="panel">
+                <p class="panel-title" th:text="'Usuarios Registrados (' + ${usuarios.size()} + ')'">USUARIOS</p>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Estado Actual</th>
+                            <th>Rol Asignado</th>
+                            <th>Acción Dinámica (Cambiar Rol)</th>
+                            <th>Acceso</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="u : ${usuarios}">
+                            <td>
+                                <strong th:text="${u.name}" style="color: #fff;"></strong><br>
+                                <span th:text="${u.email}" style="color: #777; font-size: 11px;"></span>
+                            </td>
+                            <td>
+                                <span class="badge" 
+                                      th:classappend="${u.estado == 'activo' ? 'badge-activo' : 'badge-inactivo'}" 
+                                      th:text="${u.estado}"></span>
+                            </td>
+                            <td>
+                                <span class="badge" 
+                                      th:classappend="${u.role != null && u.role.name == 'admin' ? 'badge-admin' : (u.role != null && u.role.name == 'cliente' ? 'badge-cliente' : 'badge-custom')}"
+                                      th:text="${u.role != null ? u.role.name.toUpperCase() : 'SIN ROL'}"></span>
+                            </td>
+                            <td>
+                                <!-- Formulario Dinámico de Cambio de Rol Inmediato -->
+                                <form th:action="@{/admin/usuarios/cambiar-rol}" method="POST" style="display: flex; gap: 6px; align-items: center;">
+                                    <input type="hidden" name="userId" th:value="${u.id}">
+                                    <select name="roleId" class="action-select">
+                                        <option th:each="r : ${roles}" 
+                                                th:value="${r.id}" 
+                                                th:text="${r.name.toUpperCase()}" 
+                                                th:selected="${u.role != null && u.role.id == r.id}"></option>
+                                    </select>
+                                    <button type="submit" class="btn-sm btn-save">Actualizar</button>
+                                </form>
+                            </td>
+                            <td>
+                                <!-- Alternar Estado Activo / Inactivo -->
+                                <form th:action="@{/admin/usuarios/cambiar-estado}" method="POST">
+                                    <input type="hidden" name="userId" th:value="${u.id}">
+                                    <input type="hidden" name="nuevoEstado" th:value="${u.estado == 'activo' ? 'inactivo' : 'activo'}">
+                                    <button type="submit" class="btn-sm btn-toggle" 
+                                            th:text="${u.estado == 'activo' ? 'Suspender' : 'Activar'}"
+                                            onclick="return confirm('¿Confirmas cambiar el estado de acceso de este usuario?')"></button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Columna Lateral: Roles del Sistema & Creación Dinámica -->
+        <div>
+            <div class="panel" style="margin-bottom: 24px;">
+                <p class="panel-title">Crear Nuevo Rol Dinámico</p>
+                <form th:action="@{/admin/usuarios/roles/crear}" method="POST">
+                    <div class="form-group">
+                        <label>Nombre del Rol</label>
+                        <input type="text" name="nombreRol" placeholder="ej. operador, auditor, soporte" class="input-block" required>
+                    </div>
+                    <button type="submit" class="btn-block">+ Registrar Rol</button>
+                </form>
+            </div>
+
+            <div class="panel">
+                <p class="panel-title">Roles Existentes en BD</p>
+                <ul style="list-style: none;">
+                    <li th:each="r : ${roles}" style="padding: 10px 0; border-bottom: 1px solid #1a1a1a; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong th:text="${r.name.toUpperCase()}" style="font-size: 13px; letter-spacing: 1px;"></strong>
+                            <p style="font-size: 10px; color: #666;" th:text="'ID: ' + ${r.id}"></p>
+                        </div>
+                        <span class="badge badge-custom" th:text="'Usuarios: ' + ${r.users != null ? r.users.size() : 0}"></span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

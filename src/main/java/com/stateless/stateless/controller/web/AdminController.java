@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/admin")
-@PreAuthorize("hasAnyRole('ADMIN', 'EMPLEADO')") // Ambos roles entran al panel
+@PreAuthorize("hasAnyRole('ADMIN', 'EMPLEADO')")
 public class AdminController {
 
     @Autowired private VentaRepository ventaRepository;
@@ -31,6 +31,11 @@ public class AdminController {
     @Autowired private UserRepository userRepository;
 
     private static final DateTimeFormatter LABEL_FORMAT = DateTimeFormatter.ofPattern("dd/MM");
+
+    @GetMapping
+    public String index() {
+        return "redirect:/admin/dashboard";
+    }
 
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
@@ -60,7 +65,6 @@ public class AdminController {
         LocalDateTime desde = LocalDate.now().minusMonths(1).atStartOfDay();
 
         Map<LocalDate, BigDecimal> ventasPorDiaMap = new LinkedHashMap<>();
-        // Inicializamos todos los días del rango en 0 para que la gráfica no tenga huecos
         for (LocalDate dia = desde.toLocalDate(); !dia.isAfter(LocalDate.now()); dia = dia.plusDays(1)) {
             ventasPorDiaMap.put(dia, BigDecimal.ZERO);
         }

@@ -49,13 +49,9 @@ public class CarritoService {
         if (carritoSesion != null && carritoSesion.getItems() != null && !carritoSesion.getItems().isEmpty()) {
             for (CarritoItem item : carritoSesion.getItems()) {
                 Long varianteId = (item.getVariante() != null) ? item.getVariante().getId() : null;
-<<<<<<< HEAD
-                for (int i = 0; i < item.getCantidad(); i++) {
-                    this.agregarProducto(item.getProducto().getId(), varianteId, user, null);
-                }
-=======
+
                 this.agregarProducto(item.getProducto().getId(), varianteId, item.getTalla(), item.getCantidad(), user, null);
->>>>>>> 2e47a3aa3c6bbc34415d59ee05877a9c01093587
+
             }
             session.removeAttribute("guest_cart");
         }
@@ -63,13 +59,11 @@ public class CarritoService {
 
     // 3. Agregar producto
     @Transactional
-<<<<<<< HEAD
-    public void agregarProducto(Long productoId, Long varianteId, User user, HttpSession session) {
-=======
+
     public void agregarProducto(Long productoId, Long varianteId, String talla, Integer cantidad, User user, HttpSession session) {
         if (cantidad == null || cantidad < 1) cantidad = 1;
 
->>>>>>> 2e47a3aa3c6bbc34415d59ee05877a9c01093587
+
         Producto producto = productoRepository.findById(productoId).orElseThrow();
         ProductoVariante variante = (varianteId != null) ? varianteRepository.findById(varianteId).orElse(null) : null;
         
@@ -91,12 +85,8 @@ public class CarritoService {
             item.setCarrito(carrito);
             item.setProducto(producto);
             item.setVariante(variante);
-<<<<<<< HEAD
-            item.setCantidad(1);
-=======
             item.setTalla(talla); // 👉 Se guarda la talla escogida
             item.setCantidad(cantidad);
->>>>>>> 2e47a3aa3c6bbc34415d59ee05877a9c01093587
             item.setPrecioUnitario(producto.getPrecio());
             carrito.getItems().add(item);
         }
