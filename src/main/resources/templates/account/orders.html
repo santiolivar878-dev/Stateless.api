@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Pedidos & Garantías - STATELESS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Space Grotesk', sans-serif; }
+        body { background: #050505; color: #fff; min-height: 100vh; padding: 40px 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .topbar { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; padding-bottom: 20px; margin-bottom: 30px; }
+        .title { font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 3px; }
+        .btn-link { color: #888; text-decoration: none; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        .btn-link:hover { color: #fff; }
+        .card { background: #0f0f0f; border: 1px solid #222; border-radius: 6px; padding: 24px; margin-bottom: 28px; }
+        .card-header { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 2px; margin-bottom: 16px; border-bottom: 1px solid #1a1a1a; padding-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #161616; padding: 12px; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #888; text-align: left; }
+        td { padding: 14px 12px; border-bottom: 1px solid #1c1c1c; font-size: 13px; }
+        .badge { padding: 4px 8px; border-radius: 3px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+        .badge-ok { background: #062612; color: #00ff88; border: 1px solid #0f6631; }
+        .badge-warn { background: #262206; color: #ffcc00; border: 1px solid #66550f; }
+        .badge-cancel { background: #2b0b0b; color: #ff5555; border: 1px solid #661111; }
+        .btn-sm { padding: 6px 12px; font-size: 10px; font-weight: 800; text-transform: uppercase; border-radius: 3px; text-decoration: none; border: 1px solid #444; color: #fff; cursor: pointer; background: transparent; }
+        .btn-sm:hover { background: #fff; color: #000; }
+        .btn-danger-outline { border-color: #772222; color: #ff7777; }
+        .btn-danger-outline:hover { background: #ff3333; color: #fff; border-color: #ff3333; }
+        .alert { padding: 12px 16px; border-radius: 4px; font-size: 13px; font-weight: 600; margin-bottom: 20px; }
+        .alert-success { background: #062b16; color: #00ff88; border: 1px solid #0b5e31; }
+        .modal-box { background: #141414; border: 1px solid #333; padding: 20px; border-radius: 6px; margin-top: 14px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="topbar">
+        <div>
+            <h1 class="title">MIS COMPRAS & CENTRO DE GARANTÍAS</h1>
+            <p style="font-size: 12px; color: #777;">Historial de pedidos, facturas oficiales y reporte de quejas por prendas defectuosas</p>
+        </div>
+        <a th:href="@{/}" class="btn-link">← Volver a la Tienda</a>
+    </div>
+
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <div th:if="${error}" class="alert" style="background:#330b0b; color:#ff5555; border:1px solid #661111;" th:text="${error}"></div>
+
+    <!-- 1. TABLA DE PEDIDOS -->
+    <div class="card">
+        <h2 class="card-header">Historial de Compras</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Orden #</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                    <th>Total</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:if="${#lists.isEmpty(pedidos)}">
+                    <td colspan="5" style="text-align: center; color: #666; padding: 30px;">Aún no has realizado ninguna compra en STATELESS.</td>
+                </tr>
+                <tr th:each="v : ${pedidos}">
+                    <td><strong th:text="'#' + ${v.id}"></strong></td>
+                    <td th:text="${v.createdAt != null ? #temporals.format(v.createdAt, 'dd/MM/yyyy HH:mm') : '-'}"></td>
+                    <td>
+                        <span class="badge" 
+                              th:classappend="${v.estado == 'pagado' || v.estado == 'entregado' ? 'badge-ok' : (v.estado == 'cancelado' ? 'badge-cancel' : 'badge-warn')}"
+                              th:text="${v.estado}"></span>
+                    </td>
+                    <td style="font-weight: 700; color: #00ff88;" th:text="${'$' + #numbers.formatDecimal(v.total, 0, 'COMMA', 0, 'POINT')}"></td>
+                    <td style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <a th:href="@{'/checkout/factura/' + ${v.id}}" class="btn-sm">Factura Oficial</a>
+                        <button type="button" class="btn-sm btn-danger-outline" 
+                                th:onclick="'mostrarModal(' + ${v.id} + ')'" 
+                                th:if="${v.estado != 'cancelado'}">Reportar Prenda Dañada</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- MODAL / FORMULARIO PARA RADICAR QUEJA DE PRENDA DAÑADA -->
+    <div id="modalQueja" class="card modal-box" style="display: none;">
+        <h2 class="card-header" style="color: #ffaa55;">Reportar Garantía / Queja por Prenda Defectuosa</h2>
+        <p style="font-size: 12px; color: #aaa; margin-bottom: 14px;">
+            Si tu prenda tiene una costura rota, decoloración anormal o defecto de tela, indícanos los detalles para tramitar el cambio con el taller/proveedor textil.
+        </p>
+
+        <form th:action="@{/account/garantias/radicar}" method="POST">
+            <input type="hidden" id="modalVentaId" name="ventaId">
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 12px;">
+                <!-- 1. SELECTOR DE TIPO DE FALLA -->
+                <div>
+                    <label style="font-size: 11px; text-transform: uppercase; color: #777; display:block; margin-bottom: 4px;">Tipo de Falla</label>
+                    <select name="tipoIncidencia" style="width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 8px; border-radius: 4px;" required>
+                        <option value="PRENDA_DANADA">Prenda Rota / Rasgada</option>
+                        <option value="COSTURA_ABIERTA">Costura Suelta o Descosida</option>
+                        <option value="DEFECTO_TELA">Defecto en Tela / Decoloración</option>
+                        <option value="TALLA_INCORRECTA">Talla no corresponde a la etiqueta</option>
+                        <option value="CANCELACION_SOLICITADA">Solicitud de Cancelación / Devolución</option>
+                    </select>
+                </div>
+
+                <!-- 2. SELECTOR DE PRENDA CON DEFECTO (BLINDADO CON TH:BLOCK) -->
+                <div>
+                    <label style="font-size: 11px; text-transform: uppercase; color: #777; display:block; margin-bottom: 4px;">Prenda con Defecto</label>
+                    <select name="productoId" style="width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 8px; border-radius: 4px;" required>
+                        <option value="">-- Seleccionar Prenda con Defecto --</option>
+                        <th:block th:each="p : ${pedidos}">
+                            <option th:each="it : ${p.items}" 
+                                    th:if="${it.producto != null}" 
+                                    th:value="${it.producto.id}" 
+                                    th:text="${it.producto.nombre + ' (Orden #' + p.id + ')'}">
+                            </option>
+                        </th:block>
+                    </select>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 14px;">
+                <label style="font-size: 11px; text-transform: uppercase; color: #777; display:block; margin-bottom: 4px;">Describe detalladamente el daño</label>
+                <textarea name="descripcion" rows="3" placeholder="Ej: La costura lateral de la cintura venía suelta de fábrica..." 
+                          style="width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 4px; font-size: 12px;" required></textarea>
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+                <button type="submit" style="background: #fff; color: #000; font-weight: 800; border: none; padding: 10px 18px; border-radius: 4px; cursor: pointer; text-transform: uppercase; font-size: 11px;">
+                    Enviar Reporte de Garantía
+                </button>
+                <button type="button" onclick="cerrarModal()" style="background: transparent; color: #888; border: 1px solid #333; padding: 10px 18px; border-radius: 4px; cursor: pointer; text-transform: uppercase; font-size: 11px;">
+                    Cancelar
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- 2. HISTORIAL DE RECLAMOS Y GARANTÍAS DEL CLIENTE -->
+    <div class="card" th:if="${not #lists.isEmpty(garantias)}">
+        <h2 class="card-header" style="color: #00ffaa;">Estado de mis Garantías y Reclamos</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Radicado</th>
+                    <th>Prenda</th>
+                    <th>Motivo</th>
+                    <th>Estado de Revisión</th>
+                    <th>Respuesta / Dictamen</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="g : ${garantias}">
+                    <td><strong th:text="'#GAR-' + ${g.id}"></strong></td>
+                    <td th:text="${g.producto != null ? g.producto.nombre : 'Prenda'}"></td>
+                    <td th:text="${g.tipoIncidencia}"></td>
+                    <td>
+                        <span class="badge badge-warn" th:text="${g.estado}"></span>
+                    </td>
+                    <td th:text="${g.respuestaAdmin != null ? g.respuestaAdmin : 'En evaluación por el taller textil'}"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<script>
+function mostrarModal(ventaId) {
+    document.getElementById('modalVentaId').value = ventaId;
+    document.getElementById('modalQueja').style.display = 'block';
+    window.scrollTo({ top: document.getElementById('modalQueja').offsetTop - 40, behavior: 'smooth' });
+}
+function cerrarModal() {
+    document.getElementById('modalQueja').style.display = 'none';
+}
+</script>
+
+</body>
+</html>

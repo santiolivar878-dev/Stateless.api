@@ -69,6 +69,59 @@
                     </select>
                     <button type="submit" class="btn-sl" style="width:100%;">Actualizar Estado</button>
                 </form>
+                <!-- BLOQUE DE CANCELACIÓN CONTROLADA POR CASO ESPECIAL -->
+<div style="background: #141414; border: 1px solid #331111; padding: 20px; border-radius: 6px; margin-top: 24px;" th:if="${venta.estado != 'cancelado'}">
+    <h3 style="font-family: 'Bebas Neue'; font-size: 20px; color: #ff5555; letter-spacing: 1px;">
+        ⚠️ Cancelación Excepcional de Pedido
+    </h3>
+    <p style="font-size: 12px; color: #aaa; margin-bottom: 16px;">
+        Este procedimiento solo está permitido ante solicitudes formales del cliente o garantías por defecto textil.
+    </p>
+
+    <form th:action="@{'/admin/ventas/cancelar-excepcional/' + ${venta.id}}" method="POST">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 12px;">
+            <div>
+                <label style="display:block; font-size: 10px; color: #888; text-transform: uppercase; margin-bottom: 4px;">Motivo Especial</label>
+                <select name="motivo" style="width: 100%; background: #000; border: 1px solid #444; color: #fff; padding: 8px; border-radius: 4px;" required>
+                    <option value="SOLICITUD_EXPRESA_CLIENTE">Solicitud Expresa del Cliente (Arrepentimiento / Retracto)</option>
+                    <option value="DEFECTO_FABRICA_GARANTIA">Prenda Defectuosa / Garantía Textil (Trasladar a Proveedor)</option>
+                    <option value="ERROR_DIRECCION_INUBICABLE">Cliente Inubicable / Error de Envío</option>
+                    <option value="QUIEBRE_STOCK">Falta de Stock o Materia Prima</option>
+                </select>
+            </div>
+            <div>
+                <label style="display:block; font-size: 10px; color: #888; text-transform: uppercase; margin-bottom: 4px;">Prenda Afectada (Si aplica)</label>
+                <select name="productoAfectadoId" style="width: 100%; background: #000; border: 1px solid #444; color: #fff; padding: 8px; border-radius: 4px;">
+                    <option value="">-- Toda la orden --</option>
+                    <option th:each="it : ${venta.items}" th:if="${it.producto != null}" th:value="${it.producto.id}" th:text="${it.producto.nombre}"></option>
+                </select>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 14px;">
+            <label style="display:block; font-size: 10px; color: #888; text-transform: uppercase; margin-bottom: 4px;">Justificación Obligatoria de Auditoría (Mínimo 10 caracteres)</label>
+            <textarea name="justificacion" rows="2" placeholder="Describa el motivo formal o número de radicado del cliente..." 
+                      style="width: 100%; background: #000; border: 1px solid #444; color: #fff; padding: 8px; border-radius: 4px; font-size: 12px;" required></textarea>
+        </div>
+
+        <button type="submit" style="background: #ff3333; color: #fff; font-weight: 800; border: none; padding: 10px 18px; border-radius: 4px; cursor: pointer; text-transform: uppercase; font-size: 11px; letter-spacing: 1px;"
+                onclick="return confirm('¿Está completamente seguro de cancelar esta orden? Esta acción queda registrada para auditoría.')">
+            Ejecutar Cancelación Excepcional
+        </button>
+    </form>
+</div>
+
+<!-- SI LA VENTA YA FUE CANCELADA: MOSTRAR AUDITORÍA -->
+<div th:if="${venta.estado == 'cancelado'}" style="background: #240a0a; border: 1px solid #661111; padding: 20px; border-radius: 6px; margin-top: 24px;">
+    <h3 style="font-family: 'Bebas Neue'; font-size: 22px; color: #ff5555; letter-spacing: 1px;">PEDIDO CANCELADO</h3>
+    <p style="font-size: 12px; color: #ffaaaa; margin-top: 4px;">
+        <strong>Motivo:</strong> <span th:text="${venta.motivoCancelacion}"></span>
+    </p>
+    <p style="font-size: 12px; color: #ffaaaa; margin-top: 4px;">
+        <strong>Justificación:</strong> <span th:text="${venta.justificacionCancelacion}"></span>
+    </p>
+    <p style="font-size: 11px; color: #777; margin-top: 6px;" th:if="${venta.cancelledAt != null}" th:text="'Fecha de cancelación: ' + ${#temporals.format(venta.cancelledAt, 'dd/MM/yyyy HH:mm')}"></p>
+</div>
             </div>
 
             <!-- Datos de Envío -->
@@ -84,6 +137,8 @@
                 <p style="font-size:13px; font-weight:700; margin:0;" th:text="${venta.envio != null ? venta.envio.ciudad : ''}"></p>
             </div>
         </div>
+
+        
 
     </div>
 

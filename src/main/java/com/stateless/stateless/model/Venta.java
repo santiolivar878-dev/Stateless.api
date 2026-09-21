@@ -36,6 +36,15 @@ public class Venta {
     @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL)
     private List<VentaItem> items = new ArrayList<>();
 
+        @Column(name = "motivo_cancelacion")
+    private String motivoCancelacion;
+
+    @Column(name = "justificacion_cancelacion", columnDefinition = "TEXT")
+    private String justificacionCancelacion;
+
+    @Column(name = "cancelled_at")
+    private LocalDateTime cancelledAt;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt; // Nombre exacto para el Repositorio
 
@@ -62,4 +71,10 @@ public class Venta {
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     public String getCodigoPago() { return codigoPago; }
     public void setCodigoPago(String val) { this.codigoPago = val; }
+    public String getMotivoCancelacion() { return motivoCancelacion; }
+    public void setMotivoCancelacion(String motivoCancelacion) { this.motivoCancelacion = motivoCancelacion; }
+    public String getJustificacionCancelacion() { return justificacionCancelacion; }
+    public void setJustificacionCancelacion(String justificacionCancelacion) { this.justificacionCancelacion = justificacionCancelacion; }
+    public LocalDateTime getCancelledAt() { return cancelledAt; }
+    public void setCancelledAt(LocalDateTime cancelledAt) { this.cancelledAt = cancelledAt; }
 }

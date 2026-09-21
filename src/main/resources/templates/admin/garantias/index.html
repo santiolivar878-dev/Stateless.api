@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Garantías, Incidencias & Proveedores - STATELESS ADMIN</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Space Grotesk', sans-serif; }
+        body { background: #080808; color: #fff; min-height: 100vh; padding: 32px 24px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .topbar { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; padding-bottom: 20px; margin-bottom: 24px; }
+        .title { font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 3px; }
+        .back-link { color: #888; text-decoration: none; font-size: 12px; font-weight: 700; text-transform: uppercase; }
+        .back-link:hover { color: #fff; }
+        .card { background: #111; border: 1px solid #222; border-radius: 6px; padding: 20px; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 14px; }
+        th { background: #181818; text-align: left; padding: 12px; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #888; border-bottom: 1px solid #222; }
+        td { padding: 14px 12px; font-size: 12px; border-bottom: 1px solid #1c1c1c; }
+        .badge { padding: 4px 8px; border-radius: 3px; font-size: 10px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
+        .badge-radicado { background: #262207; color: #ffd000; border: 1px solid #665500; }
+        .badge-proveedor { background: #07261a; color: #00ffaa; border: 1px solid #0f6645; }
+        .badge-cerrado { background: #1c1c1c; color: #888; }
+        .btn-action { background: #fff; color: #000; border: none; padding: 6px 12px; font-size: 10px; font-weight: 800; border-radius: 3px; cursor: pointer; text-transform: uppercase; }
+        .alert { padding: 12px; border-radius: 4px; font-size: 13px; font-weight: 600; margin-bottom: 16px; }
+        .alert-success { background: #062b16; color: #00ff88; border: 1px solid #0b5e31; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="topbar">
+        <div>
+            <h1 class="title">AUDITORÍA DE GARANTÍAS & COMUNICACIÓN CON PROVEEDORES</h1>
+            <p style="font-size: 12px; color: #777;">Control de prendas defectuosas, reclamos de clientes y traslados de garantías a proveedores textiles</p>
+        </div>
+        <a th:href="@{/admin/ventas}" class="back-link">← Volver a Ventas</a>
+    </div>
+
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+
+    <div class="card">
+        <h2 style="font-family: 'Bebas Neue'; font-size: 22px; letter-spacing: 1px;">Incidencias Registradas (<span th:text="${reclamos.size()}"></span>)</h2>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>ID / Fecha</th>
+                    <th>Pedido / Cliente</th>
+                    <th>Prenda Reportada</th>
+                    <th>Proveedor Responsable</th>
+                    <th>Motivo Técnico</th>
+                    <th>Estado</th>
+                    <th>Gestión con Proveedor</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:if="${reclamos.empty}">
+                    <td colspan="7" style="text-align:center; color:#666; padding: 30px;">No hay reportes de garantías ni prendas dañadas actualmente.</td>
+                </tr>
+                <tr th:each="r : ${reclamos}">
+                    <td>
+                        <strong th:text="'#' + ${r.id}"></strong><br>
+                        <span style="font-size: 10px; color: #666;" th:text="${#temporals.format(r.createdAt, 'dd/MM/yyyy HH:mm')}"></span>
+                    </td>
+                    <td>
+                        <a th:href="@{'/admin/ventas/' + ${r.venta.id}}" style="color: #fff; font-weight: 700;" th:text="'Pedido #' + ${r.venta.id}"></a><br>
+                        <span style="color: #888; font-size: 11px;" th:text="${r.usuario != null ? r.usuario.name : 'Cliente'}"></span>
+                    </td>
+                    <td>
+                        <strong th:text="${r.producto != null ? r.producto.nombre : 'General'}"></strong>
+                    </td>
+                    <td>
+                        <span th:if="${r.proveedor != null}" style="color: #00ffaa; font-weight: 700;" 
+                            th:text="${r.proveedor.nombre != null ? r.proveedor.nombre : 'Proveedor Asignado'}"></span>
+                        <span th:if="${r.proveedor == null}" style="color: #666;">Sin proveedor</span>
+                        <br>
+                        <span th:if="${r.notificadoProveedor}" style="font-size: 9px; color: #00ffaa;">✓ TRASLADADO</span>
+                    </td>
+                    <td>
+                        <strong style="color: #ffaa55;" th:text="${r.tipoIncidencia}"></strong>
+                        <p style="font-size: 11px; color: #aaa;" th:text="${r.descripcionCliente}"></p>
+                    </td>
+                    <td>
+                        <span class="badge" 
+                              th:classappend="${r.estado == 'TRASLADADO_A_PROVEEDOR' ? 'badge-proveedor' : (r.estado == 'RADICADO' ? 'badge-radicado' : 'badge-cerrado')}"
+                              th:text="${r.estado}"></span>
+                    </td>
+                    <td>
+                        <form th:action="@{'/admin/garantias/actualizar-estado/' + ${r.id}}" method="POST" style="display:flex; flex-direction:column; gap:4px;">
+                            <select name="nuevoEstado" style="background:#000; color:#fff; border:1px solid #333; padding:4px; font-size:11px; border-radius:3px;">
+                                <option value="TRASLADADO_A_PROVEEDOR" th:selected="${r.estado == 'TRASLADADO_A_PROVEEDOR'}">Trasladar a Proveedor</option>
+                                <option value="APROBADO_GARANTIA" th:selected="${r.estado == 'APROBADO_GARANTIA'}">Garantía Aprobada</option>
+                                <option value="RECHAZADO" th:selected="${r.estado == 'RECHAZADO'}">Rechazar Reclamo</option>
+                            </select>
+                            <input type="text" name="respuestaAdmin" placeholder="Nota técnica / Acuerdo..." th:value="${r.respuestaAdmin}" style="background:#000; color:#fff; border:1px solid #333; padding:4px; font-size:10px; border-radius:3px;" required>
+                            <button type="submit" class="btn-action">Guardar</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

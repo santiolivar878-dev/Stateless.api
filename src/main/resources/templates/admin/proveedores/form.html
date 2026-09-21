@@ -3,44 +3,139 @@
 <body>
 <section>
 
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
-        <h2 style="font-family:'Bebas Neue', sans-serif; font-size:32px; letter-spacing:3px;" 
-            th:text="${proveedor.id == null ? 'REGISTRAR PROVEEDOR' : 'EDITAR PROVEEDOR'}"></h2>
-        <a th:href="@{/admin/proveedores}" class="btn-sl-outline">← Volver</a>
-    </div>
+    <!-- ESTILO FORZADO PARA VISIBILIDAD DE INPUTS Y SELECTS -->
+    <style>
+        .form-control-sl {
+            width: 100% !important;
+            background-color: #161616 !important;
+            color: #ffffff !important;
+            border: 1px solid #333333 !important;
+            padding: 10px 14px !important;
+            font-size: 13px !important;
+            border-radius: 4px !important;
+            outline: none !important;
+        }
+        .form-control-sl:focus {
+            border-color: #00ff88 !important;
+            box-shadow: 0 0 5px rgba(0, 255, 136, 0.3) !important;
+        }
+        .form-control-sl option {
+            background-color: #161616 !important;
+            color: #ffffff !important;
+        }
+        .label-sl {
+            display: block !important;
+            font-size: 11px !important;
+            text-transform: uppercase !important;
+            letter-spacing: 1.5px !important;
+            color: #999999 !important;
+            margin-bottom: 6px !important;
+            font-weight: 700 !important;
+        }
+    </style>
 
-    <div style="background:#fff; border:1px solid #eee; padding:32px; max-width:600px;">
-        <form th:action="@{/admin/proveedores/save}" th:object="${proveedor}" method="POST">
-            <input type="hidden" th:field="*{id}">
+    <div style="max-width: 850px; margin: 0 auto; padding: 10px;">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-bottom: 1px solid #222; padding-bottom: 16px;">
+            <div>
+                <h2 style="font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 3px; color: #fff;"
+                    th:text="${proveedor.id != null ? 'Editar Proveedor Textil #' + proveedor.id : 'Registrar Nuevo Proveedor'}">
+                    Registrar Proveedor
+                </h2>
+                <p style="font-size: 12px; color: #777;">Ficha técnica de taller, proveedor de telas o insumos de confección</p>
+            </div>
+            <a th:href="@{/admin/proveedores}" class="btn-sl-outline" style="text-decoration: none; padding: 6px 14px; font-size: 11px;">← Volver al Listado</a>
+        </div>
+
+        <form th:action="@{/admin/proveedores/save}" th:object="${proveedor}" method="POST" 
+              style="background: #0d0d0d; border: 1px solid #222; padding: 32px; border-radius: 6px;">
             
-            <div class="sl-form-group">
-                <label class="sl-label">Nombre de la Empresa</label>
-                <input type="text" th:field="*{nombre}" class="sl-input" required>
+            <!-- Campo oculto para ID si es edición -->
+            <input type="hidden" th:field="*{id}">
+
+            <!-- 1. IDENTIFICACIÓN Y EMPRESA -->
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 20px;">
+                <div>
+                    <label class="label-sl">Razón Social / Nombre de la Empresa *</label>
+                    <input type="text" th:field="*{nombre}" required placeholder="Ej: Tejidos Lafayette S.A.S." class="form-control-sl">
+                </div>
+                <div>
+                    <label class="label-sl">NIT / RUT Tributario *</label>
+                    <input type="text" th:field="*{nit}" required placeholder="Ej: 900.123.456-7" class="form-control-sl">
+                </div>
             </div>
 
-            <div class="sl-form-group">
-                <label class="sl-label">Teléfono de Contacto</label>
-                <input type="text" th:field="*{telefono}" class="sl-input" required>
+            <!-- 2. CONTACTO DIRECTO -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+                <div>
+                    <label class="label-sl">Asesor / Contacto Comercial</label>
+                    <input type="text" th:field="*{contactoNombre}" placeholder="Ej: Carlos Ramírez" class="form-control-sl">
+                </div>
+                <div>
+                    <label class="label-sl">Teléfono / WhatsApp *</label>
+                    <input type="text" th:field="*{telefono}" required placeholder="Ej: +57 300 123 4567" class="form-control-sl">
+                </div>
+                <div>
+                    <label class="label-sl">Correo Electrónico *</label>
+                    <input type="email" th:field="*{correo}" required placeholder="Ej: ventas@proveedor.com" class="form-control-sl">
+                </div>
             </div>
 
-            <div class="sl-form-group">
-                <label class="sl-label">Correo Electrónico</label>
-                <input type="email" th:field="*{correo}" class="sl-input" required>
+            <!-- 3. SUMINISTRO TEXTIL Y CALIFICACIÓN -->
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 20px;">
+                <div>
+                    <label class="label-sl">Tipo de Insumo / Suministro Textil *</label>
+                    <select th:field="*{tipoInsumo}" required class="form-control-sl">
+                        <option value="Telas & Tejidos">Telas & Tejidos (Algodón Pima, Fleece, Rib)</option>
+                        <option value="Confección Textil">Taller de Confección & Ensamble</option>
+                        <option value="Estampado & Lavandería">Estampado / Serigrafía / Tintorería</option>
+                        <option value="Avíos & Marquillas">Avíos, Cierres, Cordones & Marquillas</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="label-sl">Calificación Calidad (1 - 5)</label>
+                    <select th:field="*{calificacionCalidad}" class="form-control-sl" style="color: #ffd000 !important; font-weight: 700;">
+                        <option value="5">★★★★★ (5/5) - Excelente Calidad</option>
+                        <option value="4">★★★★☆ (4/5) - Alta Calidad</option>
+                        <option value="3">★★★☆☆ (3/5) - Calidad Aceptable</option>
+                        <option value="2">★★☆☆☆ (2/5) - En Observación</option>
+                        <option value="1">★☆☆☆☆ (1/5) - Alto Índice de Defectos</option>
+                    </select>
+                </div>
             </div>
 
-            <div class="sl-form-group">
-                <label class="sl-label">Estado</label>
-                <select th:field="*{estado}" class="sl-input">
-                    <option th:value="true">Activo</option>
-                    <option th:value="false">Inactivo</option>
-                </select>
+            <!-- 4. UBICACIÓN FÍSICA -->
+            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 16px; margin-bottom: 24px;">
+                <div>
+                    <label class="label-sl">Ciudad / Municipio *</label>
+                    <input type="text" th:field="*{ciudad}" placeholder="Ej: Medellín / Bogotá" class="form-control-sl">
+                </div>
+                <div>
+                    <label class="label-sl">Dirección de Planta / Taller</label>
+                    <input type="text" th:field="*{direccion}" placeholder="Ej: Calle 34 # 45-67 Zona Industrial" class="form-control-sl">
+                </div>
             </div>
 
-            <div style="display:flex; gap:12px; margin-top:8px;">
-                <button type="submit" class="btn-sl">Guardar Proveedor</button>
-                <a th:href="@{/admin/proveedores}" class="btn-sl-outline">Cancelar</a>
+            <!-- 5. ESTADO OPERATIVO -->
+            <div style="margin-bottom: 28px; background: #141414; padding: 14px; border-radius: 4px; border: 1px solid #222;">
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                    <input type="checkbox" th:field="*{estado}" style="width: 18px; height: 18px;">
+                    <span style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: #fff;">
+                        Proveedor Habilitado y Activo para Producción
+                    </span>
+                </label>
             </div>
+
+            <!-- BOTONES -->
+            <div style="display: flex; justify-content: flex-end; gap: 12px;">
+                <a th:href="@{/admin/proveedores}" class="btn-sl-outline" style="text-decoration: none; padding: 10px 20px;">Cancelar</a>
+                <button type="submit" class="btn-sl" style="padding: 10px 28px; font-size: 12px;">
+                    Guardar Ficha de Proveedor
+                </button>
+            </div>
+
         </form>
+
     </div>
 
 </section>

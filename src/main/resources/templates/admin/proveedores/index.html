@@ -7,40 +7,86 @@
     <div th:if="${error}" class="alert alert-danger" th:text="${error}" style="border-radius:0;"></div>
 
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
-        <h2 style="font-family:'Bebas Neue', sans-serif; font-size:32px; letter-spacing:3px;">Lista de Proveedores</h2>
+        <div>
+            <h2 style="font-family:'Bebas Neue', sans-serif; font-size:32px; letter-spacing:3px;">Proveedores & Cadena de Suministro</h2>
+            <p style="font-size:12px; color:#888;">Gestión de talleres de confección, proveedores de telas y auditoría de calidad textil</p>
+        </div>
         <a th:href="@{/admin/proveedores/create}" class="btn-sl">+ Registrar Proveedor</a>
     </div>
 
+    <!-- FILTROS MULTICRITERIO DE PROVEEDORES -->
+    <form th:action="@{/admin/proveedores}" method="GET" style="display:flex; gap:10px; flex-wrap:wrap; background:#141414; padding:14px; border:1px solid #222; border-radius:4px; margin-bottom:20px;">
+        <input type="text" name="buscar" th:value="${buscar}" placeholder="Buscar por Nombre, NIT, Contacto o Ciudad..." 
+               style="flex:1; min-width:200px; background:#000; border:1px solid #333; color:#fff; padding:8px 12px; font-size:12px; border-radius:3px;">
+        
+        <select name="tipoInsumo" style="background:#000; border:1px solid #333; color:#fff; padding:8px 12px; font-size:12px; border-radius:3px;">
+            <option value="">-- Todos los Insumos --</option>
+            <option value="Telas & Tejidos" th:selected="${selectedTipoInsumo == 'Telas & Tejidos'}">Telas & Tejidos (Algodón)</option>
+            <option value="Confección Textil" th:selected="${selectedTipoInsumo == 'Confección Textil'}">Confección & Maquila</option>
+            <option value="Estampado & Lavandería" th:selected="${selectedTipoInsumo == 'Estampado & Lavandería'}">Estampado / Serigrafía</option>
+            <option value="Avíos & Marquillas" th:selected="${selectedTipoInsumo == 'Avíos & Marquillas'}">Avíos, Cierres & Etiquetas</option>
+        </select>
+
+        <select name="estado" style="background:#000; border:1px solid #333; color:#fff; padding:8px 12px; font-size:12px; border-radius:3px;">
+            <option value="">-- Todos los Estados --</option>
+            <option value="true" th:selected="${selectedEstado == true}">Activos</option>
+            <option value="false" th:selected="${selectedEstado == false}">Inactivos</option>
+        </select>
+
+        <button type="submit" class="btn-sl" style="padding:8px 16px; font-size:11px;">Filtrar</button>
+        <a th:href="@{/admin/proveedores}" class="btn-sl-outline" style="padding:8px 12px; font-size:11px; text-decoration:none;">Limpiar</a>
+    </form>
+
+    <!-- TABLA ROBUSTA -->
     <table class="stateless-table">
         <thead>
             <tr>
-                <th>ID</th>
-                <th>Empresa</th>
-                <th>Teléfono</th>
-                <th>Correo Electrónico</th>
+                <th>ID / NIT</th>
+                <th>Empresa / Razón Social</th>
+                <th>Contacto Directo</th>
+                <th>Suministro Textil</th>
+                <th>Ubicación</th>
+                <th>Calidad</th>
                 <th>Estado</th>
                 <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
             <tr th:each="prov : ${proveedores}">
-                <td th:text="${prov.id}"></td>
-                <td style="font-weight:700;" th:text="${prov.nombre}"></td>
-                <td th:text="${prov.telefono}"></td>
-                <td th:text="${prov.correo}"></td>
                 <td>
-                    <span th:if="${prov.estado}" style="background:green; color:#fff; padding:2px 8px; font-size:10px; font-weight:700;">ACTIVO</span>
-                    <span th:unless="${prov.estado}" style="background:#c00; color:#fff; padding:2px 8px; font-size:10px; font-weight:700;">INACTIVO</span>
+                    <strong th:text="'#' + ${prov.id}"></strong><br>
+                    <small style="color:#777; font-size:10px;" th:text="${prov.nit != null ? prov.nit : 'SIN NIT'}"></small>
+                </td>
+                <td style="font-weight:800; color:#111111; font-size:14px;" th:text="${prov.nombre}"></td>
+                <td>
+                    <strong th:text="${prov.contactoNombre != null ? prov.contactoNombre : 'Principal'}"></strong><br>
+                    <small style="color:#888;" th:text="${prov.telefono}"></small><br>
+                    <small style="color:#666;" th:text="${prov.correo}"></small>
+                </td>
+                <td>
+                    <span style="background:#1c1c1c; border:1px solid #333; color:#00ffaa; padding:2px 8px; font-size:10px; font-weight:700; border-radius:2px;" 
+                          th:text="${prov.tipoInsumo != null ? prov.tipoInsumo : 'Telas & Tejidos'}"></span>
+                </td>
+                <td>
+                    <span th:text="${prov.ciudad != null ? prov.ciudad : 'Colombia'}"></span><br>
+                    <small style="color:#666;" th:text="${prov.direccion}"></small>
+                </td>
+                <td style="color:#ffd000; font-size:11px; font-weight:700;">
+                    <span th:text="${prov.calificacionCalidad != null ? ('★ ' + prov.calificacionCalidad + '/5') : '★ 5/5'}"></span>
+                </td>
+                <td>
+                    <span th:if="${prov.estado}" style="background:#072614; color:#00ff88; border:1px solid #0f522b; padding:2px 8px; font-size:10px; font-weight:700;">ACTIVO</span>
+                    <span th:unless="${prov.estado}" style="background:#330b0b; color:#ff5555; border:1px solid #771111; padding:2px 8px; font-size:10px; font-weight:700;">INACTIVO</span>
                 </td>
                 <td style="display:flex; gap:8px;">
                     <a th:href="@{'/admin/proveedores/edit/' + ${prov.id}}" class="btn-sl-outline" style="padding:4px 12px; font-size:10px;">Editar</a>
-                    <form th:action="@{'/admin/proveedores/delete/' + ${prov.id}}" method="POST" onsubmit="return confirm('¿Eliminar este proveedor?')">
+                    <form th:action="@{'/admin/proveedores/delete/' + ${prov.id}}" method="POST" onsubmit="return confirm('¿Confirmas eliminar este proveedor de la cadena de suministro?')">
                         <button type="submit" class="btn-sl-danger" style="padding:4px 12px; font-size:10px;">Eliminar</button>
                     </form>
                 </td>
             </tr>
             <tr th:if="${#lists.isEmpty(proveedores)}">
-                <td colspan="6" style="text-align:center; opacity:0.5; padding:40px;">No hay proveedores registrados.</td>
+                <td colspan="8" style="text-align:center; opacity:0.5; padding:40px;">No se encontraron proveedores con los criterios indicados.</td>
             </tr>
         </tbody>
     </table>
